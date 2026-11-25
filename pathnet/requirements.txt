@@ -1,5 +1,5 @@
-numpy
+numpy>=1.26,<2
 torch
 scipy
 shapely>=2.1
-opencv-python-headless
+opencv-python-headless<4.12
