@@ -1,0 +1,11 @@
+{
+  "n": 400,
+  "raw_mean_reference_iou": 0.9297938219765982,
+  "raw_iou_at_least_0_85": 400,
+  "raw_iou_at_least_0_90": 367,
+  "logo_sampling_latent_range": [
+    -0.28,
+    0.28
+  ],
+  "accepted_min_iou": 0.85
+}

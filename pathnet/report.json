@@ -1,0 +1,60 @@
+{
+  "architecture": "conditional neural decoder: class embedding + 6D latent -> 96 periodic cubic B-spline controls -> closed cubic Bezier SVG",
+  "parameters": 87504,
+  "classes": 59,
+  "training_contours": 8690,
+  "logo_training_contours": 2600,
+  "validation_contours": 2140,
+  "logo_validation_contours": 400,
+  "epochs": 80,
+  "trace": [
+    {
+      "epoch": 1,
+      "train_mse": 0.022879833284491124,
+      "validation_mse": 0.007955827750265598,
+      "logo_mse": 0.0007392073166556656
+    },
+    {
+      "epoch": 5,
+      "train_mse": 0.00064521848240983,
+      "validation_mse": 0.0006612087017856538,
+      "logo_mse": 7.543652463937178e-05
+    },
+    {
+      "epoch": 10,
+      "train_mse": 0.00028057920861580935,
+      "validation_mse": 0.0003121456247754395,
+      "logo_mse": 2.116001815011259e-05
+    },
+    {
+      "epoch": 20,
+      "train_mse": 0.00011508820163634241,
+      "validation_mse": 0.00013008808309677988,
+      "logo_mse": 8.22665333544137e-06
+    },
+    {
+      "epoch": 40,
+      "train_mse": 4.5662416945879004e-05,
+      "validation_mse": 5.223518019192852e-05,
+      "logo_mse": 6.2623334997624625e-06
+    },
+    {
+      "epoch": 60,
+      "train_mse": 2.5312400726035214e-05,
+      "validation_mse": 3.105089126620442e-05,
+      "logo_mse": 8.308350516017526e-06
+    },
+    {
+      "epoch": 80,
+      "train_mse": 1.700950498497505e-05,
+      "validation_mse": 1.9823435650323518e-05,
+      "logo_mse": 5.630048235616414e-06
+    }
+  ],
+  "valid_validation_contours": 2140,
+  "mean_validation_target_iou_valid": 0.9629706911584095,
+  "logo_mean_reference_iou": 0.7827163034776795,
+  "logo_ref_iou_at_least_0_85": 47,
+  "logo_mean_augmented_target_iou": 0.9771602859848325,
+  "validation_scope": "held-out deformations of known shape families, not unseen families or human recognition"
+}

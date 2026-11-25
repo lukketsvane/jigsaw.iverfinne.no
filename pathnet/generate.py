@@ -1,0 +1,44 @@
+import argparse, json, math
+from pathlib import Path
+import numpy as np, torch
+from shapely.geometry import Polygon, LineString, box, Point
+from shapely.ops import unary_union, polygonize, nearest_points
+from shapely import set_precision, get_parts
+from scipy.spatial import Delaunay
+from train import ROOT, Model, N, Z, path, flatten
+
+torch.set_num_threads(1)
+ck=torch.load(ROOT/'pathnet.pt',weights_only=True,map_location='cpu'); names=ck['names']; model=Model(len(names)); model.load_state_dict(ck['state']); model.eval()
+ref=Polygon(flatten(np.array(json.loads((ROOT/'reference.json').read_text())['logo_control_points']),8))
+
+def decode(k,z):
+    with torch.no_grad(): return model(torch.tensor([k]),torch.tensor(np.asarray(z)[None],dtype=torch.float32))[0].numpy()
+def sample(rng,k):
+    for _ in range(60):
+        z=rng.uniform(-.28,.28,Z) if k==0 else rng.uniform(-1,1,Z); q=decode(k,z); p=Polygon(flatten(q,6))
+        if p.is_valid and p.area>.035 and (k!=0 or p.intersection(ref).area/p.union(ref).area>=.85): return q,p,z
+    raise ValueError('no valid sample')
+def points_svg(coords):
+    return 'M'+' L'.join(f'{x:.5f} {y:.5f}' for x,y in coords)
+def poly_svg(p): return points_svg(p.exterior.coords)+' Z'+''.join(points_svg(r.coords)+' Z' for r in p.interiors)
+def outsvg(f,body,w,h,units='mm'):
+    f.write_text(f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}{units}" height="{h}{units}" viewBox="0 0 {w} {h}">\n{body}\n</svg>')
+def library(out,rng,count=60):
+    w=300; h=math.ceil(count/10)*29; items=[]; ids=[]
+    for i in range(count):
+        k=0 if i%3!=2 else int(rng.integers(1,len(names))); q,p,z=sample(rng,k); x=15+(i%10)*30;y=14.5+(i//10)*29; q=q*25+np.array([x,y]); items.append(f'<path id="piece-{i:03d}" data-family="{names[k]}" d="{path(q)}"/>'); ids.append(k)
+    outsvg(out/'aphex-pathnet-shapes.svg','<g fill="black">'+''.join(items)+'</g>',w,h)
+    outsvg(out/'aphex-pathnet-shapes-cut.svg','<g fill="none" stroke="#ff0000" stroke-width="0.1">'+''.join(items)+'</g>',w,h)
+    return ids
+
+def export(out,ps,placed,net,r):
+    w=r['width_mm'];h=r['height_mm']; fills=[]; colors=['#efeee8','#d9d8d0','#e5e4dc','#c9cbc3','#f9f8f4'];
+    for i,p in enumerate(ps):
+        motif=next((j for j,q in enumerate(placed) if p.symmetric_difference(q).area<.002),None); color=('#282924' if r['motifs'][motif]['k']==0 else '#64675f') if motif is not None else colors[i%len(colors)]; fills.append(f'<path d="{poly_svg(p)}" fill="{color}" stroke="#111111" stroke-width="0.35" stroke-linejoin="round"/>')
+    outsvg(out/'aphex-pathnet-puzzle-preview.svg',''.join(fills),w,h)
+    lines=[l for l in get_parts(net) if l.geom_type=='LineString']; outsvg(out/'aphex-pathnet-puzzle.svg','<g fill="none" stroke="#ff0000" stroke-width="0.1" stroke-linecap="round" stroke-linejoin="round">'+''.join(f'<path d="{points_svg(l.coords)}"/>' for l in lines)+'</g>',w,h)
+    (out/'puzzle-report.json').write_text(json.dumps(r,indent=2))
+    outsvg(out/'aphex-pathnet-piece-outlines.svg','<g fill="none" stroke="#111" stroke-width=".2">'+''.join(f'<path id="p{i}" d="{poly_svg(p)}"/>' for i,p in enumerate(ps))+'</g>',w,h)
+
+if __name__=='__main__':
+    p=argparse.ArgumentParser(); p.add_argument('--seed',type=int,default=22); p.add_argument('--count',type=int,default=60); p.add_argument('--output',type=Path,default=ROOT); a=p.parse_args(); a.output.mkdir(parents=True,exist_ok=True); library(a.output,np.random.default_rng(a.seed),a.count)

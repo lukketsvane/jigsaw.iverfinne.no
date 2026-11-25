@@ -2,7 +2,7 @@
 
 Whole-piece neural SVG geometry and constrained puzzle composition for laser cutting.
 
-The active implementation is in [`pathnet/`](pathnet/README.md). It predicts closed cubic BÃ©zier shapes, with a dedicated Aphex Twin logo class, then arranges them into a shared cutting network.
+The active implementation is in [`pathnet/`](pathnet/README.md). It predicts closed cubic Bézier shapes, with a dedicated Aphex Twin logo class, then arranges them into a shared cutting network.
 
 ## Run
 
