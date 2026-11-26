@@ -34,6 +34,8 @@ FAMILIES = {
     "animal_hybrid": dict(catalog="runs/scale32_targets/animal_sourceguided_v10/catalog.json",
                           reference="runs/scale32_targets/animal_cc0_reference_v9/catalog.json"),
     "helleristning": dict(catalog="runs/scale32_targets/helleristning/catalog.json"),
+    # CC0 targets chosen for how much of each silhouette survives a 3 mm neck (scripts/v12_curate_targets.py).
+    "animal_curated": dict(catalog="runs/scale32_targets/animal_cc0_curated_v12/catalog.json", baseline="animal_reference"),
 }
 PREVIOUS = {
     "aphex": "runs/v10-campaign/verified-winners/aphex",
@@ -95,6 +97,8 @@ def baseline(_):
 def compose(args):
     jobs = []
     for fam, spec in FAMILIES.items():
+        if args.family and fam not in args.family:
+            continue
         for area in AREAS:
             for i, seed in enumerate(SEEDS):
                 out = OUT / "layouts" / fam / f"a{area}-s{seed}-m{i % 4}"
@@ -115,6 +119,8 @@ def compose(args):
 def lock(args):
     jobs = []
     for fam in FAMILIES:
+        if args.family and fam not in args.family:
+            continue
         trials = []
         for t in (OUT / "layouts" / fam).glob("*/trial.json"):
             r = json.loads(t.read_text())
@@ -192,12 +198,12 @@ def select(_):
                              fidelity_score=fid["fidelity"]["score"], fidelity_mean=fid["fidelity"]["mean"],
                              fidelity_min=fid["fidelity"]["minimum"], boundary_f=fid["boundary_f"]["mean"],
                              bay_fill=fid["bay_fill"]["mean"], iou=fid["iou"]["mean"]))
-        prev = base.get(fam, {})
+        prev = base.get(FAMILIES[fam].get("baseline", fam), {})
         eligible = [r for r in rows if r["gates_pass"]]
         best = max(eligible, key=lambda r: r["fidelity_score"], default=None)
         promote = bool(best and best["fidelity_score"] > prev.get("fidelity_score", 0) + 0.01
                        and best["fidelity_min"] >= prev.get("fidelity_min", 0) - 0.02)
-        manifest[fam] = dict(previous=PREVIOUS.get(fam), previous_fidelity=prev, candidates=len(rows),
+        manifest[fam] = dict(previous=PREVIOUS.get(FAMILIES[fam].get("baseline", fam)), previous_fidelity=prev, candidates=len(rows),
                              eligible=len(eligible), best=best, promoted=promote,
                              physical_test="not performed", commercial_release="not cleared",
                              all=sorted(rows, key=lambda r: -r["fidelity_score"]))
@@ -217,6 +223,7 @@ if __name__ == "__main__":
     p.add_argument("stage", choices=["baseline", "compose", "lock", "audit", "select"])
     p.add_argument("--workers", type=int, default=max(1, (os.cpu_count() or 2) - 1))
     p.add_argument("--top", type=int, default=3)
+    p.add_argument("--family", nargs="*", help="Limit compose/lock to these families")
     a = p.parse_args()
     os.chdir(ROOT)
     globals()[a.stage](a)

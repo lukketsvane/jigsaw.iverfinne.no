@@ -543,6 +543,9 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--balanced", action="store_true", help="Train with uniform class sampling and affine augmentation")
     s.add_argument("--width", type=int, default=1, help="Channel multiplier (1 = original architecture)")
     s.add_argument("--stages", type=int, default=3, choices=(3, 4, 5), help="Stride-2 encoder/decoder levels")
+    s.add_argument("--kl-weight", type=float, default=0.045)
+    s.add_argument("--aug-rotation", type=float, default=0.35, help="Rotation range in radians (--balanced only)")
+    s.add_argument("--aug-scale", type=float, default=0.15, help="Scale jitter range (--balanced only)")
     s.set_defaults(func=cmd_train_shapes)
 
     b = sub.add_parser("benchmark-shapes", help="Compare shape models on held-out masks at a common 256 px resolution")
@@ -607,6 +610,9 @@ def cmd_train_shapes(args: argparse.Namespace) -> int:
         balanced=args.balanced,
         width=args.width,
         stages=args.stages,
+        kl_weight=args.kl_weight,
+        aug_rotation=args.aug_rotation,
+        aug_scale=args.aug_scale,
     )
     print(json.dumps({k: v for k, v in metrics.items() if k != "history"}, indent=2))
     return 0

@@ -50,6 +50,9 @@ def train_shapes(
     exclude_classes: Sequence[str] = ("unclassified_motif", "multi_motif_panel"),
     width: int = 1,
     stages: int = 3,
+    kl_weight: float = 0.045,
+    aug_rotation: float = 0.35,
+    aug_scale: float = 0.15,
 ):
     folder = Path(out_dir)
     folder.mkdir(parents=True, exist_ok=True)
@@ -132,6 +135,13 @@ def train_shapes(
         config["width"] = int(width)
     if stages != 3:
         config["stages"] = int(stages)
+    # Regularisation knobs; recorded only when changed so older checkpoints still resume.
+    if kl_weight != 0.045:
+        config["kl_weight"] = float(kl_weight)
+    if aug_rotation != 0.35:
+        config["aug_rotation"] = float(aug_rotation)
+    if aug_scale != 0.15:
+        config["aug_scale"] = float(aug_scale)
     if device.type == "cuda":
         torch.cuda.reset_peak_memory_stats(device)
     started = time.perf_counter()
@@ -173,8 +183,8 @@ def train_shapes(
             flip = torch.rand((len(x), 1, 1, 1), device=device) < 0.5
             x = torch.where(flip, x.flip(-1), x)
             if balanced:
-                a = (torch.rand(len(x), device=device) - 0.5) * 0.35
-                scale = 0.95 + torch.rand(len(x), device=device) * 0.15
+                a = (torch.rand(len(x), device=device) - 0.5) * aug_rotation
+                scale = 1.0 - aug_scale / 3 + torch.rand(len(x), device=device) * aug_scale
                 t = torch.zeros((len(x), 2, 3), device=device)
                 t[:, 0, 0] = t[:, 1, 1] = a.cos() * scale
                 t[:, 0, 1] = -a.sin() * scale
@@ -191,7 +201,7 @@ def train_shapes(
             dice = 1 - ((2 * inter + 1) / (area + 1)).mean()
             sdf_error = ((pred - x).abs() * (1 + 2 * torch.exp(-4 * x.abs()))).mean()
             kl = 0.5 * (mu.square() + log_var.exp() - 1 - log_var).mean()
-            loss = sdf_error + dice + 0.045 * min(1.0, (epoch + 1) / 15) * kl
+            loss = sdf_error + dice + kl_weight * min(1.0, (epoch + 1) / 15) * kl
             if eikonal_weight > 0.0:
                 loss = loss + float(eikonal_weight) * _eikonal_loss(pred, size)
             opt.zero_grad(set_to_none=True)
