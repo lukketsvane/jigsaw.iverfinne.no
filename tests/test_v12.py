@@ -1,9 +1,12 @@
+from types import SimpleNamespace
+
+import numpy as np
 import torch
 from shapely.geometry import Polygon, box
 
 from heller_jigsaw.models.shape_prior import AnimalShapeVAE, build_from_checkpoint
 from heller_jigsaw.production.fidelity import piece_fidelity
-from heller_jigsaw.production.search import CONFIGS, CONFIG_SETS
+from heller_jigsaw.production.search import CONFIGS, CONFIG_SETS, dock
 
 # A "table" animal: body with two legs and a gap between them.
 LEGGED = Polygon([(0, 20), (40, 20), (40, 0), (34, 0), (34, 12), (6, 12), (6, 0), (0, 0)])
@@ -56,6 +59,16 @@ def test_wider_deeper_vae_round_trips_through_checkpoint():
 def test_standard_partition_configs_unchanged():
     assert CONFIG_SETS["standard"] == CONFIGS == [(1, 2, 0), (2, 2, 0), (2, 3, 0), (2, 3, 4), (3, 3, 0), (3, 5, 0)]
     assert CONFIG_SETS["extended"][:6] == CONFIGS
+
+
+def test_weighted_docking_preserves_distinct_target_areas():
+    mask = np.zeros((64, 64), dtype=np.float32)
+    mask[16:48, 16:48] = 1
+    motifs = [SimpleNamespace(mask=mask), SimpleNamespace(mask=mask)]
+    cores, px = dock(motifs, seed=1202, mode=1, area=1850, area_scales=[2.6, 1.0])
+    areas = cores.sum(axis=(1, 2)) * px ** 2
+    np.testing.assert_allclose(areas, [4810, 1850], rtol=0.03)
+    assert not (cores[0] & cores[1]).any()
 
 
 def test_protrusions_find_a_needle_but_not_a_square():

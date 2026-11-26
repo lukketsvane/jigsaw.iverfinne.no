@@ -17,15 +17,28 @@ cv2.setNumThreads(1)
 CONFIGS = [(1, 2, 0), (2, 2, 0), (2, 3, 0), (2, 3, 4), (3, 3, 0), (3, 5, 0)]
 # Stronger convex-hull 'bay' penalties hand a motif's concavities to its neighbours instead of filling them.
 EXTENDED_CONFIGS = CONFIGS + [(1, 2, 6), (2, 2, 8), (2, 3, 12), (1, 3, 16), (2, 2, 20), (3, 3, 10)]
-CONFIG_SETS = dict(standard=CONFIGS, extended=EXTENDED_CONFIGS)
+CONFIG_SETS = dict(standard=CONFIGS, extended=EXTENDED_CONFIGS,
+                   bounded=[(2, 2, 0), (2, 3, 4), (3, 5, 0)])
 
-def dock(motifs, seed, mode, area=1850.0):
+def dock(motifs, seed, mode, area=1850.0, area_scales=None, bounds_mm=None):
     rng = np.random.default_rng(seed)
     px = 0.65
     n = len(motifs)
-    N = 960
-    cores = np.zeros((n, N, N), bool)
-    occ = np.zeros((N, N), bool)
+    scales = np.ones(n) if area_scales is None else np.asarray(area_scales, dtype=float)
+    if scales.shape != (n,) or not np.all(np.isfinite(scales) & (scales > 0)):
+        raise ValueError('Each motif needs a positive finite area scale')
+    border = 28
+    h_grid = w_grid = 960
+    y_penalty = 1.0
+    if bounds_mm is not None:
+        width, height = bounds_mm
+        if not all(math.isfinite(value) and value > 0 for value in bounds_mm):
+            raise ValueError('Layout bounds must be positive and finite')
+        w_grid = math.floor(width / px) + 2 * border
+        h_grid = math.floor(height / px) + 2 * border
+        y_penalty = width / height
+    cores = np.zeros((n, h_grid, w_grid), bool)
+    occ = np.zeros((h_grid, w_grid), bool)
     radial, holes, noise, step, perimeter = [(0.85, 4.5, 0.025, 15, 0), (0.5, 9, 0.07, 15, 0.25), (1.1, 8, 0.045, 15, 0.15), (0.65, 13, 0.1, 10, 0.1)][mode]
     compact = []
     for m in motifs:
@@ -36,20 +49,29 @@ def dock(motifs, seed, mode, area=1850.0):
         l = cv2.arcLength(c, True)
         compact.append(0.5 * a / max(h, 1) + 0.5 * 4 * math.pi * a / max(l * l, 1) + rng.uniform(-noise, noise))
     order = np.argsort(-np.asarray(compact))
-    center = np.array([N / 2, N / 2])
+    if np.any(scales != scales[0]):
+        # Place the largest target in the central slot before docking the others.
+        anchor = order[np.argmax(scales[order])]
+        order = np.r_[anchor, order[order != anchor]]
+    center = np.array([h_grid / 2, w_grid / 2])
     for i, idx in enumerate(order):
-        variants = [rotated(motifs[idx].mask, float(a), area / px ** 2) for a in np.arange(0, 360, step)]
+        target_area = area * scales[idx] / px ** 2
+        variants = [rotated(motifs[idx].mask, float(a), target_area) for a in np.arange(0, 360, step)]
         if i == 0:
-            m = variants[int(rng.integers(len(variants)))]
+            fitting = [m for m in variants if m.shape[0] <= h_grid - 2 * border
+                       and m.shape[1] <= w_grid - 2 * border]
+            if not fitting:
+                raise ValueError('First motif exceeds the layout bounds')
+            m = fitting[int(rng.integers(len(fitting)))]
             h, w = m.shape
-            y, x = ((N - h) // 2, (N - w) // 2)
+            y, x = ((h_grid - h) // 2, (w_grid - w) // 2)
         else:
             yy, xx = np.where(occ)
             margin = max((max(m.shape) for m in variants)) + 24
-            y0 = max(28, int(yy.min()) - margin)
-            y1 = min(N - 28, int(yy.max()) + margin + 1)
-            x0 = max(28, int(xx.min()) - margin)
-            x1 = min(N - 28, int(xx.max()) + margin + 1)
+            y0 = max(border, int(yy.min()) - margin)
+            y1 = min(h_grid - border, int(yy.max()) + margin + 1)
+            x0 = max(border, int(xx.min()) - margin)
+            x1 = min(w_grid - border, int(xx.max()) + margin + 1)
             region = occ[y0:y1, x0:x1]
             near = np.exp(-ndi.distance_transform_edt(~region) / 4.0).astype('float32')
             of = region.astype('float32')
@@ -62,7 +84,7 @@ def dock(motifs, seed, mode, area=1850.0):
                 overlap = cv2.matchTemplate(of, mf, cv2.TM_CCORR)
                 contact = cv2.matchTemplate(near, mf, cv2.TM_CCORR)
                 yy, xx = np.ogrid[:contact.shape[0], :contact.shape[1]]
-                rad = np.hypot(yy + y0 + h * 0.5 - center[0], xx + x0 + w * 0.5 - center[1])
+                rad = np.hypot((yy + y0 + h * 0.5 - center[0]) * y_penalty, xx + x0 + w * 0.5 - center[1])
                 score = contact - radial * rad
                 score[(overlap > 0.25) | (contact < 6)] = -np.inf
                 for j in range(2):
@@ -152,7 +174,8 @@ def all_kerf(part):
                 return False
     return True
 
-def run(catalog, out, seed=42, mode=0, reference_catalog=None, piece_area=1850.0, objective='iou', config_set='standard'):
+def run(catalog, out, seed=42, mode=0, reference_catalog=None, piece_area=1850.0, objective='iou', config_set='standard',
+        bounds_mm=None):
     if objective not in ('iou', 'fidelity'):
         raise ValueError('objective must be iou or fidelity')
     configs = CONFIG_SETS[config_set]
@@ -165,8 +188,9 @@ def run(catalog, out, seed=42, mode=0, reference_catalog=None, piece_area=1850.0
     cat = Path(catalog)
     rows, base = load_corpus_catalog(cat)
     motifs = [load_motif_asset(r, base) for r in rows]
-    if not 2 <= len(motifs) <= 32:
-        raise ValueError('Supply 2 to 32 catalog records')
+    if len(motifs) < 2:
+        raise ValueError('Supply at least two catalog records')
+    area_scales = [r.get('area_scale', 1.0) for r in rows]
     references = None
     if reference_catalog is not None:
         old, oldbase = load_corpus_catalog(reference_catalog)
@@ -175,7 +199,7 @@ def run(catalog, out, seed=42, mode=0, reference_catalog=None, piece_area=1850.0
     results = []
     best = None
     try:
-        cores, px = dock(motifs, seed, mode, piece_area)
+        cores, px = dock(motifs, seed, mode, piece_area, area_scales=area_scales, bounds_mm=bounds_mm)
     except Exception as e:
         (out / 'trial.json').write_text(json.dumps(dict(theme=theme, seed=seed, mode=mode, error=str(e), seconds=time.perf_counter() - start, results=[])))
         raise RuntimeError('layout failed') from e
@@ -225,11 +249,18 @@ def run(catalog, out, seed=42, mode=0, reference_catalog=None, piece_area=1850.0
         results.append(result)
         print(theme, seed, mode, result, flush=True)
     report = dict(theme=theme, seed=seed, mode=mode, piece_area_mm2=piece_area, objective=objective, config_set=config_set, seconds=time.perf_counter() - start, results=results, best=None)
+    if bounds_mm is not None:
+        report['docking_bounds_mm'] = list(bounds_mm)
     if best:
         _, part, ff, result = best
         for f, m, v in zip(part.faces, motifs, ff):
             f.metadata.update(asset_id=m.asset_id, family=m.family, motif_class=m.motif_class, aligned_iou=round(float(v[0]), 4), sdf_chamfer=round(float(v[1]), 4))
         cfg = dict(seed=seed, mode=mode, piece_area_mm2=piece_area, objective=objective, config_set=config_set, outline_type='campaign_v10', num_pieces=len(motifs), kerf_mm=0.15, min_neck_mm=3, corpus_source=str(cat), motifs=[dict(asset_id=m.asset_id, motif_class=m.motif_class, family=m.family) for m in motifs], docking=result)
+        for entry, row in zip(cfg['motifs'], rows):
+            if 'area_scale' in row:
+                entry['area_scale'] = float(row['area_scale'])
+        if bounds_mm is not None:
+            cfg['docking_bounds_mm'] = list(bounds_mm)
         prov = dict(corpus_source=str(cat), all_commercial_ok=all((m.commercial_ok for m in motifs)), assets=rows)
         q = export_puzzle_run(part, out, cfg, prov, ['V10 multi-seed layout search candidate; not locked'], [m.mask for m in motifs], vcfg)
         report['best'] = dict(result, export_pass=q['all_hard_gates_passed'])

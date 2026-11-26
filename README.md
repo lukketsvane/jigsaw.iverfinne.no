@@ -2,6 +2,29 @@
 
 Whole-piece neural SVG geometry and constrained puzzle composition for laser cutting.
 
+## Øglepuslespelet
+
+Lag eit kantlaust puslespel med 216 øgler. Kvar brikke har fire føter, krumma hale og sin eigen farge. Øgler på venstresida passar til naboane på høgresida, og det same gjeld oppe og nede. Forma og fargefeltet endrar seg med frøet. Utforminga byggjer på [Nervous System sitt Lizard Infinity Puzzle](https://n-e-r-v-o-u-s.com/shop/product.php?code=387).
+
+Køyr frå prosjektrota med pakkane i `requirements.txt`.
+
+```powershell
+.\.venv\Scripts\python.exe -m pathnet.lizards --seed 387 --output runs/lizards-387
+Start-Process runs/lizards-387/index.html
+```
+
+`index.html` er eit sjølvstendig spel som verkar utan nett. Du kan starte med åtte lause brikker eller blande alle. `artwork.svg` og `cut.svg` har same mål og koordinatsystem. Kvar fysisk saum står éin gong i kuttefila. Standardbreidda på 298,45 mm gjeld éin repetisjon. Heile føter og halar stikk utanfor dette rektangelet. `assembly.png` viser heile puslespelet, og `detail.png` viser korleis to lause brikker møter naboane sine.
+
+Tre kurver og 120-gradars rotasjonar definerer grunnøgla. Eit trena konvolusjonsnett lærer korleis eit elastisk ark bøyer seg rundt lokale trekkpunkt. Øgler, auge og ryggstrekar blir flytta gjennom det same periodiske feltet. Avgrensa lokale hellingar hindrar at feltet brettar seg. Kvar eksport kontrollerer dei avrunda saumane, dekninga over begge kantane og at kuttefila dannar nøyaktig dei same lukka brikkene som spelet. Fysisk passform avheng òg av materiale og snittbreidd.
+
+Dei trente vektene ligg i `pathnet/lizard_elastic.npz`. Desse kommandoane viser treningsmåla, trenar ein ny modell til ei eiga fil og testar 64 brett gjennom SVG-eksport og ny innlesing.
+
+```powershell
+.\.venv\Scripts\python.exe -m pathnet.lizard_net report
+.\.venv\Scripts\python.exe -m pathnet.lizard_net train --output runs/lizards-387/retrained.npz
+.\.venv\Scripts\python.exe -m pathnet.lizards --seed 356 --check-seeds 64 --output runs/lizards-387
+```
+
 ## Nordic rock-art animal puzzles
 
 The `heller_jigsaw` generator fits shared seams to silhouettes from the local Nordic rock-art catalog. Use `--family animal` to fill every slot from the animal records. The run records the target asset, site, creator and license for each piece.

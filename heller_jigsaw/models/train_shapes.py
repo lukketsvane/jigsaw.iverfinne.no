@@ -53,6 +53,7 @@ def train_shapes(
     kl_weight: float = 0.045,
     aug_rotation: float = 0.35,
     aug_scale: float = 0.15,
+    checkpoint_seconds: float = 0,
 ):
     folder = Path(out_dir)
     folder.mkdir(parents=True, exist_ok=True)
@@ -109,7 +110,7 @@ def train_shapes(
     )
     source_list = [{k: r.get(k) for k in fields} for r in selected]
     model = AnimalShapeVAE(len(names), size, latent_dim, width, stages).to(device)
-    opt = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-4)
+    opt = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-4, fused=device.type == "cuda")
     sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=epochs)
     config = dict(
         trainer="animal_sdf_vae",
@@ -147,7 +148,16 @@ def train_shapes(
     started = time.perf_counter()
     first_epoch = None
 
-    run = EpochCheckpoint(folder, model, opt, sched, config, epochs, rng, resume=resume)
+    run = EpochCheckpoint(
+        folder, model, opt, sched, config, epochs, rng,
+        resume=resume, checkpoint_seconds=checkpoint_seconds,
+    )
+    if resume and device.type == "cuda":
+        for group in opt.param_groups:
+            group.update(fused=True, foreach=False)
+        # Checkpoints from unfused AdamW keep their step counters on the CPU.
+        for parameter, state in opt.state.items():
+            state["step"] = state["step"].to(device=parameter.device, dtype=torch.float32)
     (folder / "training-sources.json").write_text(json.dumps(source_list, indent=2), encoding="utf-8")
 
     @torch.inference_mode()
@@ -161,13 +171,17 @@ def train_shapes(
             actual = x < 0
             inter = (pred & actual).flatten(1).sum(1)
             union = (pred | actual).flatten(1).sum(1)
-            scores.extend((inter / union.clamp_min(1)).cpu().tolist())
-        return np.asarray(scores)
+            scores.append(inter / union.clamp_min(1))
+        return torch.cat(scores).cpu().numpy().astype(np.float64)
 
     train_x, train_y = tensors["train"]
-    freq = np.bincount(train_y.cpu().numpy(), minlength=len(names))
-    weights = np.power(freq[train_y.cpu().numpy()].astype(float), -1.0 if balanced else -0.5)
+    train_labels = train_y.cpu().numpy()
+    val_labels = tensors["val"][1].cpu().numpy() if balanced else None
+    freq = np.bincount(train_labels, minlength=len(names))
+    weights = np.power(freq[train_labels].astype(float), -1.0 if balanced else -0.5)
     weights /= weights.sum()
+    training_started = time.perf_counter()
+    training_started_at = time.time()
     for epoch in range(len(run.history), epochs):
         if first_epoch is None:
             first_epoch = epoch
@@ -176,9 +190,8 @@ def train_shapes(
         if balanced:
             indices = rng.choice(len(train_x), 2 * len(train_x), p=weights)
         rng.shuffle(indices)
-        loss_sum = 0.0
-        for start in range(0, len(indices), batch_size):
-            sel = torch.as_tensor(indices[start : start + batch_size], device=device)
+        loss_sum = torch.zeros((), device=device)
+        for sel in torch.as_tensor(indices, device=device).split(batch_size):
             x, y = train_x[sel], train_y[sel]
             flip = torch.rand((len(x), 1, 1, 1), device=device) < 0.5
             x = torch.where(flip, x.flip(-1), x)
@@ -208,13 +221,12 @@ def train_shapes(
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), 5.0)
             opt.step()
-            loss_sum += loss.item() * len(sel)
+            loss_sum.add_(loss.detach(), alpha=len(sel))
         val_scores = evaluate("val")
         score = float(val_scores.mean())
         if balanced:
-            val_labels = tensors["val"][1].cpu().numpy()
             score = float(np.mean([val_scores[val_labels == c].mean() for c in np.unique(val_labels)]))
-        run.finish_epoch(dict(loss=loss_sum / len(indices), val_reconstruction_iou=score), score)
+        run.finish_epoch(dict(loss=loss_sum.item() / len(indices), val_reconstruction_iou=score), score)
         if (epoch + 1) % 10 == 0 or epoch + 1 == epochs:
             print(
                 f"epoch {epoch + 1}/{epochs}  validation reconstruction IoU {score:.3f}",
@@ -222,6 +234,8 @@ def train_shapes(
                 flush=True,
             )
 
+    training_seconds = time.perf_counter() - training_started
+    training_finished_at = time.time()
     model.load_state_dict(run.best_weights)
     model.eval()
     path = folder / "animal-shape-vae.pt"
@@ -316,6 +330,9 @@ def train_shapes(
         session=dict(
             first_epoch_this_session=first_epoch,
             seconds=round(time.perf_counter() - started, 1),
+            training_seconds=round(training_seconds, 2),
+            training_started_at=training_started_at,
+            training_finished_at=training_finished_at,
             peak_cuda_memory_mib=round(torch.cuda.max_memory_allocated(device) / 2**20, 1) if device.type == "cuda" else None,
             device_name=torch.cuda.get_device_name(device) if device.type == "cuda" else "cpu",
         ),

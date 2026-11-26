@@ -1,0 +1,116 @@
+{
+  "checked_on": "2026-11-26",
+  "scope": "Technical illustrations from three Nervous System articles. Captions describe each figure in the context of its source.",
+  "figures": [
+    {
+      "source_article": "Generative Jigsaw Puzzles",
+      "source_page": "https://n-e-r-v-o-u-s.com/works/puzzles/",
+      "url": "https://n-e-r-v-o-u-s.com/works/puzzles/images/lateral1.jpg",
+      "local_file": "lateral1.jpg",
+      "caption": "A small bump advances from an almost flat interface at the start of the studio's explanation of branch growth.",
+      "content_type": "image/jpeg",
+      "byte_size": 28081,
+      "sha256": "fc00ec3302837f1b4b6bcd8ef1cfd2184d0cde0f94aad90a6859c3dd926baae5"
+    },
+    {
+      "source_article": "Generative Jigsaw Puzzles",
+      "source_page": "https://n-e-r-v-o-u-s.com/works/puzzles/",
+      "url": "https://n-e-r-v-o-u-s.com/works/puzzles/images/lateral2.jpg",
+      "local_file": "lateral2.jpg",
+      "caption": "The bump grows taller while heat inhibits growth on both sides.",
+      "content_type": "image/jpeg",
+      "byte_size": 34462,
+      "sha256": "de88fdaf719dd23915c395ee27c75ee3e59152f895c618b908fde6f88f9f1212"
+    },
+    {
+      "source_article": "Generative Jigsaw Puzzles",
+      "source_page": "https://n-e-r-v-o-u-s.com/works/puzzles/",
+      "url": "https://n-e-r-v-o-u-s.com/works/puzzles/images/hothotcold.jpg",
+      "local_file": "hothotcold.jpg",
+      "caption": "A three-way junction shows the ambiguity of a two-phase model. Two neighboring pieces carry the same solid/hot label.",
+      "content_type": "image/jpeg",
+      "byte_size": 20257,
+      "sha256": "a395643ee13198dca302aa258198b3b6065972f0903dfbf5bba3c27faecd94d1"
+    },
+    {
+      "source_article": "Generative Jigsaw Puzzles",
+      "source_page": "https://n-e-r-v-o-u-s.com/works/puzzles/",
+      "url": "https://n-e-r-v-o-u-s.com/works/puzzles/images/puzzleCuts.jpg",
+      "local_file": "puzzleCuts.jpg",
+      "caption": "Shape study comparing candidate cuts from experiments with the original generator.",
+      "content_type": "image/jpeg",
+      "byte_size": 1380476,
+      "sha256": "7ba20e69debda3260150112bc902d5581bee0c2a9f70646f9dcb12bf12369e2d"
+    },
+    {
+      "source_article": "Generative Jigsaw Puzzles",
+      "source_page": "https://n-e-r-v-o-u-s.com/works/puzzles/",
+      "url": "https://n-e-r-v-o-u-s.com/works/puzzles/images/insertion.jpg",
+      "local_file": "insertion.jpg",
+      "caption": "Design sketches exploring variations in the initial grid and how a figure piece can fit among neighboring pieces.",
+      "content_type": "image/jpeg",
+      "byte_size": 502130,
+      "sha256": "655d54a902ba99862dd4a3747295d054ba41ab642ff3d6215ad5991235c17dc1"
+    },
+    {
+      "source_article": "Unique puzzle cuts inspired by nature",
+      "source_page": "https://n-e-r-v-o-u-s.com/blog/?p=9738",
+      "url": "https://n-e-r-v-o-u-s.com/blog/wp-content/uploads/2025/03/nervousSystem_puzzleCuts_2025-825x779.png",
+      "local_file": "nervousSystem_puzzleCuts_2025-825x779.png",
+      "caption": "Guide to the visual signatures of the six cut styles.",
+      "content_type": "image/png",
+      "byte_size": 961777,
+      "sha256": "ffed69ecbb6e5942a6d78bce1cfbc8cb4b963952ac4d677f00c77394657d091a"
+    },
+    {
+      "source_article": "Unique puzzle cuts inspired by nature",
+      "source_page": "https://n-e-r-v-o-u-s.com/blog/?p=9738",
+      "url": "https://n-e-r-v-o-u-s.com/blog/wp-content/uploads/2025/03/dendriteCut-1-825x619.png",
+      "local_file": "dendriteCut-1-825x619.png",
+      "caption": "Six panels follow Dendrite from initial sites through cellular boundaries, edge perturbation and branching to the cut pattern.",
+      "content_type": "image/png",
+      "byte_size": 156370,
+      "sha256": "62e4a89c4394dd045be45ebcb14de8470f6b3392a4ca026c87796b7c6f2a612f"
+    },
+    {
+      "source_article": "Unique puzzle cuts inspired by nature",
+      "source_page": "https://n-e-r-v-o-u-s.com/blog/?p=9738",
+      "url": "https://n-e-r-v-o-u-s.com/blog/wp-content/uploads/2025/03/maze.gif",
+      "local_file": "maze.gif",
+      "caption": "Animation of the Maze cut as the constrained edges lengthen, buckle and meet.",
+      "content_type": "image/gif",
+      "byte_size": 4442450,
+      "sha256": "3a4f58c41cd4a19ff5ab89940f04a7c671be093a92b50b63ea3da44c9dd25a8d"
+    },
+    {
+      "source_article": "Unique puzzle cuts inspired by nature",
+      "source_page": "https://n-e-r-v-o-u-s.com/blog/?p=9738",
+      "url": "https://n-e-r-v-o-u-s.com/blog/wp-content/uploads/2025/03/matrix4-825x279.png",
+      "local_file": "matrix4-825x279.png",
+      "caption": "Matrix example illustrating how a grid aligned with the outline is partitioned into interlocking pieces.",
+      "content_type": "image/png",
+      "byte_size": 324778,
+      "sha256": "dff660f5cac3970371f794a9709086e319350602907fd822e921b5bbce93b26a"
+    },
+    {
+      "source_article": "Unique puzzle cuts inspired by nature",
+      "source_page": "https://n-e-r-v-o-u-s.com/blog/?p=9738",
+      "url": "https://n-e-r-v-o-u-s.com/blog/wp-content/uploads/2022/10/wavePuzzle2-1.gif",
+      "local_file": "wavePuzzle2-1.gif",
+      "caption": "Animation accompanying the Wave description of vortices pulling growing edges into curls.",
+      "content_type": "image/gif",
+      "byte_size": 15339052,
+      "sha256": "a071628b15964829720d01d6cc7c130029eb211b885839d706fbfc2a80fee03c"
+    },
+    {
+      "source_article": "Marbling Infinity Puzzles",
+      "source_page": "https://n-e-r-v-o-u-s.com/blog/?p=9225",
+      "url": "https://n-e-r-v-o-u-s.com/blog/wp-content/uploads/2022/10/waveDiagram-825x322.jpg",
+      "local_file": "waveDiagram-825x322.jpg",
+      "caption": "Paired Wave diagrams showing initial cells and grown piece boundaries.",
+      "content_type": "image/jpeg",
+      "byte_size": 229237,
+      "sha256": "69617ff22defebb1bebd67ce16431ba037c2cf06a06ec9b4d3af3a0030d150b1"
+    }
+  ]
+}

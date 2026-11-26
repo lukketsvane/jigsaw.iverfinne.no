@@ -403,7 +403,8 @@ def cmd_compose(args: argparse.Namespace) -> int:
     from .production.search import run
 
     run(args.catalog, args.out, args.seed, args.mode, args.reference_catalog,
-        piece_area=args.piece_area, objective=args.objective, config_set=args.configs)
+        piece_area=args.piece_area, objective=args.objective, config_set=args.configs,
+        bounds_mm=args.bounds_mm)
     return 0
 
 
@@ -548,11 +549,16 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--seed", type=int, default=42)
     s.add_argument("--resume", action="store_true", help="Restore the last complete epoch in --out")
     s.add_argument("--balanced", action="store_true", help="Train with uniform class sampling and affine augmentation")
+    s.add_argument("--checkpoint-seconds", type=float, default=0,
+                   help="Minimum seconds between checkpoint writes, with first and final epoch always saved")
     s.add_argument("--width", type=int, default=1, help="Channel multiplier (1 = original architecture)")
     s.add_argument("--stages", type=int, default=3, choices=(3, 4, 5), help="Stride-2 encoder/decoder levels")
     s.add_argument("--kl-weight", type=float, default=0.045)
     s.add_argument("--aug-rotation", type=float, default=0.35, help="Rotation range in radians (--balanced only)")
     s.add_argument("--aug-scale", type=float, default=0.15, help="Scale jitter range (--balanced only)")
+    s.add_argument("--all-families", action="store_true", help="Train on all catalog families")
+    s.add_argument("--min-train-count", type=int, default=1)
+    s.add_argument("--eikonal-weight", type=float, default=0.0)
     s.set_defaults(func=cmd_train_shapes)
 
     b = sub.add_parser("benchmark-shapes", help="Compare shape models on held-out masks at a common 256 px resolution")
@@ -570,8 +576,10 @@ def build_parser() -> argparse.ArgumentParser:
     c.add_argument("--piece-area", type=float, default=1850.0, help="Core motif area in mm^2 before gaps are shared")
     c.add_argument("--objective", choices=["iou", "fidelity"], default="iou",
                    help="Rank partition configurations by aligned IoU (V10) or silhouette fidelity")
-    c.add_argument("--configs", choices=["standard", "extended"], default="standard",
-                   help="extended adds stronger concavity-preserving partition penalties")
+    c.add_argument("--configs", choices=["standard", "extended", "bounded"], default="standard",
+                   help="Partition search presets. Bounded runs a short search for large catalogs.")
+    c.add_argument("--bounds-mm", nargs=2, type=float, metavar=("WIDTH", "HEIGHT"),
+                   help="Bounds for target placement before growing the shared outline")
     c.add_argument("--out", required=True)
     c.set_defaults(func=cmd_compose)
 
@@ -626,6 +634,10 @@ def cmd_train_shapes(args: argparse.Namespace) -> int:
         kl_weight=args.kl_weight,
         aug_rotation=args.aug_rotation,
         aug_scale=args.aug_scale,
+        families=None if args.all_families else ("animal",),
+        min_train_count=args.min_train_count,
+        eikonal_weight=args.eikonal_weight,
+        checkpoint_seconds=args.checkpoint_seconds,
     )
     print(json.dumps({k: v for k, v in metrics.items() if k != "history"}, indent=2))
     return 0

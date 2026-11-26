@@ -12,9 +12,29 @@ A conditional neural decoder for complete closed vector pieces. Given a family I
 
 `python train.py` retrains the network from the included glyph dataset and reference image. The logo family has 2,600 augmented training targets. All validation contours use held-out deformation vectors on known families. Logo sampling uses a narrower latent range and rejects shapes below .85 IoU with the reference. New boards require every requested motif to fit and verify each logo against the transformed reference after the final SVG is exported and reparsed. The report records the minimum final logo IoU and the logo share of all pieces.
 
+Training selects CUDA when available. Use `--device cuda` to require it, `--device cpu` for a CPU comparison, or `--out ../runs/pathnet-retrain` to write a separate checkpoint, decoder and validation report. The training report includes contours per second and peak allocated CUDA memory.
+
 For a less regular layout, add --jitter .18 to the dense-board command; .11 remains the default. Higher jitter can fail placement.
 
 For a denser motif board: `python puzzle.py --seed 22 --width 300 --height 220 --motifs 32 --logo-share 1 --output ./generated/dense32`.
+
+## Typeface edition
+
+From the repository root, build a catalog with one Aphex Twin logo, all 26 typeface letters, and five labeled glyph blends. The catalog gives the logo 2.6 times the target area of a letter. Compose places it first in the center of the layout. The final piece areas are measured from the exported cut.
+
+```powershell
+python scripts/build_aphex_typeface_catalog.py --out runs/aphex-typeface/targets
+python -m heller_jigsaw compose --catalog runs/aphex-typeface/targets/catalog.json --piece-area 2400 --seed 1202 --mode 1 --out runs/aphex-typeface/layouts/a2400-s1202-m1
+python -m heller_jigsaw lock --run-dir runs/aphex-typeface/layouts/a2400-s1202-m1 --method mincost --out runs/aphex-typeface/locked/a2400-s1202-m1-mincost
+```
+
+For the approximately 600 × 400 mm, 100-piece edition, the catalog includes every available letter and blend, then repeats glyphs with unique piece IDs to reach the requested count.
+
+```powershell
+python scripts/build_aphex_typeface_catalog.py --pieces 100 --out runs/aphex-typeface-100/targets
+python -m heller_jigsaw compose --catalog runs/aphex-typeface-100/targets/catalog.json --bounds-mm 600 400 --piece-area 1200 --seed 1202 --mode 1 --configs bounded --out runs/aphex-typeface-100/layouts/a1200-s1202-m1
+python -m heller_jigsaw lock --run-dir runs/aphex-typeface-100/layouts/a1200-s1202-m1 --method standard --out runs/aphex-typeface-100/locked/a1200-s1202-m1-standard
+```
 
 ## Outputs
 

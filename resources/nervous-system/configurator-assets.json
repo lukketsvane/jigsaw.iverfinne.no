@@ -1,0 +1,353 @@
+{
+  "source_page": "https://n-e-r-v-o-u-s.com/customPuzzle/",
+  "checked_on": "2026-11-26",
+  "scope": "Static puzzle images and the studio wordmark archived from the configurator HTML, with a link to the embedded process video. Each URL appears once even when several stages reuse it.",
+  "cut_styles": [
+    "amoeba",
+    "dendrite",
+    "maze",
+    "wave",
+    "coral",
+    "matrix"
+  ],
+  "assets": [
+    {
+      "url": "https://n-e-r-v-o-u-s.com/images/nervous_horizontal.svg",
+      "stages": [
+        "header",
+        "footer"
+      ],
+      "role": "Studio wordmark",
+      "kind": "image",
+      "http_status": 200,
+      "content_type": "image/svg+xml",
+      "local_file": "images/nervous_horizontal.svg",
+      "byte_size": 67160,
+      "sha256": "ff83d22438b64c5a15c08299a691d1f2702aa282a7d44a5094b2896706b856cd"
+    },
+    {
+      "url": "https://n-e-r-v-o-u-s.com/customPuzzle/images/kidsPuzzle.jpg",
+      "stages": [
+        "intro"
+      ],
+      "role": "Wide landing-page puzzle photograph",
+      "kind": "image",
+      "http_status": 200,
+      "content_type": "image/jpeg",
+      "local_file": "images/kidsPuzzle.jpg",
+      "byte_size": 1230113,
+      "sha256": "bf720428d8c665efafddae7b33e843afacbb79dd8e6aacb8085e863d8d97096a"
+    },
+    {
+      "url": "https://n-e-r-v-o-u-s.com/customPuzzle/images/kidsPuzzle_square.jpg",
+      "stages": [
+        "intro"
+      ],
+      "role": "Square crop of the landing-page photograph",
+      "kind": "image",
+      "http_status": 200,
+      "content_type": "image/jpeg",
+      "local_file": "images/kidsPuzzle_square.jpg",
+      "byte_size": 2722116,
+      "sha256": "b022fbc1c42b842b97b02bda6c2968c566fb453950dd0d4c649ec4b8cc820b3c"
+    },
+    {
+      "url": "https://n-e-r-v-o-u-s.com/customPuzzle/images/agave.jpg",
+      "stages": [
+        "intro"
+      ],
+      "role": "Agave puzzle example",
+      "kind": "image",
+      "http_status": 200,
+      "content_type": "image/jpeg",
+      "local_file": "images/agave.jpg",
+      "byte_size": 177360,
+      "sha256": "d8ffcc466f273effdf5b7a6e926cc7f291671b8f0001fe30590d86e91a01f4dc"
+    },
+    {
+      "url": "https://n-e-r-v-o-u-s.com/customPuzzle/images/puzzle2.png",
+      "stages": [
+        "intro"
+      ],
+      "role": "Example of the generated piece pattern",
+      "kind": "image",
+      "http_status": 200,
+      "content_type": "image/png",
+      "local_file": "images/puzzle2.png",
+      "byte_size": 395315,
+      "sha256": "bb50707417bc0b0c216debc0840fa9beca4fe713ddb66d5bb2a865aa0d4c5186"
+    },
+    {
+      "url": "https://n-e-r-v-o-u-s.com/customPuzzle/images/puzzle3.png",
+      "stages": [
+        "intro"
+      ],
+      "role": "Example of shaped figure pieces",
+      "kind": "image",
+      "http_status": 200,
+      "content_type": "image/png",
+      "local_file": "images/puzzle3.png",
+      "byte_size": 339829,
+      "sha256": "0921656c1891cfb20fd894583d3e170faab4fbe9fa90e3397c2e73c75c4c21f8"
+    },
+    {
+      "url": "https://n-e-r-v-o-u-s.com/customPuzzle/images/diagram2.gif",
+      "stages": [
+        "intro"
+      ],
+      "role": "Animated diagram of the custom puzzle process",
+      "kind": "image",
+      "http_status": 200,
+      "content_type": "image/gif",
+      "local_file": "images/diagram2.gif",
+      "byte_size": 743941,
+      "sha256": "63d9a0f20adc8b176acbdea566eda94d80879614dc3a65b3c4b9af661dd829b0"
+    },
+    {
+      "url": "https://player.vimeo.com/video/238139162?loop=1&title=0&byline=0&portrait=0",
+      "stages": [
+        "intro"
+      ],
+      "role": "Embedded process video",
+      "kind": "video_embed",
+      "http_status": 200,
+      "content_type": "text/html"
+    },
+    {
+      "url": "https://n-e-r-v-o-u-s.com/customPuzzle/images/iowa.jpg",
+      "stages": [
+        "intro"
+      ],
+      "role": "Photograph in the process overview alongside the video",
+      "kind": "image",
+      "http_status": 200,
+      "content_type": "image/jpeg",
+      "local_file": "images/iowa.jpg",
+      "byte_size": 807332,
+      "sha256": "0b29c7e114ae59d0a7dbe4b2234e656992bc65cad3753900799deebc44ec5f9f"
+    },
+    {
+      "url": "https://n-e-r-v-o-u-s.com/customPuzzle/images/uploadArt.png",
+      "stages": [
+        "art"
+      ],
+      "role": "Image at the artwork upload control",
+      "kind": "image",
+      "http_status": 200,
+      "content_type": "image/png",
+      "local_file": "images/uploadArt.png",
+      "byte_size": 6068,
+      "sha256": "e86f93c4d7a55e82962757ce71cbcd4f8cfc2347cdb551eb81912f2cca3ee985"
+    },
+    {
+      "url": "https://n-e-r-v-o-u-s.com/customPuzzle/images/rectangle.png",
+      "stages": [
+        "size and shape"
+      ],
+      "role": "Rectangular outline option",
+      "kind": "image",
+      "http_status": 200,
+      "content_type": "image/png",
+      "local_file": "images/rectangle.png",
+      "byte_size": 268,
+      "sha256": "a892960bbdcbfd8f0a56985a7e5dfb25d3df675286b85fa09e5f397f51c3d24e"
+    },
+    {
+      "url": "https://n-e-r-v-o-u-s.com/customPuzzle/images/circle.png",
+      "stages": [
+        "size and shape"
+      ],
+      "role": "Circular outline option",
+      "kind": "image",
+      "http_status": 200,
+      "content_type": "image/png",
+      "local_file": "images/circle.png",
+      "byte_size": 803,
+      "sha256": "23c2eb8e0c4f682bd85700437839342fcc215b4b22f193dd311958ff5ecdec0b"
+    },
+    {
+      "url": "https://n-e-r-v-o-u-s.com/customPuzzle/images/style_amoeba.png",
+      "stages": [
+        "pieces"
+      ],
+      "role": "Amoeba cut-style icon",
+      "kind": "image",
+      "http_status": 200,
+      "content_type": "image/png",
+      "local_file": "images/style_amoeba.png",
+      "byte_size": 1391,
+      "sha256": "0566f53900689cdfdf45577fec53e7405f27d904fcb2b1ff32b43a3ace36a8fd"
+    },
+    {
+      "url": "https://n-e-r-v-o-u-s.com/customPuzzle/images/style_amoeba_photo.jpg",
+      "stages": [
+        "pieces"
+      ],
+      "role": "Amoeba cut-style sample photograph",
+      "kind": "image",
+      "http_status": 200,
+      "content_type": "image/jpeg",
+      "local_file": "images/style_amoeba_photo.jpg",
+      "byte_size": 824987,
+      "sha256": "03839335e54f693c8b6afe50450c18ad713d837e180eb3645994c86c4ba5f22e"
+    },
+    {
+      "url": "https://n-e-r-v-o-u-s.com/customPuzzle/images/style_dendrite.png",
+      "stages": [
+        "pieces",
+        "whimsies",
+        "buy"
+      ],
+      "role": "Dendrite cut-style icon",
+      "kind": "image",
+      "http_status": 200,
+      "content_type": "image/png",
+      "local_file": "images/style_dendrite.png",
+      "byte_size": 1609,
+      "sha256": "1a3369edec76494d9883edc814309bacf9843271e2db2ef01a69f1bea36781c2"
+    },
+    {
+      "url": "https://n-e-r-v-o-u-s.com/customPuzzle/images/style_dendrite_photo.jpg",
+      "stages": [
+        "pieces"
+      ],
+      "role": "Dendrite cut-style sample photograph",
+      "kind": "image",
+      "http_status": 200,
+      "content_type": "image/jpeg",
+      "local_file": "images/style_dendrite_photo.jpg",
+      "byte_size": 981132,
+      "sha256": "af95c240d4631f9531ede58950413079d5822a077eec97e199e749dfd97a0004"
+    },
+    {
+      "url": "https://n-e-r-v-o-u-s.com/customPuzzle/images/style_maze.png",
+      "stages": [
+        "pieces"
+      ],
+      "role": "Maze cut-style icon",
+      "kind": "image",
+      "http_status": 200,
+      "content_type": "image/png",
+      "local_file": "images/style_maze.png",
+      "byte_size": 1351,
+      "sha256": "d91c3c730bec5ef8c327d6a24833cee666fc2fe2ce4580ed2c3928963653f040"
+    },
+    {
+      "url": "https://n-e-r-v-o-u-s.com/customPuzzle/images/style_maze_photo.jpg",
+      "stages": [
+        "pieces"
+      ],
+      "role": "Maze cut-style sample photograph",
+      "kind": "image",
+      "http_status": 200,
+      "content_type": "image/jpeg",
+      "local_file": "images/style_maze_photo.jpg",
+      "byte_size": 1024505,
+      "sha256": "d5c370c41874b56b79a8c0fdb32e94d85b916092bf0084b86826949b050f300f"
+    },
+    {
+      "url": "https://n-e-r-v-o-u-s.com/customPuzzle/images/style_wave.png",
+      "stages": [
+        "pieces"
+      ],
+      "role": "Wave cut-style icon",
+      "kind": "image",
+      "http_status": 200,
+      "content_type": "image/png",
+      "local_file": "images/style_wave.png",
+      "byte_size": 1539,
+      "sha256": "aaa19474e5d4b00e73a10cb68083a3c18a52be49d3a5e5b63eddc9f8983d958c"
+    },
+    {
+      "url": "https://n-e-r-v-o-u-s.com/customPuzzle/images/style_wave_photo.jpg",
+      "stages": [
+        "pieces"
+      ],
+      "role": "Wave cut-style sample photograph",
+      "kind": "image",
+      "http_status": 200,
+      "content_type": "image/jpeg",
+      "local_file": "images/style_wave_photo.jpg",
+      "byte_size": 1156848,
+      "sha256": "34e4ce2212e8473b6b3f10d83ea326394b1838b09a44df25b28fa853cc759e7c"
+    },
+    {
+      "url": "https://n-e-r-v-o-u-s.com/customPuzzle/images/style_coral.png",
+      "stages": [
+        "pieces"
+      ],
+      "role": "Coral cut-style icon",
+      "kind": "image",
+      "http_status": 200,
+      "content_type": "image/png",
+      "local_file": "images/style_coral.png",
+      "byte_size": 3321,
+      "sha256": "6d95c1d7e81deeed2ae5b524cb35ffbc675cbd4b8216ddfbae550eea794ddb64"
+    },
+    {
+      "url": "https://n-e-r-v-o-u-s.com/customPuzzle/images/style_coral_photo.jpg",
+      "stages": [
+        "pieces"
+      ],
+      "role": "Coral cut-style sample photograph",
+      "kind": "image",
+      "http_status": 200,
+      "content_type": "image/jpeg",
+      "local_file": "images/style_coral_photo.jpg",
+      "byte_size": 558786,
+      "sha256": "128b426b9021967716a06e88f22d078a0a4df13d21c4eff66fc61d139d627b30"
+    },
+    {
+      "url": "https://n-e-r-v-o-u-s.com/customPuzzle/images/style_matrix.png",
+      "stages": [
+        "pieces"
+      ],
+      "role": "Matrix cut-style icon",
+      "kind": "image",
+      "http_status": 200,
+      "content_type": "image/png",
+      "local_file": "images/style_matrix.png",
+      "byte_size": 2480,
+      "sha256": "bc3521824d095397eac9fe2e00ce6a1e182ae9848b56e11bf8d3e15f54b86f8a"
+    },
+    {
+      "url": "https://n-e-r-v-o-u-s.com/customPuzzle/images/style_matrix_photo.jpg",
+      "stages": [
+        "pieces"
+      ],
+      "role": "Matrix cut-style sample photograph",
+      "kind": "image",
+      "http_status": 200,
+      "content_type": "image/jpeg",
+      "local_file": "images/style_matrix_photo.jpg",
+      "byte_size": 738207,
+      "sha256": "8eb99d02ae167e61c6cc372f8551115c30040810ee93d1024507709604f4a2a8"
+    },
+    {
+      "url": "https://n-e-r-v-o-u-s.com/customPuzzle/images/whimsies2.jpg",
+      "stages": [
+        "whimsies"
+      ],
+      "role": "Illustration accompanying the introduction to figure pieces",
+      "kind": "image",
+      "http_status": 200,
+      "content_type": "image/jpeg",
+      "local_file": "images/whimsies2.jpg",
+      "byte_size": 712953,
+      "sha256": "2c3a3b429da979832d64f7e5b886f64b04d7373f530e4d89df9585ef18445f3e"
+    },
+    {
+      "url": "https://n-e-r-v-o-u-s.com/customPuzzle/images/shapeDiagrams.png",
+      "stages": [
+        "size and shape"
+      ],
+      "role": "Guidelines for preparing a custom outline image",
+      "kind": "image",
+      "http_status": 200,
+      "content_type": "image/png",
+      "local_file": "images/shapeDiagrams.png",
+      "byte_size": 20179,
+      "sha256": "d8ce6d0f27857e1ecd106be7758db2eb4364d803c5c3e00ef59ef3475882721e"
+    }
+  ]
+}

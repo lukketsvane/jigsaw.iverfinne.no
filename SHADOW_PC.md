@@ -57,6 +57,14 @@ The 192px configuration is an unbenchmarked starting point; check actual peak VR
 
 The CPU-based free-form layout search and Shapely validation do not automatically benefit from additional VRAM. Benchmark separate CPU workers and GPU training independently.
 
+To train all three editions together on the RTX A4500, point the launcher at completed Animal and Helleristning run directories containing `metrics.json` and `training-last.pt`.
+
+```powershell
+& $py scripts/train_editions.py --animal-from $animalRun --helleristning-from $hellerRun --out runs/editions-next
+```
+
+The launcher copies both checkpoints, continues each VAE for 24 epochs, and retrains Aphex PathNet for 80 epochs at batch size 256. It caps each worker at two CPU threads and starts Aphex four seconds after the VAEs to overlap training. The VAE workers save their first and final epochs and wait at least ten seconds between intermediate saves. Set `--checkpoint-seconds 0` to save every epoch.
+
 ## Release limits
 
 Use `cut.svg` (not `pieces.svg`) for common-line cutting at 1:1 millimetre scale. The geometry audit, sampled motion screens and thin-feature analysis do not establish material strength, physical fit, complete rigid-body locking, or legal permission to sell. Physical cutting/assembly tests and source-rights review remain required.

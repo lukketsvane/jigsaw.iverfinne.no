@@ -1,0 +1,67 @@
+{
+  "source_page": "https://n-e-r-v-o-u-s.com/customPuzzle/",
+  "checked_on": "2026-11-26",
+  "scope": "Distinct external script and stylesheet references declared in the landing HTML, in document order. URLs are recorded as references. Runtime requests and inline scripts are outside this inventory.",
+  "includes": [
+    {
+      "kind": "stylesheet",
+      "url": "https://n-e-r-v-o-u-s.com/customPuzzle/style5.css?version=2"
+    },
+    {
+      "kind": "stylesheet",
+      "url": "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    },
+    {
+      "kind": "script",
+      "url": "https://n-e-r-v-o-u-s.com/customPuzzle/gui.js?version=2.5"
+    },
+    {
+      "kind": "script",
+      "url": "https://n-e-r-v-o-u-s.com/js/pointer.js"
+    },
+    {
+      "kind": "script",
+      "url": "https://n-e-r-v-o-u-s.com/customPuzzle/cropping.js?version=1.1"
+    },
+    {
+      "kind": "script",
+      "url": "https://n-e-r-v-o-u-s.com/customPuzzle/main4.js?version=2"
+    },
+    {
+      "kind": "script",
+      "url": "https://n-e-r-v-o-u-s.com/customPuzzle/whimsies.js?version=6"
+    },
+    {
+      "kind": "script",
+      "url": "https://n-e-r-v-o-u-s.com/customPuzzle/pieceStyle.js?version=3.0"
+    },
+    {
+      "kind": "script",
+      "url": "https://n-e-r-v-o-u-s.com/customPuzzle/addToCart.js?version=5"
+    },
+    {
+      "kind": "script",
+      "url": "https://n-e-r-v-o-u-s.com/customPuzzle/load-image.all.min.js"
+    },
+    {
+      "kind": "stylesheet",
+      "url": "https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap"
+    },
+    {
+      "kind": "stylesheet",
+      "url": "https://n-e-r-v-o-u-s.com/shop/includes/css/site_header.css?v=1795536490"
+    },
+    {
+      "kind": "stylesheet",
+      "url": "https://n-e-r-v-o-u-s.com/includes/home/footer.css?v=1793038428"
+    },
+    {
+      "kind": "script",
+      "url": "https://app.mailjet.com/pas-nc-embedded-v1.js"
+    },
+    {
+      "kind": "script",
+      "url": "https://www.googletagmanager.com/gtag/js?id=G-BH1VNBYRRL"
+    }
+  ]
+}

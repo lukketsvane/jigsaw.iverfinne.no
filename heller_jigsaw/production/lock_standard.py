@@ -131,7 +131,7 @@ def run(src, out):
             cfg['simplification_mm'] = tol
             prov['parent_run'] = str(src)
             dest = out
-            quality = export_puzzle_run(part, dest, cfg, prov, ['32-piece minimum-area canonical shared-seam undercuts'], [m.mask for m in motifs], vcfg)
+            quality = export_puzzle_run(part, dest, cfg, prov, ['Canonical shared-seam undercuts'], [m.mask for m in motifs], vcfg)
             print('FINAL', str(dest), quality['all_hard_gates_passed'], lock, 'mean', np.mean([f[0] for f in ff]), 'min', min((f[0] for f in ff)), flush=True)
             if quality['all_hard_gates_passed']:
                 fabrication_audit(dest)

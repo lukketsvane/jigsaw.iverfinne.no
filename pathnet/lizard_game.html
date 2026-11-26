@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="nn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f7f6ed">
+<title>Øglepuslespelet</title>
+<style>
+  :root { color-scheme: light; font-family: "DM Sans", "Segoe UI", sans-serif; color: #282d21; background: #f7f6ed; }
+  * { box-sizing: border-box; }
+  body { margin: 0; height: 100vh; height: 100dvh; min-height: 340px; display: flex; flex-direction: column; }
+  button, select { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  button:focus-visible, select:focus-visible, #table:focus-visible { outline: 3px solid #347b53; outline-offset: 2px; }
+  button, .select { border-radius: 8px; }
+  button:disabled { opacity: .4; cursor: default; }
+  header, footer { padding: 0 clamp(15px,3.3vw,58px); display: flex; align-items: center; flex: none; gap: 20px; }
+  header { min-height: 73px; border-bottom: 1px solid #cecfc1; }
+  h1 { margin: 0; font-family: "Instrument Serif", Georgia, serif; font-weight: 500; font-size: clamp(26px,3.2vw,40px); line-height: 1; letter-spacing: -.055em; }
+  .meta { margin-right: auto; color: #626657; font-size: 13px; border-left: 1px solid #c7c9ba; padding-left: 19px; }
+  main { flex: 1; min-height: 0; position: relative; background: radial-gradient(ellipse at 48% 39%, #fffef9, #f1f1e7); overflow: hidden; }
+  #table { display: block; width: 100%; height: 100%; touch-action: none; user-select: none; cursor: grab; }
+  #table:focus-visible { outline-offset: -4px; }
+  #table.moving { cursor: grabbing; }
+  .piece { stroke-linecap: round; stroke-linejoin: round; }
+  .selected .face { stroke: #16241a; paint-order: stroke fill; stroke-width: var(--selected-width); }
+  #underside { filter: drop-shadow(0px 1px 1.6px #33261060); }
+  #table.moving #underside { filter: none; }
+  .zoom { position: absolute; left: clamp(12px,2.3vw,32px); bottom: 15px; display: flex; align-items: center; padding: 3px; border: 1px solid #d5d6ca; border-radius: 9px; background: #fcfcf5f5; }
+  .zoom button { background: none; border: 0; width: 36px; height: 34px; display: grid; place-items: center; border-radius: 5px; }
+  .zoom span { min-width: 40px; text-align: center; font-size: 12px; font-variant-numeric: tabular-nums; }
+  .zoom button:last-child { border-left: 1px solid #dedfd2; border-radius: 0 5px 5px 0; margin-left: 2px; }
+  button svg { width: 17px; height: 17px; stroke-linecap: round; stroke-linejoin: round; stroke: currentColor; stroke-width: 1.65; fill: none; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 43px; border: 1px solid #bfc3b2; background: #fbfbf4; padding: 0 15px; font-size: 14px; font-weight: 550; white-space: nowrap; }
+  .btn:hover, .zoom button:hover { background: #e8ebdc; }
+  .btn.primary { background: #253f2b; color: #fffef5; border-color: #253f2b; padding: 0 23px; }
+  .btn.primary:hover { background: #365b3e; }
+  .btn.plain { border-color: transparent; background: transparent; }
+  .btn.plain:hover { background: #e8ebdc; }
+  footer { min-height: 77px; justify-content: space-between; border-top: 1px solid #cecfc1; }
+  .status { min-width: 0; display: flex; align-items: center; gap: 10px; font-size: 14px; }
+  .status::before { content: ''; width: 9px; height: 9px; border-radius: 50%; background: #6a8152; flex: none; }
+  .controls { display: flex; align-items: center; justify-content: flex-end; gap: 7px; }
+  .select { position: relative; border: 1px solid #bfc3b2; display: inline-flex; background: #fbfbf4; }
+  .select select { padding: 0 28px 0 13px; border: 0; min-height: 41px; appearance: none; font-size: 14px; border-radius: 8px; background: transparent; cursor: pointer; }
+  .select::after { content: ''; position: absolute; right: 12px; top: 16px; width: 6px; height: 6px; border-right: 1.5px solid; border-bottom: 1.5px solid; transform: rotate(45deg); pointer-events: none; }
+  dialog { padding: 0; background: #fcfcf5; color: #282d21; border: 1px solid #b9c0ae; border-radius: 15px; width: min(430px,calc(100% - 30px)); box-shadow: 0 16px 65px #13200f35; }
+  dialog::backdrop { background: #1e291e4a; }
+  .dialog-body { padding: 24px; }
+  dialog h2 { font: 500 31px/1.1 "Instrument Serif",Georgia,serif; letter-spacing: -.035em; margin: 0 0 16px; }
+  dialog p { font-size: 15px; line-height: 1.55; margin: 12px 0; }
+  dialog details { font-size: 14px; line-height: 1.5; margin: 17px 0; }
+  dialog summary { cursor: pointer; }
+  .dialog-actions { margin-top: 21px; display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+  [hidden] { display: none !important; }
+  .sr { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); }
+  @media(max-width: 730px) {
+    header, footer { gap: 10px; }
+    header { min-height: 61px; }
+    header .btn { padding: 0 6px; }
+    .meta { font-size: 12px; padding-left: 11px; }
+    footer { padding-top: 9px; padding-bottom: 9px; min-height: 73px; flex-wrap: wrap; }
+    .status { font-size: 12px; }
+    .btn { min-height: 39px; padding: 0 10px; font-size: 13px; }
+    .btn.primary { padding: 0 14px; }
+    .select select { min-height: 37px; font-size: 13px; }
+    .zoom { left: 10px; bottom: 9px; }
+  }
+  @media(max-width: 550px) {
+    .help-label { display: none; }
+    header .btn { min-width: 38px; }
+    footer { justify-content: center; gap: 7px; }
+    .status { width: 100%; justify-content: center; }
+    .controls { justify-content: center; flex-wrap: wrap; gap: 4px; }
+    .zoom button { width: 30px; height: 30px; }
+    .zoom span { min-width: 33px; }
+  }
+</style>
+</head>
+<body>
+<svg aria-hidden="true" style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.1a2.6 2.6 0 0 1 5.1.6c0 1.8-2.6 2.1-2.6 4.1m0 2.7h.01"/></symbol>
+  <symbol id="i-wrap" viewBox="0 0 24 24"><path d="M5 9h14m-4-4 4 4-4 4M19 15H5m4 4-4-4 4-4"/></symbol>
+  <symbol id="i-undo" viewBox="0 0 24 24"><path d="m9 5-5 5 5 5M4 10h10a5 5 0 0 1 0 10"/></symbol>
+  <symbol id="i-next" viewBox="0 0 24 24"><path d="M4 12h15m-6-6 6 6-6 6"/></symbol>
+  <symbol id="i-fit" viewBox="0 0 24 24"><path d="M9 4H4v5m11-5h5v5M4 15v5h5m11-5v5h-5"/></symbol>
+</svg>
+<header>
+  <h1>Øglepuslespelet</h1>
+  <span class="meta" id="edition"></span>
+  <button class="btn plain" id="help" aria-label="Slik spelar du"><svg aria-hidden="true"><use href="#i-help"/></svg><span class="help-label">Slik spelar du</span></button>
+</header>
+<main>
+  <svg id="table" tabindex="0" xmlns="http://www.w3.org/2000/svg" aria-label="Puslebord. Bruk piltastane til å flytte utsnittet. Du finn tastane for brikkene under Slik spelar du.">
+    <defs id="shapes"></defs>
+    <g id="camera"><g id="underside" aria-hidden="true" pointer-events="none"></g><g id="faces"></g></g>
+  </svg>
+  <div class="zoom" aria-label="Utsnitt">
+    <button id="smaller" aria-label="Zoom ut" title="Zoom ut">−</button>
+    <span id="zoomValue">100 %</span>
+    <button id="larger" aria-label="Zoom inn" title="Zoom inn">+</button>
+    <button id="fit" aria-label="Vis alle brikkene" title="Vis alle brikkene"><svg aria-hidden="true"><use href="#i-fit"/></svg></button>
+  </div>
+</main>
+<footer>
+  <div class="status" id="status" role="status"></div>
+  <div class="controls">
+    <button class="btn plain" id="wrap"><svg aria-hidden="true"><use href="#i-wrap"/></svg>Flytt kanten</button>
+    <button class="btn plain" id="undo" hidden><svg aria-hidden="true"><use href="#i-undo"/></svg>Angre</button>
+    <button class="btn" id="show" hidden>Vis motivet</button>
+    <label class="select" id="difficulty"><span class="sr">Vel talet på lause brikker</span><select id="mode"><option value="few">8 lause brikker</option><option value="all">Alle lause</option></select></label>
+    <button class="btn primary" id="action"><span id="actionLabel">Start spelet</span><svg aria-hidden="true"><use href="#i-next"/></svg></button>
+  </div>
+</footer>
+<dialog id="instructions"><div class="dialog-body">
+  <h2>Slik spelar du</h2>
+  <p>Dra ei øgle inntil ein nabo som passar. Slepp henne når kantane møtest. Øgler som heng saman, kan du flytte som ei gruppe.</p>
+  <p>Bordet har ingen fast kant. Ei øgle på venstresida kan òg passe til ein nabo ytst på høgresida. Målet er å samle alle brikkene i éi samanhengande form.</p>
+  <p>Dra i bakgrunnen for å flytte utsnittet. Zoom med musehjulet, to fingrar eller knappane på bordet.</p>
+  <details><summary>Spel med tastatur</summary><p>Gå til puslebordet med Tab. Bruk Page Down og Page Up for å velje gruppe. Piltastane flyttar henne, og Shift gir større steg. Enter festar gruppa dersom ho passar. Escape slepper valet. Utan ei vald gruppe flyttar piltastane utsnittet. Pluss og minus zoomar.</p></details>
+  <div class="dialog-actions"><button class="btn primary" id="closeHelp">Til bordet</button></div>
+</div></dialog>
+<dialog id="restart"><div class="dialog-body">
+  <h2>Ny runde</h2><p>Vel kor mange øgler du vil leggje ut på bordet.</p>
+  <label class="select"><span class="sr">Tal på lause brikker</span><select id="newMode"><option value="few">8 lause brikker</option><option value="all">Alle lause</option></select></label>
+  <div class="dialog-actions"><button class="btn plain" id="cancelNew">Avbryt</button><button class="btn primary" id="startNew">Start på nytt</button></div>
+</div></dialog>
+<span class="sr" id="notice" aria-live="polite"></span>
+<script id="puzzle-data" type="application/json">__PUZZLE_JSON__</script>
+<script>
+'use strict';
+const puzzle = JSON.parse(document.getElementById('puzzle-data').textContent);
+const pieces = puzzle.pieces;
+const count = pieces.length;
+const $ = id => document.getElementById(id);
+const svg = $('table'), camera = $('camera'), faces = $('faces'), underside = $('underside');
+const svgNS = 'http://www.w3.org/2000/svg';
+const node = (name, attrs) => {
+  const element = document.createElementNS(svgNS, name);
+  for (const [key, value] of Object.entries(attrs)) element.setAttribute(key, value);
+  return element;
+};
+const pathData = points => points.length ? 'M' + points.map(point => point.join(',')).join('L') : '';
+const [periodA, periodB] = puzzle.periods;
+const det = periodA[0] * periodB[1] - periodA[1] * periodB[0];
+const step = Math.sqrt(Math.abs(det) / count);
+const shortRound = Math.min(8, Math.max(1, Math.floor(count / 2)));
+const stroke = step * .015;
+const nodes = [], bounds = [];
+let view = {x: 0, y: 0, scale: 1, homeScale: 1};
+let play = null, preview = true, layoutIndex = 0;
+let previewOffsets = pieces.map(() => [0, 0]);
+let selected = null, drag = null, keysBefore = null, pinch = null;
+let undoStack = [], pointers = new Map();
+let round = 0;
+const stateKey = 'oglepuslespel-v1-' + [puzzle.seed, count, det, pieces[0].outline[0]].join('/');
+
+function buildBoard() {
+  svg.style.setProperty('--selected-width', stroke * 5);
+  const fragment = document.createDocumentFragment();
+  for (const p of pieces) {
+    const id = p.id, x = p.outline.map(q => q[0]), y = p.outline.map(q => q[1]);
+    bounds[id] = [Math.min(...x), Math.min(...y), Math.max(...x), Math.max(...y)];
+    $('shapes').append(node('path', {id: 'lizard-' + id, d: pathData(p.outline) + 'Z'}));
+    const wood = node('use', {href: '#lizard-' + id, fill: '#573d29', stroke: '#573d29', 'stroke-width': stroke * 1.05});
+    underside.append(wood);
+    const g = node('g', {class: 'piece', 'data-id': id});
+    const face = node('use', {href: '#lizard-' + id, fill: p.color, class: 'face', stroke: '#4e431f', 'stroke-opacity': .75, 'stroke-width': stroke});
+    g.append(face);
+    if (p.spine?.length) g.append(node('path', {d: pathData(p.spine), fill: 'none', stroke: '#504124', 'stroke-opacity': .91, 'stroke-width': stroke * .95, 'pointer-events': 'none'}));
+    for (const [cx, cy] of p.eyes || []) g.append(node('circle', {cx, cy, r: p.eyeRadius || step * .025, fill: '#4b381d', 'pointer-events': 'none'}));
+    fragment.append(g);
+    nodes[id] = {g, wood};
+  }
+  faces.append(fragment);
+  $('edition').textContent = count + ' brikker · Nr. ' + puzzle.seed;
+  for (const selector of ['mode', 'newMode']) $(selector).options[0].textContent = shortRound + ' lause brikker';
+}
+function offsets() { return preview ? previewOffsets : play.offsets; }
+function draw(id) {
+  const [x,y] = offsets()[id];
+  nodes[id].g.setAttribute('transform', 'translate(' + x + ' ' + y + ')');
+  nodes[id].wood.setAttribute('transform', 'translate(' + (x + stroke) + ' ' + (y + stroke * 2.2) + ')');
+}
+function drawAll() { pieces.forEach(p => draw(p.id)); }
+function extent() {
+  const box = [Infinity, Infinity, -Infinity, -Infinity];
+  for (const p of pieces) {
+    const b = bounds[p.id], [x,y] = offsets()[p.id];
+    box[0] = Math.min(box[0], b[0]+x); box[1] = Math.min(box[1], b[1]+y);
+    box[2] = Math.max(box[2], b[2]+x); box[3] = Math.max(box[3], b[3]+y);
+  }
+  return box;
+}
+function dimensions() { return [svg.clientWidth, svg.clientHeight]; }
+function applyCamera() {
+  camera.setAttribute('transform', 'translate(' + view.x + ' ' + view.y + ') scale(' + view.scale + ')');
+  $('zoomValue').textContent = Math.round(100 * view.scale / view.homeScale) + ' %';
+}
+function fit() {
+  const [w,h] = dimensions(), [x0,y0,x1,y1] = extent();
+  if (!w || !h) return;
+  const reserve = Math.min(34,h*.1);
+  view.scale = Math.max(.001, Math.min(w*.92/(x1-x0), (h-reserve)*.91/(y1-y0)));
+  view.homeScale = view.scale;
+  view.x = (w - view.scale * (x1+x0))/2;
+  view.y = (h - reserve - view.scale * (y1+y0))/2 + reserve*.25;
+  applyCamera();
+}
+function zoom(factor, pos) {
+  const newScale = Math.min(view.homeScale*12, Math.max(view.homeScale*.16, view.scale*factor));
+  const ratio = newScale / view.scale;
+  view.x = pos[0] - ratio * (pos[0]-view.x); view.y = pos[1] - ratio * (pos[1]-view.y);
+  view.scale = newScale;
+  applyCamera();
+}
+function midScreen() { return dimensions().map(n => n/2); }
+function screenPoint(e) { const b = svg.getBoundingClientRect(); return [e.clientX-b.left,e.clientY-b.top]; }
+function snapshot() { return {groups: play.groups.slice(), offsets: play.offsets.map(p => p.slice()), mode: play.mode}; }
+function remember(before) {
+  undoStack.push(before);
+  if (undoStack.length > 35) undoStack.shift();
+}
+function save() {
+  try { localStorage.setItem(stateKey, JSON.stringify(play)); } catch {}
+}
+function restore() {
+  try {
+    const state = JSON.parse(localStorage.getItem(stateKey));
+    if (['all','few'].includes(state?.mode) && state.groups?.length === count && state.offsets?.length === count &&
+        state.groups.every(n => Number.isInteger(n) && n>=0 && n<count) &&
+        state.offsets.every(p => Array.isArray(p) && p.length===2 && p.every(Number.isFinite))) play = state;
+  } catch {}
+}
+function groupIds(id) { return pieces.filter(p => play.groups[p.id] === play.groups[id]).map(p => p.id); }
+function largestGroup() {
+  if (!play) return 0;
+  const sizes = Array(count).fill(0);
+  for (const g of play.groups) sizes[g]++;
+  return Math.max(...sizes);
+}
+function refresh() {
+  const size = largestGroup(), won = size === count, hasRound = !!play;
+  $('wrap').hidden = !preview;
+  $('undo').hidden = preview; $('undo').disabled = undoStack.length === 0;
+  $('show').hidden = preview;
+  $('difficulty').hidden = !preview || (hasRound && !won);
+  $('actionLabel').textContent = preview ? (hasRound && !won ? 'Hald fram' : hasRound ? 'Spel igjen' : 'Start spelet') : 'Ny runde';
+  $('status').textContent = preview ? 'Samla motiv' : (won ? 'Alle ' + count + ' øglene heng saman!' : size + ' av ' + count + ' i største gruppe');
+}
+function select(id) {
+  if (selected !== null) nodes[selected].g.classList.remove('selected');
+  selected = id;
+  if (id !== null) nodes[id].g.classList.add('selected');
+}
+function applyOffset(ids, dx, dy) {
+  for (const id of ids) {
+    play.offsets[id][0] += dx; play.offsets[id][1] += dy; draw(id);
+  }
+}
+function shuffledIds() {
+  let n = (Number(puzzle.seed) ^ Math.imul(++round, 0x9e3779b9) ^ Date.now()) >>> 0;
+  const rand = () => { n = (Math.imul(n,1664525) + 1013904223) >>> 0; return n / 4294967296; };
+  const ids = pieces.map(p => p.id);
+  for (let i=ids.length-1; i>0; i--) { const j=Math.floor(rand()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; }
+  return ids;
+}
+function connectedGroups(ids, positions) {
+  const left = new Set(ids);
+  const groups = [];
+  for (const root of ids) {
+    if (!left.delete(root)) continue;
+    const stack = [root], group = [];
+    while (stack.length) {
+      const i = stack.pop();
+      group.push(i);
+      for (const neighbor of pieces[i].neighbors) {
+        const j = neighbor.id, a = positions[i], b = positions[j];
+        if (left.has(j) && Math.hypot(b[0]-a[0]-neighbor.offset[0], b[1]-a[1]-neighbor.offset[1]) < step*1e-5) {
+          left.delete(j); stack.push(j);
+        }
+      }
+    }
+    groups.push(group);
+  }
+  return groups;
+}
+function newRound(mode) {
+  select(null); keysBefore = null;
+  const original = previewOffsets.map(p => p.slice());
+  play = {mode, groups: pieces.map(p => p.id), offsets: original};
+  preview = false;
+  const initial = extent(), order = shuffledIds(), few = mode === 'few';
+  let loose = order;
+  if (few) {
+    const remaining = new Set(order), nearHole = new Set();
+    loose = [];
+    // An arm of an alternate layout may be just one lizard wide.
+    // Take pieces only where the rest of the starting puzzle stays connected.
+    while (loose.length < shortRound) {
+      const canLift = id => connectedGroups([...remaining].filter(i => i!==id), original).length === 1;
+      const candidates = order.filter(i => remaining.has(i));
+      const id = candidates.find(i => !nearHole.has(i) && canLift(i)) ?? candidates.find(canLift);
+      if (id === undefined) break;
+      loose.push(id); remaining.delete(id);
+      pieces[id].neighbors.forEach(n => nearHole.add(n.id));
+    }
+    const anchor = remaining.values().next().value;
+    for (const id of remaining) play.groups[id] = anchor;
+  }
+  const width = Math.max(...loose.map(i => bounds[i][2]-bounds[i][0])) * 1.08;
+  const height = Math.max(...loose.map(i => bounds[i][3]-bounds[i][1])) * 1.08;
+  const vertical = svg.clientWidth < svg.clientHeight;
+  const columns = few ? (vertical ? Math.min(loose.length,Math.ceil(Math.sqrt(loose.length*1.8))) : Math.ceil(Math.sqrt(loose.length/2))) : Math.max(1, Math.ceil(Math.sqrt(count * svg.clientWidth / Math.max(1,svg.clientHeight) * height / width)));
+  const rows = Math.ceil(loose.length/columns);
+  const x0 = few ? (vertical ? (initial[0]+initial[2]-columns*width)/2 : initial[2]+step*.45) : 0;
+  const y0 = few ? (vertical ? initial[3]+step*.45 : (initial[1]+initial[3]-rows*height)/2) : 0;
+  loose.forEach((id,i) => {
+    const box = bounds[id];
+    play.offsets[id] = [x0+(i%columns+.5)*width-(box[0]+box[2])/2, y0+(Math.floor(i/columns)+.5)*height-(box[1]+box[3])/2];
+  });
+  undoStack = []; drawAll(); fit(); refresh(); save();
+}
+function closestFit(ids, tolerance) {
+  let best = null, bestDistance = tolerance;
+  for (const i of ids) {
+    const [ax,ay] = play.offsets[i];
+    for (const n of pieces[i].neighbors) {
+      if (play.groups[i] === play.groups[n.id]) continue;
+      const [bx,by] = play.offsets[n.id];
+      const dx = bx-n.offset[0]-ax, dy = by-n.offset[1]-ay;
+      const dist = Math.hypot(dx,dy);
+      if (dist <= bestDistance) { best = {id:n.id,dx,dy}; bestDistance = dist; }
+    }
+  }
+  return best;
+}
+function finishMove(id,before) {
+  let ids = groupIds(id);
+  const hit = closestFit(ids, Math.max(step*.13, Math.min(step*.42, 19/view.scale)));
+  if (hit) {
+    applyOffset(ids, hit.dx, hit.dy);
+    const group = play.groups[hit.id];
+    for (const i of ids) play.groups[i] = group;
+    // One drop can close a gap between several assembled clusters.
+    for (;;) {
+      ids = groupIds(id);
+      const joined = closestFit(ids, step*1e-5);
+      if (!joined) break;
+      for (const i of groupIds(joined.id)) play.groups[i] = group;
+    }
+    $('notice').textContent = ids.length + ' brikker heng saman.';
+    select(null);
+  }
+  if (before) remember(before);
+  keysBefore = null; refresh(); save();
+}
+function wrap() {
+  layoutIndex = (layoutIndex + 1) % 5;
+  previewOffsets = pieces.map(() => [0,0]);
+  if (layoutIndex !== 0) {
+    const phase = layoutIndex*1.318;
+    const center = pieces.reduce((c,p) => [c[0]+p.center[0]/count, c[1]+p.center[1]/count], [0,0]);
+    // Each piece can be lifted by any whole lattice period. Choose the copy
+    // closest to a lobed silhouette, leaving a small opening near its centre.
+    for (const p of pieces) {
+      const x = p.center[0]-center[0], y = p.center[1]-center[1];
+      const s = (x*periodB[1]-y*periodB[0])/det, t = (periodA[0]*y-periodA[1]*x)/det;
+      let best = Infinity;
+      for (let i=-1; i<=1; i++) {
+        for (let j=-1; j<=1; j++) {
+          const u=s+i, v=t+j, angle=Math.atan2(v,u);
+          const radius=1+.39*Math.cos(5*angle+phase)+.10*Math.cos(3*angle-.8*phase);
+          const opening=.87*Math.exp(-((u-.13)**2+(v+.10)**2)/.011);
+          const score=Math.hypot(u,v)/radius+opening;
+          if (score < best) {
+            best=score;
+            previewOffsets[p.id]=[i*periodA[0]+j*periodB[0], i*periodA[1]+j*periodB[1]];
+          }
+        }
+      }
+    }
+    // Lift disconnected tips as entire clusters onto a matching tooth of the
+    // largest island. A joined cluster keeps every seam it already contained.
+    const ids=pieces.map(p=>p.id);
+    for (;;) {
+      const groups=connectedGroups(ids,previewOffsets).sort((a,b)=>b.length-a.length);
+      if (groups.length===1) break;
+      const core=new Set(groups[0]), byId=new Map();
+      groups.forEach(group=>group.forEach(id=>byId.set(id,group)));
+      let best=Infinity, move=null;
+      for (const i of core) {
+        for (const n of pieces[i].neighbors) {
+          if (core.has(n.id)) continue;
+          const a=previewOffsets[i], b=previewOffsets[n.id];
+          const dx=a[0]+n.offset[0]-b[0], dy=a[1]+n.offset[1]-b[1];
+          const group=byId.get(n.id), cost=group.length*Math.hypot(dx,dy);
+          if (cost<best) { best=cost; move={group,dx,dy}; }
+        }
+      }
+      if (!move) throw Error('Brikkene manglar ei samanhengande naboliste.');
+      for (const id of move.group) { previewOffsets[id][0]+=move.dx; previewOffsets[id][1]+=move.dy; }
+    }
+  }
+  drawAll(); fit();
+}
+function switchView(toPreview) {
+  select(null); keysBefore = null; preview = toPreview;
+  drawAll(); fit(); refresh();
+}
+function dragStart(e) {
+  if (e.button !== 0) return;
+  const pt = screenPoint(e);
+  pointers.set(e.pointerId,pt); svg.setPointerCapture(e.pointerId);
+  if (pointers.size > 1) {
+    if (drag?.before) { play = drag.before; drawAll(); }
+    drag = null; keysBefore = null; select(null);
+    const [a,b] = [...pointers.values()];
+    pinch = {mid:[(a[0]+b[0])/2,(a[1]+b[1])/2], dist:Math.hypot(a[0]-b[0],a[1]-b[1])};
+    return;
+  }
+  const target = e.target.closest('[data-id]');
+  const id = !preview && target && largestGroup() < count ? Number(target.dataset.id) : null;
+  if (keysBefore && selected !== null) finishMove(selected,keysBefore);
+  select(id);
+  drag = {id, pointer:e.pointerId, start:pt, last:pt, moved:false, ids:id === null ? [] : groupIds(id), before:id === null ? null : snapshot()};
+  svg.focus({preventScroll:true});
+}
+function dragMove(e) {
+  if (!pointers.has(e.pointerId)) return;
+  const pt = screenPoint(e);
+  pointers.set(e.pointerId,pt);
+  if (pinch && pointers.size>1) {
+    const [a,b] = [...pointers.values()], mid = [(a[0]+b[0])/2,(a[1]+b[1])/2], dist = Math.hypot(a[0]-b[0],a[1]-b[1]);
+    zoom(dist / Math.max(1,pinch.dist), pinch.mid);
+    view.x += mid[0]-pinch.mid[0]; view.y += mid[1]-pinch.mid[1]; applyCamera();
+    pinch = {mid,dist}; return;
+  }
+  if (!drag || drag.pointer!==e.pointerId) return;
+  if (!drag.moved && Math.hypot(pt[0]-drag.start[0],pt[1]-drag.start[1])<2) return;
+  if (!drag.moved && drag.id!==null) {
+    for (const id of drag.ids) { faces.append(nodes[id].g); underside.append(nodes[id].wood); }
+  }
+  drag.moved = true; svg.classList.add('moving');
+  const dx = pt[0]-drag.last[0], dy=pt[1]-drag.last[1];
+  if (drag.id===null) { view.x+=dx; view.y+=dy; applyCamera(); }
+  else applyOffset(drag.ids,dx/view.scale,dy/view.scale);
+  drag.last = pt;
+}
+function dragEnd(e) {
+  pointers.delete(e.pointerId);
+  if (pointers.size < 2) pinch = null;
+  if (drag?.pointer===e.pointerId) {
+    if (drag.moved && drag.id!==null) {
+      if (e.type==='pointercancel') { play = drag.before; drawAll(); }
+      else finishMove(drag.id, drag.before);
+    }
+    drag = null;
+  }
+  if (!pointers.size) svg.classList.remove('moving');
+}
+function keydown(e) {
+  if (drag || pinch) return;
+  if (e.key==='+' || e.key==='=' || e.key==='-') { e.preventDefault(); zoom(e.key==='-'?1/1.3:1.3, midScreen()); return; }
+  if (!preview && (e.key==='PageDown' || e.key==='PageUp')) {
+    e.preventDefault();
+    if (keysBefore && selected!==null) finishMove(selected,keysBefore);
+    const reps = [...new Set(play.groups)];
+    const idx = selected===null ? (e.key==='PageDown'?-1:0) : reps.indexOf(play.groups[selected]);
+    const group = reps[(idx + (e.key==='PageDown'?1:-1) + reps.length)%reps.length];
+    select(play.groups.indexOf(group));
+    $('notice').textContent = 'Vald gruppe med ' + groupIds(selected).length + ' brikker.';
+    return;
+  }
+  if (!preview && selected!==null && (e.key==='Enter' || e.key==='Escape')) {
+    e.preventDefault();
+    if (e.key==='Enter') finishMove(selected, keysBefore);
+    else if (keysBefore) { play=keysBefore; keysBefore=null; drawAll(); }
+    select(null); return;
+  }
+  const directions = {ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]};
+  if (!directions[e.key]) return;
+  e.preventDefault();
+  const [dx,dy] = directions[e.key];
+  if (!preview && selected!==null) {
+    if (!keysBefore) keysBefore=snapshot();
+    const d = step*(e.shiftKey ? .85 : .14); applyOffset(groupIds(selected),dx*d,dy*d);
+  } else { view.x-=dx*38; view.y-=dy*38; applyCamera(); }
+}
+svg.addEventListener('pointerdown',dragStart); svg.addEventListener('pointermove',dragMove);
+svg.addEventListener('pointerup',dragEnd); svg.addEventListener('pointercancel',dragEnd);
+svg.addEventListener('keydown',keydown);
+svg.addEventListener('wheel',e => {
+  e.preventDefault();
+  zoom(Math.exp(-Math.max(-450, Math.min(450, e.deltaY * (e.deltaMode===1 ? 14 : 1))) * .002),screenPoint(e));
+},{passive:false});
+$('larger').onclick=()=>zoom(1.3,midScreen()); $('smaller').onclick=()=>zoom(1/1.3,midScreen()); $('fit').onclick=fit;
+$('wrap').onclick=wrap; $('show').onclick=()=>switchView(true);
+$('undo').onclick=()=>{ if (undoStack.length) { play=undoStack.pop(); keysBefore=null; select(null); drawAll(); refresh(); save(); } };
+$('action').onclick=()=>{
+  if (preview) { if (play && largestGroup()<count) switchView(false); else newRound($('mode').value); }
+  else { $('newMode').value=play.mode; $('restart').showModal(); }
+};
+$('startNew').onclick=()=>{ $('restart').close(); newRound($('newMode').value); };
+$('cancelNew').onclick=()=>$('restart').close();
+$('help').onclick=()=>$('instructions').showModal(); $('closeHelp').onclick=()=>$('instructions').close();
+buildBoard(); restore(); drawAll(); fit(); refresh();
+new ResizeObserver(fit).observe(svg);
+</script>
+</body>
+</html>

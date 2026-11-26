@@ -43,9 +43,12 @@ def save_atomic(payload, path: Path) -> None:
 class EpochCheckpoint:
     """Track last and best states separately, including the random streams used during fitting."""
 
-    def __init__(self, out_dir, model, optimizer, scheduler, config, epochs, rng, resume=False):
+    def __init__(self, out_dir, model, optimizer, scheduler, config, epochs, rng, resume=False,
+                 checkpoint_seconds: float = 0):
         if epochs < 1:
             raise ValueError("Specify at least one training epoch")
+        if not np.isfinite(checkpoint_seconds) or checkpoint_seconds < 0:
+            raise ValueError("Checkpoint interval must be a finite, non-negative number of seconds")
         self.path = Path(out_dir) / "training-last.pt"
         self.model = model
         self.optimizer = optimizer
@@ -58,6 +61,8 @@ class EpochCheckpoint:
         self.best_weights = None
         self.best_epoch = None
         self.initial_checkpoint = None
+        self.checkpoint_seconds = checkpoint_seconds
+        self.last_checkpoint_time = float("-inf")
         if resume:
             self.restore()
         elif self.path.exists():
@@ -105,6 +110,8 @@ class EpochCheckpoint:
         self.history.append(dict(epoch=epoch, **metrics))
         self.consider(score, epoch)
         self.scheduler.step()
+        if epoch < self.epochs and time.monotonic() - self.last_checkpoint_time < self.checkpoint_seconds:
+            return
         use_cuda = next(self.model.parameters()).is_cuda
         save_atomic({
             "format_version": 1, "config": self.config, "target_epochs": self.epochs,
@@ -115,3 +122,4 @@ class EpochCheckpoint:
             "cuda_rng": torch.cuda.get_rng_state() if use_cuda else None,
             "augmentation_rng": self.rng.bit_generator.state,
         }, self.path)
+        self.last_checkpoint_time = time.monotonic()
