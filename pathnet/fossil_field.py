@@ -23,6 +23,7 @@ import fossil_net as fn
 from field import DEV, BIG, T
 
 fl.GL = 1.3                    # canonical distance grids must hold the larger families (size factors up to 1.9)
+fl.GRES = 169                  # ... at the same sample spacing as field.py's 129 samples over [-1, 1]
 MIXES = {'trilobites': ('trilobite',), 'reef': ('coral', 'dendrite'), 'fossil-sea': ('trilobite', 'coral', 'dendrite')}
 
 
@@ -43,13 +44,14 @@ def auto_pieces(fams, categories, W, H, s_ref=34.):
     return int(round(.75 * W * H / (s_ref ** 2 * unit)))
 
 
-def refine(net, k, z0, zr, c, th, size, W, H, s_lo, s_hi, steps=260, px=1.25, lam=(150., 3000.), chunk=12, log=None):
-    """field_large.refine with FossilNet as the decoder"""
+def refine(net, k, z0, zr, c, th, size, W, H, s_lo, s_hi, steps=260, px=1.25, lam=(150., 3000.), chunk=12, free_latents=True, log=None):
+    """field_large.refine with FossilNet as the decoder; free_latents=False moves only poses and sizes"""
     n = len(k); w = round(W / px); h = round(H / px); win = 2 * int(math.ceil((.58 * s_hi * 1.9 + 8) / px)); off = torch.arange(-win // 2, win // 2, device=DEV)
     oy, ox = torch.meshgrid(off, off, indexing='ij'); zlim = zr if torch.is_tensor(zr) else torch.full((n, 1), float(zr), device=DEV)   # per-piece safe radius
     c = c.clone().requires_grad_(True); th = th.clone().requires_grad_(True); a = torch.logit(((size - s_lo) / (s_hi - s_lo)).clamp(.02, .98)).requires_grad_(True)
-    zeta = torch.atanh((z0 / zlim).clamp(-.97, .97)).requires_grad_(True)
-    opt = torch.optim.Adam([{'params': [c], 'lr': .06}, {'params': [th], 'lr': .0015}, {'params': [a], 'lr': .006}, {'params': [zeta], 'lr': .02}])
+    zeta = torch.atanh((z0 / zlim).clamp(-.97, .97)).requires_grad_(free_latents)
+    groups = [{'params': [c], 'lr': .06}, {'params': [th], 'lr': .0015}, {'params': [a], 'lr': .006}] + ([{'params': [zeta], 'lr': .02}] if free_latents else [])
+    opt = torch.optim.Adam(groups)
     from torch.utils.checkpoint import checkpoint
     for it in range(steps):
         f = it / max(1, steps - 1); weight = lam[0] * (lam[1] / lam[0]) ** f; sz = s_lo + (s_hi - s_lo) * torch.sigmoid(a); jit = (torch.rand(2, device=DEV) - .5) * px
@@ -97,10 +99,16 @@ def compose(mix='fossil-sea', seed=1, W=570., H=390., n=0, restarts=4, base_mm=f
     log(f'  size range {s_lo:.1f}-{s_hi:.1f} mm (times each family size factor); best packing score {packed[0][0]:.3f} ({time.time() - t0:.0f}s)')
     if out is not None: fll.snapshot(out, '1-layout', outlines(net, k, z0, packed[0][1], packed[0][2], packed[0][3]), W, H, f'Layout: {n} creatures placed ({time.time() - t0:.0f} s)')
     for li, (score, c0, th0, size0, _) in enumerate(packed[:max(1, layouts)]):
-        c, th, size, z = refine(net, k, z0, zr, c0, th0, size0, W, H, s_lo, s_hi, log=log); rv = 0
-        for i in range(n):                         # a refined latent must still decode to the drawing it came from
+        c, th, size, z = refine(net, k, z0, zr, c0, th0, size0, W, H, s_lo, s_hi, log=log); rv = thin = 0
+        mm = outlines(net, k, z, c, th, size)
+        for i in range(n):                         # a refined latent must still decode to the drawing it came from ...
             p = Polygon(fn.flatten(net(k[i:i + 1], z[i:i + 1])[0].cpu().numpy().astype(float)))
-            if not (p.is_valid and fn.iou(p, Polygon(fn.flatten(fams[int(k[i])]['q']))) >= .8): z[i] = z0[i]; rv += 1
+            if not (p.is_valid and fn.iou(p, Polygon(fn.flatten(fams[int(k[i])]['q']))) >= .8): z[i] = z0[i]; rv += 1; continue
+            e = Polygon(mm[i]).buffer(-1.5)         # ... and keep every part 3 mm wide at the size it is cut
+            if e.is_empty or e.geom_type != 'Polygon': z[i] = z0[i]; thin += 1
+        if rv + thin:                              # put-back shapes no longer fit their refined poses: settle poses and sizes only
+            c, th, size, z = refine(net, k, z, zr, c, th, size, W, H, s_lo, s_hi, steps=120, lam=(3000., 3000.), free_latents=False)
+            log(f'  layout {li}: {rv} latents put back for drawing fidelity, {thin} for thin parts; poses settled')
         if out is not None:
             out.mkdir(parents=True, exist_ok=True)
             torch.save({'seed': seed, 'mix': mix, 'k': k.cpu(), 'z': z.cpu(), 'c': c.cpu(), 'th': th.cpu(), 'size': size.cpu(), 'W': W, 'H': H, 'bay': bay}, out / f'layout-{li}-state.pt')
@@ -111,9 +119,10 @@ def compose(mix='fossil-sea', seed=1, W=570., H=390., n=0, restarts=4, base_mm=f
                 m = -1. if any(flag(f) for f in faces) else fl.lock_margin(faces)
             except ValueError as e: m = -1.; log(f'  layout {li}: {e}')
             tried.append({'packing_score': score, 'lock_margin_mm': m}); log(f'  layout {li} (packing score {score:.3f}): lock margin {m:.2f} mm ({time.time() - t0:.0f}s)')
-        if best is None or (m is not None and m > best[0]): best = (m if m is not None else 0., c, th, size, z, rv)
-    _, c, th, size, z, reverted = best
+        if best is None or (m is not None and m > best[0]): best = (m if m is not None else 0., c, th, size, z, (rv, thin))
+    _, c, th, size, z, (reverted, reverted_thin) = best
     polys = outlines(net, k, z, c, th, size); lay = fl.measure(fl.distance_stack(polys, W, H, 1., 80.), W, H)
+    thin_final = sum(1 for xy in polys if (lambda e: e.is_empty or e.geom_type != 'Polygon')(Polygon(xy).buffer(-1.5)))   # silhouettes still holding a part under 3 mm
     log(f'  silhouettes cover {lay["covered"]:.3f} of the board, rms gap {lay["rms_gap_mm"]:.2f} mm, deepest overlap {lay["max_overlap_depth_mm"]:.2f} mm ({time.time() - t0:.0f}s)')
     if out is not None: fll.snapshot(out, '2-refined', polys, W, H, f'Refined: poses, sizes and network latents optimised together ({time.time() - t0:.0f} s)')
     res = fll.partition(polys, W, H, px, bay=bay, margin=margin); bis = fll.partition(polys, W, H, px, bay=0., margin=margin)
@@ -131,7 +140,7 @@ def compose(mix='fossil-sea', seed=1, W=570., H=390., n=0, restarts=4, base_mm=f
         meta[i]['drawing_iou'] = src_iou[-1]
     import hashlib
     report = {'model_sha256': hashlib.sha256((fn.DATA / 'fossilnet.pt').read_bytes()).hexdigest(), 'seed': seed, 'mix': mix, 'categories': list(categories), 'width_mm': W, 'height_mm': H, 'requested_pieces': n, 'device': str(DEV), 'model': 'FossilNet (pathnet/fossil_net.py)',
-              'layout': lay, 'layouts_compared': tried, 'latents_reverted': reverted, 'size_range_mm': [float(size.min()), float(size.max())],
+              'layout': lay, 'layouts_compared': tried, 'latents_reverted': reverted, 'latents_reverted_for_thin_parts': reverted_thin, 'silhouettes_with_parts_under_3mm': thin_final, 'size_range_mm': [float(size.min()), float(size.max())],
               'extent_range_mm': [min(m['extent_mm'] for m in meta), max(m['extent_mm'] for m in meta)],
               'drawing_iou': {'mean': float(np.mean(src_iou)), 'min': float(np.min(src_iou))},
               'families_used': {fams[j]['label']: int((k == j).sum()) for j in sorted(set(ks))},
@@ -143,7 +152,7 @@ def compose(mix='fossil-sea', seed=1, W=570., H=390., n=0, restarts=4, base_mm=f
     return res, polys, meta, report, state, engravings(net, fams, k, z, c, th, size)
 
 
-def export_engraving(out, faces, loops, W, H, polys=None, clearance=1.0, line_clearance=.6, min_line=2.0, tag='fossil-field'):
+def export_engraving(out, faces, loops, W, H, polys=None, clearance=1.0, line_clearance=1.0, min_line=3.0, tag='fossil-field'):
     """engraving layer: every feature loop (eyes, faces) that stays `clearance` mm inside its own cut piece, plus the
     drawing's own outline wherever it runs at least `line_clearance` mm inside the piece (notches too narrow to cut)"""
     from generate import outsvg, points_svg
