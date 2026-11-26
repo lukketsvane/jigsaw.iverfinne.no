@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import sys
+import time
 from collections import Counter
 from pathlib import Path
 from typing import Optional, Sequence
@@ -47,6 +48,8 @@ def train_shapes(
     min_train_count: int = 1,
     eikonal_weight: float = 0.0,
     exclude_classes: Sequence[str] = ("unclassified_motif", "multi_motif_panel"),
+    width: int = 1,
+    stages: int = 3,
 ):
     folder = Path(out_dir)
     folder.mkdir(parents=True, exist_ok=True)
@@ -102,7 +105,7 @@ def train_shapes(
         "source_url", "creator", "license", "license_url", "commercial_ok",
     )
     source_list = [{k: r.get(k) for k in fields} for r in selected]
-    model = AnimalShapeVAE(len(names), size, latent_dim).to(device)
+    model = AnimalShapeVAE(len(names), size, latent_dim, width, stages).to(device)
     opt = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-4)
     sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=epochs)
     config = dict(
@@ -124,6 +127,15 @@ def train_shapes(
         config["min_train_count"] = int(min_train_count)
     if eikonal_weight > 0:
         config["eikonal_weight"] = float(eikonal_weight)
+    # Recorded only when they differ from the original architecture, so older checkpoints still resume.
+    if width != 1:
+        config["width"] = int(width)
+    if stages != 3:
+        config["stages"] = int(stages)
+    if device.type == "cuda":
+        torch.cuda.reset_peak_memory_stats(device)
+    started = time.perf_counter()
+    first_epoch = None
 
     run = EpochCheckpoint(folder, model, opt, sched, config, epochs, rng, resume=resume)
     (folder / "training-sources.json").write_text(json.dumps(source_list, indent=2), encoding="utf-8")
@@ -147,6 +159,8 @@ def train_shapes(
     weights = np.power(freq[train_y.cpu().numpy()].astype(float), -1.0 if balanced else -0.5)
     weights /= weights.sum()
     for epoch in range(len(run.history), epochs):
+        if first_epoch is None:
+            first_epoch = epoch
         model.train()
         indices = np.concatenate([np.arange(len(train_x)), rng.choice(len(train_x), len(train_x), p=weights)])
         if balanced:
@@ -211,6 +225,10 @@ def train_shapes(
         best_epoch=run.best_epoch,
         catalog_digest=config["catalog_digest"],
     )
+    if width != 1:
+        ckpt_payload["width"] = int(width)
+    if stages != 3:
+        ckpt_payload["stages"] = int(stages)
     save_atomic(ckpt_payload, path)
 
     evaluation = {}
@@ -284,6 +302,13 @@ def train_shapes(
         valid_raw_shapes_per_class=valid,
         sample_diversity_vs_retrieval=sample_stats,
         raw_draws_per_class=32,
+        parameters=int(sum(p.numel() for p in model.parameters())),
+        session=dict(
+            first_epoch_this_session=first_epoch,
+            seconds=round(time.perf_counter() - started, 1),
+            peak_cuda_memory_mib=round(torch.cuda.max_memory_allocated(device) / 2**20, 1) if device.type == "cuda" else None,
+            device_name=torch.cuda.get_device_name(device) if device.type == "cuda" else "cpu",
+        ),
     )
     (folder / "metrics.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
     return report

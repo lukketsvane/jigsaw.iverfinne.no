@@ -402,7 +402,8 @@ def cmd_train_encoder(args: argparse.Namespace) -> int:
 def cmd_compose(args: argparse.Namespace) -> int:
     from .production.search import run
 
-    run(args.catalog, args.out, args.seed, args.mode, args.reference_catalog)
+    run(args.catalog, args.out, args.seed, args.mode, args.reference_catalog,
+        piece_area=args.piece_area, objective=args.objective, config_set=args.configs)
     return 0
 
 
@@ -436,6 +437,31 @@ def cmd_fabrication_audit(args: argparse.Namespace) -> int:
     print(json.dumps({"digital_screen_pass": bool(passed), "physical_test": "not performed",
                       "commercial_release": "not cleared"}, indent=2))
     return 0 if passed else 2
+
+
+def cmd_fidelity_audit(args: argparse.Namespace) -> int:
+    from .production.fidelity import fidelity_audit
+
+    report = fidelity_audit(args.run_dir, reference_catalog=args.reference_catalog)
+    print(json.dumps({"summary": report["summary"], "weakest": [
+        {k: r[k] for k in ("piece", "motif_class", "fidelity", "boundary_f", "bay_fill", "extremity_recall")}
+        for r in report["weakest"]]}, indent=2))
+    return 0
+
+
+def cmd_benchmark_shapes(args: argparse.Namespace) -> int:
+    from .models.benchmark_shapes import benchmark
+
+    report = benchmark(args.corpus, args.models, args.out, args.device)
+    print(json.dumps({"selected_model": report["selected_model"], "ranking": report["ranking"]}, indent=2))
+    return 0
+
+
+def cmd_render_previews(args: argparse.Namespace) -> int:
+    from .production.preview import render_previews
+
+    print(render_previews(args.run_dir, args.out, args.dpi, args.piece_dpi, args.reference_catalog))
+    return 0
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -515,13 +541,27 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--seed", type=int, default=42)
     s.add_argument("--resume", action="store_true", help="Restore the last complete epoch in --out")
     s.add_argument("--balanced", action="store_true", help="Train with uniform class sampling and affine augmentation")
+    s.add_argument("--width", type=int, default=1, help="Channel multiplier (1 = original architecture)")
+    s.add_argument("--stages", type=int, default=3, choices=(3, 4, 5), help="Stride-2 encoder/decoder levels")
     s.set_defaults(func=cmd_train_shapes)
+
+    b = sub.add_parser("benchmark-shapes", help="Compare shape models on held-out masks at a common 256 px resolution")
+    b.add_argument("--corpus", required=True)
+    b.add_argument("--models", nargs="+", required=True, help="Training output folders")
+    b.add_argument("--out", required=True)
+    b.add_argument("--device", choices=["cpu", "cuda"], default=None)
+    b.set_defaults(func=cmd_benchmark_shapes)
 
     c = sub.add_parser("compose", help="Search free-form layouts from an explicit ordered catalog")
     c.add_argument("--catalog", required=True)
     c.add_argument("--reference-catalog")
     c.add_argument("--seed", type=int, default=42)
     c.add_argument("--mode", type=int, choices=range(4), default=0)
+    c.add_argument("--piece-area", type=float, default=1850.0, help="Core motif area in mm^2 before gaps are shared")
+    c.add_argument("--objective", choices=["iou", "fidelity"], default="iou",
+                   help="Rank partition configurations by aligned IoU (V10) or silhouette fidelity")
+    c.add_argument("--configs", choices=["standard", "extended"], default="standard",
+                   help="extended adds stronger concavity-preserving partition penalties")
     c.add_argument("--out", required=True)
     c.set_defaults(func=cmd_compose)
 
@@ -536,6 +576,19 @@ def build_parser() -> argparse.ArgumentParser:
     a.add_argument("--max-tip-mm", type=float, default=6.0)
     a.add_argument("--rigid", action="store_true", help="Also sample individual planar rotations and translations")
     a.set_defaults(func=cmd_fabrication_audit)
+
+    fa = sub.add_parser("audit-fidelity", help="Measure silhouette fidelity of each piece against its source mask")
+    fa.add_argument("--run-dir", required=True)
+    fa.add_argument("--reference-catalog", help="Judge modified targets against these original silhouettes")
+    fa.set_defaults(func=cmd_fidelity_audit)
+
+    rp = sub.add_parser("render-previews", help="Render true-scale assembly, exploded and per-piece preview images")
+    rp.add_argument("--run-dir", required=True)
+    rp.add_argument("--out", help="Output folder (default: <run-dir>/previews)")
+    rp.add_argument("--dpi", type=int, default=300)
+    rp.add_argument("--piece-dpi", type=int, default=600)
+    rp.add_argument("--reference-catalog")
+    rp.set_defaults(func=cmd_render_previews)
 
     return p
 
@@ -552,8 +605,10 @@ def cmd_train_shapes(args: argparse.Namespace) -> int:
         seed=args.seed,
         resume=args.resume,
         balanced=args.balanced,
+        width=args.width,
+        stages=args.stages,
     )
-    print(json.dumps(metrics, indent=2))
+    print(json.dumps({k: v for k, v in metrics.items() if k != "history"}, indent=2))
     return 0
 
 

@@ -19,21 +19,44 @@ def _block(in_ch: int, out_ch: int, stride: int = 1) -> nn.Sequential:
 
 
 class AnimalShapeVAE(nn.Module):
-    def __init__(self, num_classes: int, size: int = 64, latent_dim: int = 32):
+    """Conditional SDF VAE.
+
+    ``width`` scales every convolution and ``stages`` sets the number of stride-2
+    levels. The defaults (1, 3) reproduce the original architecture exactly, so
+    checkpoints saved before these options existed load unchanged.
+    """
+
+    def __init__(self, num_classes: int, size: int = 64, latent_dim: int = 32, width: int = 1, stages: int = 3):
         super().__init__()
-        if size < 32 or size % 8:
-            raise ValueError("Shape resolution must be at least 32 and divisible by 8")
+        if stages not in (3, 4, 5) or width < 1:
+            raise ValueError("Use 3-5 stages and a positive width")
+        if size < 32 or size % (2 ** stages):
+            raise ValueError(f"Shape resolution must be at least 32 and divisible by {2 ** stages}")
         self.size = size
         self.latent_dim = latent_dim
-        self.side = size // 8
+        self.width = width
+        self.stages = stages
+        self.side = size // (2 ** stages)
+        enc = [20, 40, 64, 96, 128][:stages]
+        enc = [c * width for c in enc]
+        dec = [40, 24, 16] if stages == 3 else [64, 48, 32, 24, 16][-stages:]
+        dec = [c * width for c in dec]
+        self.top = enc[-1]
         self.label = nn.Embedding(num_classes, 16)
-        self.encoder = nn.Sequential(_block(1, 20, 2), _block(20, 40, 2), _block(40, 64, 2))
-        hidden = self.side * self.side * 64
+        layers, ch = [], 1
+        for c in enc:
+            layers.append(_block(ch, c, 2))
+            ch = c
+        self.encoder = nn.Sequential(*layers)
+        hidden = self.side * self.side * self.top
         self.posterior = nn.Linear(hidden + 16, 2 * latent_dim)
         self.expand = nn.Linear(latent_dim + 16, hidden)
         up = lambda: nn.Upsample(scale_factor=2, mode="bilinear", align_corners=False)
-        self.decoder = nn.Sequential(up(), _block(64, 40), up(), _block(40, 24),
-                                     up(), _block(24, 16), nn.Conv2d(16, 1, 3, padding=1), nn.Tanh())
+        layers, ch = [], self.top
+        for c in dec:
+            layers += [up(), _block(ch, c)]
+            ch = c
+        self.decoder = nn.Sequential(*layers, nn.Conv2d(ch, 1, 3, padding=1), nn.Tanh())
 
     def encode(self, sdf, labels):
         features = self.encoder(sdf).flatten(1)
@@ -42,7 +65,12 @@ class AnimalShapeVAE(nn.Module):
 
     def decode(self, z, labels):
         h = self.expand(torch.cat([z, self.label(labels)], dim=1))
-        return self.decoder(h.reshape(-1, 64, self.side, self.side))
+        return self.decoder(h.reshape(-1, self.top, self.side, self.side))
+
+
+def build_from_checkpoint(ckpt) -> AnimalShapeVAE:
+    return AnimalShapeVAE(len(ckpt["classes"]), ckpt["size"], ckpt["latent_dim"],
+                          int(ckpt.get("width", 1)), int(ckpt.get("stages", 3)))
 
 
 def usable_mask(sdf: np.ndarray) -> np.ndarray | None:
@@ -70,7 +98,7 @@ def sample_motifs(
     requested = classes or names
     if count < 1 or set(requested) - set(names):
         raise ValueError(f"Choose a positive count and classes from {', '.join(names)}")
-    model = AnimalShapeVAE(len(names), ckpt["size"], ckpt["latent_dim"])
+    model = build_from_checkpoint(ckpt)
     model.load_state_dict(ckpt["state_dict"])
     model.eval()
     rng = np.random.default_rng(seed)

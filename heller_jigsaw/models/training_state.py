@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import os
+import time
 import tempfile
 from pathlib import Path
 
@@ -26,7 +27,15 @@ def save_atomic(payload, path: Path) -> None:
         tmp = Path(handle.name)
     try:
         torch.save(payload, tmp)
-        os.replace(tmp, path)
+        # Windows virus scanners and indexers briefly lock freshly written files; retry the swap.
+        for attempt in range(8):
+            try:
+                os.replace(tmp, path)
+                break
+            except PermissionError:
+                if attempt == 7:
+                    raise
+                time.sleep(0.25 * 2 ** attempt)
     finally:
         tmp.unlink(missing_ok=True)
 

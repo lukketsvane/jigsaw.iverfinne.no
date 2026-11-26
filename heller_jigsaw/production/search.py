@@ -12,10 +12,14 @@ from heller_jigsaw.geometry.export import export_puzzle_run
 from heller_jigsaw.solver.geodesic import _aligned_iou_and_chamfer
 from .geometry import rotated, disk
 from .audit import measure
+from .fidelity import aligned_targets, piece_fidelity, summarize
 cv2.setNumThreads(1)
 CONFIGS = [(1, 2, 0), (2, 2, 0), (2, 3, 0), (2, 3, 4), (3, 3, 0), (3, 5, 0)]
+# Stronger convex-hull 'bay' penalties hand a motif's concavities to its neighbours instead of filling them.
+EXTENDED_CONFIGS = CONFIGS + [(1, 2, 6), (2, 2, 8), (2, 3, 12), (1, 3, 16), (2, 2, 20), (3, 3, 10)]
+CONFIG_SETS = dict(standard=CONFIGS, extended=EXTENDED_CONFIGS)
 
-def dock(motifs, seed, mode):
+def dock(motifs, seed, mode, area=1850.0):
     rng = np.random.default_rng(seed)
     px = 0.65
     n = len(motifs)
@@ -34,7 +38,7 @@ def dock(motifs, seed, mode):
     order = np.argsort(-np.asarray(compact))
     center = np.array([N / 2, N / 2])
     for i, idx in enumerate(order):
-        variants = [rotated(motifs[idx].mask, float(a), 1850 / px ** 2) for a in np.arange(0, 360, step)]
+        variants = [rotated(motifs[idx].mask, float(a), area / px ** 2) for a in np.arange(0, 360, step)]
         if i == 0:
             m = variants[int(rng.integers(len(variants)))]
             h, w = m.shape
@@ -148,7 +152,10 @@ def all_kerf(part):
                 return False
     return True
 
-def run(catalog, out, seed=42, mode=0, reference_catalog=None):
+def run(catalog, out, seed=42, mode=0, reference_catalog=None, piece_area=1850.0, objective='iou', config_set='standard'):
+    if objective not in ('iou', 'fidelity'):
+        raise ValueError('objective must be iou or fidelity')
+    configs = CONFIG_SETS[config_set]
     start = time.perf_counter()
     out = Path(out)
     theme = Path(catalog).parent.name
@@ -168,12 +175,12 @@ def run(catalog, out, seed=42, mode=0, reference_catalog=None):
     results = []
     best = None
     try:
-        cores, px = dock(motifs, seed, mode)
+        cores, px = dock(motifs, seed, mode, piece_area)
     except Exception as e:
         (out / 'trial.json').write_text(json.dumps(dict(theme=theme, seed=seed, mode=mode, error=str(e), seconds=time.perf_counter() - start, results=[])))
         raise RuntimeError('layout failed') from e
     vcfg = ValidationConfig()
-    for radius, closing, bay in CONFIGS:
+    for radius, closing, bay in configs:
         result = dict(radius=radius, closing=closing, bay=bay)
         try:
             part = partition(cores, px, radius, closing, bay)
@@ -204,6 +211,12 @@ def run(catalog, out, seed=42, mode=0, reference_catalog=None):
                 result['max_tip_mm'] = float(max(tips))
                 result['over6'] = sum((v > 6 for v in tips))
                 result['score'] = result['original']['mean'] + 0.35 * result['original']['p10'] + 0.4 * result['original']['minimum'] - 0.012 * result['over6'] - 0.004 * max(tips)
+            if objective == 'fidelity':
+                polys = [f.polygon for f in part.faces]
+                judged = references if references is not None else motifs
+                fid = [piece_fidelity(q, t)['fidelity'] for q, t in zip(polys, aligned_targets(polys, judged, px=0.65, n_angles=36))]
+                result['fidelity'] = summarize(fid)
+                result['score'] = result['fidelity']['score'] + 0.25 * result['score']
             if best is None or result['score'] > best[0]:
                 best = (result['score'], part, ff, result.copy())
         except (ValueError, RuntimeError, shapely.GEOSException) as e:
@@ -211,12 +224,12 @@ def run(catalog, out, seed=42, mode=0, reference_catalog=None):
             result['error'] = str(e)[:180]
         results.append(result)
         print(theme, seed, mode, result, flush=True)
-    report = dict(theme=theme, seed=seed, mode=mode, seconds=time.perf_counter() - start, results=results, best=None)
+    report = dict(theme=theme, seed=seed, mode=mode, piece_area_mm2=piece_area, objective=objective, config_set=config_set, seconds=time.perf_counter() - start, results=results, best=None)
     if best:
         _, part, ff, result = best
         for f, m, v in zip(part.faces, motifs, ff):
             f.metadata.update(asset_id=m.asset_id, family=m.family, motif_class=m.motif_class, aligned_iou=round(float(v[0]), 4), sdf_chamfer=round(float(v[1]), 4))
-        cfg = dict(seed=seed, mode=mode, outline_type='campaign_v10', num_pieces=len(motifs), kerf_mm=0.15, min_neck_mm=3, corpus_source=str(cat), motifs=[dict(asset_id=m.asset_id, motif_class=m.motif_class, family=m.family) for m in motifs], docking=result)
+        cfg = dict(seed=seed, mode=mode, piece_area_mm2=piece_area, objective=objective, config_set=config_set, outline_type='campaign_v10', num_pieces=len(motifs), kerf_mm=0.15, min_neck_mm=3, corpus_source=str(cat), motifs=[dict(asset_id=m.asset_id, motif_class=m.motif_class, family=m.family) for m in motifs], docking=result)
         prov = dict(corpus_source=str(cat), all_commercial_ok=all((m.commercial_ok for m in motifs)), assets=rows)
         q = export_puzzle_run(part, out, cfg, prov, ['V10 multi-seed layout search candidate; not locked'], [m.mask for m in motifs], vcfg)
         report['best'] = dict(result, export_pass=q['all_hard_gates_passed'])

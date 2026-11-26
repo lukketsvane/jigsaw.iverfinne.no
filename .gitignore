@@ -17,3 +17,8 @@ resources/*.zip
 *.pth
 *.ckpt
 *.safetensors
+
+# Local secrets and private snapshot manifests (restored from Google Drive, not source)
+.env
+/TRANSFER_MANIFEST.json
+/RAW_RESEARCH_MANIFEST.json
