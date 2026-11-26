@@ -1,0 +1,702 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FossilNet</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* the window is the board: FossilNet creatures cut into a sheet at 1:1 millimetres, nothing else on the page */
+:root {
+  --paper: #fbfbfa;
+  --ink: #16181b;
+  --engrave: #7b8798;
+  --ghost: #c4c8cd;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --paper: #101112; --ink: #e7e5e0; --engrave: #708096; --ghost: #383c41; color-scheme: dark; }
+}
+:root[data-theme="dark"] { --paper: #101112; --ink: #e7e5e0; --engrave: #708096; --ghost: #383c41; color-scheme: dark; }
+html, body { height: 100%; }
+body {
+  margin: 0; background: var(--paper); overflow: hidden; box-sizing: border-box;
+  padding-block: 16px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none;
+}
+svg { display: block; width: 100%; height: 100%; overflow: visible; }
+svg:focus { outline: none; }
+g { fill: none; stroke-linecap: round; stroke-linejoin: round; transition: opacity .7s ease; }
+.cut { stroke: var(--ink); }
+.eng { stroke: var(--engrave); }
+.ghost { stroke: var(--ghost); }
+.gone { opacity: 0; }
+.ghost path { animation: appear .45s ease backwards; }
+.cut path { stroke-dasharray: 1 1; stroke-dashoffset: 1; animation: draw var(--d, .5s) cubic-bezier(.5, 0, .3, 1) var(--t, 0s) forwards; }
+.eng { animation: appear .9s ease .5s backwards; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@keyframes appear { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .ghost path, .eng { animation: none; }
+  .cut path { animation: none; stroke-dasharray: none; stroke-dashoffset: 0; }
+}
+</style>
+<svg id="board" role="img" aria-label="FossilNet jigsaw" tabindex="0" preserveAspectRatio="xMidYMid meet"></svg>
+<script src="fossilnet.js"></script>
+<script>
+(() => {
+'use strict';
+const M = window.FOSSILNET, svg = document.getElementById('board'), NS = 'http://www.w3.org/2000/svg';
+if (!M) return;
+
+// ---------------------------------------------------------------- the network (fossil_net.FossilNet, inference only)
+const NC = M.N, ZD = M.Z, NF = M.FEAT, FP = M.FP, E = M.E, BASE = M.base || 30;
+const f32 = s => { const b = atob(s), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return new Float32Array(u.buffer); };
+const LAY = M.layers.map(l => ({ i: l.i, o: l.o, w: f32(l.w), b: f32(l.b) })), EMB = f32(M.emb), SRC = f32(M.q), FAM = M.fam;
+const H0 = FAM.map((_, k) => {                       // embedding part of the first layer, once per family
+  const l = LAY[0], o = new Float32Array(l.o);
+  for (let j = 0; j < l.o; j++) { let s = l.b[j]; const r = j * l.i; for (let e = 0; e < E; e++) s += l.w[r + e] * EMB[k * E + e]; o[j] = s; }
+  return o;
+});
+const silu = x => x / (1 + Math.exp(-x));
+function decode(k, z) {
+  let l = LAY[0], h = new Float32Array(l.o); const h0 = H0[k];
+  for (let j = 0; j < l.o; j++) { let s = h0[j]; const r = j * l.i + E; for (let t = 0; t < ZD; t++) s += l.w[r + t] * z[t]; h[j] = silu(s); }
+  for (let li = 1; li < LAY.length; li++) {
+    l = LAY[li]; const o = new Float32Array(l.o), w = l.w, n = l.i, last = li === LAY.length - 1;
+    for (let j = 0; j < l.o; j++) { let s = l.b[j]; const r = j * n; for (let i = 0; i < n; i++) s += w[r + i] * h[i]; o[j] = last ? s : silu(s); }
+    h = o;
+  }
+  return h;
+}
+
+// ---------------------------------------------------------------- small geometry
+function mulberry(a) { return () => { a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const gauss = R => Math.sqrt(-2 * Math.log(1 - R())) * Math.cos(6.283185307 * R());
+
+function flatten(q, steps, off = 0, n = NC) {         // periodic cubic B-spline controls -> closed polyline
+  const out = new Float64Array(2 * n * steps); let o = 0;
+  for (let i = 0; i < n; i++) {
+    const a = off + 2 * ((i + n - 1) % n), b = off + 2 * i, c = off + 2 * ((i + 1) % n), d = off + 2 * ((i + 2) % n);
+    const x0 = (q[a] + 4 * q[b] + q[c]) / 6, y0 = (q[a + 1] + 4 * q[b + 1] + q[c + 1]) / 6, x1 = (2 * q[b] + q[c]) / 3, y1 = (2 * q[b + 1] + q[c + 1]) / 3;
+    const x2 = (q[b] + 2 * q[c]) / 3, y2 = (q[b + 1] + 2 * q[c + 1]) / 3, x3 = (q[b] + 4 * q[c] + q[d]) / 6, y3 = (q[b + 1] + 4 * q[c + 1] + q[d + 1]) / 6;
+    for (let s = 0; s < steps; s++) {
+      const t = s / steps, u = 1 - t, w0 = u * u * u, w1 = 3 * u * u * t, w2 = 3 * u * t * t, w3 = t * t * t;
+      out[o++] = w0 * x0 + w1 * x1 + w2 * x2 + w3 * x3; out[o++] = w0 * y0 + w1 * y1 + w2 * y2 + w3 * y3;
+    }
+  }
+  return out;
+}
+function area(p) { let s = 0; const n = p.length >> 1; for (let i = 0, j = n - 1; i < n; j = i++) s += p[2 * j] * p[2 * i + 1] - p[2 * i] * p[2 * j + 1]; return s / 2; }
+function box(p) { let a = Infinity, b = Infinity, c = -Infinity, d = -Infinity; for (let i = 0; i < p.length; i += 2) { a = Math.min(a, p[i]); c = Math.max(c, p[i]); b = Math.min(b, p[i + 1]); d = Math.max(d, p[i + 1]); } return [a, b, c, d]; }
+function hull(p) {
+  const n = p.length >> 1, ix = Array.from({ length: n }, (_, i) => i).sort((a, b) => p[2 * a] - p[2 * b] || p[2 * a + 1] - p[2 * b + 1]), h = [];
+  const cr = (o, a, b) => (p[2 * a] - p[2 * o]) * (p[2 * b + 1] - p[2 * o + 1]) - (p[2 * a + 1] - p[2 * o + 1]) * (p[2 * b] - p[2 * o]);
+  for (const i of ix) { while (h.length >= 2 && cr(h[h.length - 2], h[h.length - 1], i) <= 0) h.pop(); h.push(i); }
+  const lo = h.length + 1;
+  for (let k = n - 2; k >= 0; k--) { const i = ix[k]; while (h.length >= lo && cr(h[h.length - 2], h[h.length - 1], i) <= 0) h.pop(); h.push(i); }
+  h.pop(); const out = new Float64Array(2 * h.length); h.forEach((i, j) => { out[2 * j] = p[2 * i]; out[2 * j + 1] = p[2 * i + 1]; }); return out;
+}
+function scan(p, px, gw, gh, fn) {                    // cells whose centres are inside polygon p (board mm), even-odd
+  const n = p.length >> 1, [, y0, , y1] = box(p), xs = [];
+  const r0 = Math.max(0, Math.ceil(y0 / px - .5)), r1 = Math.min(gh - 1, Math.floor(y1 / px - .5));
+  for (let r = r0; r <= r1; r++) {
+    const yc = (r + .5) * px; xs.length = 0;
+    for (let i = 0, j = n - 1; i < n; j = i++) {
+      const yi = p[2 * i + 1], yj = p[2 * j + 1];
+      if ((yi > yc) !== (yj > yc)) xs.push(p[2 * j] + (yc - yj) * (p[2 * i] - p[2 * j]) / (yi - yj));
+    }
+    xs.sort((a, b) => a - b);
+    for (let m = 0; m + 1 < xs.length; m += 2) {
+      const c0 = Math.max(0, Math.ceil(xs[m] / px - .5)), c1 = Math.min(gw - 1, Math.floor(xs[m + 1] / px - .5));
+      for (let c = c0; c <= c1; c++) fn(r * gw + c, r, c);
+    }
+  }
+}
+function simple(p) {                                  // no two non-adjacent edges cross (grid-hashed)
+  const n = p.length >> 1, [x0, y0, x1, y1] = box(p), G = 24, sx = G / (x1 - x0 + 1e-9), sy = G / (y1 - y0 + 1e-9), cells = Array.from({ length: G * G }, () => []);
+  for (let i = 0; i < n; i++) {
+    const j = (i + 1) % n, a = Math.min(G - 1, (Math.min(p[2 * i], p[2 * j]) - x0) * sx | 0), b = Math.min(G - 1, (Math.max(p[2 * i], p[2 * j]) - x0) * sx | 0);
+    const c = Math.min(G - 1, (Math.min(p[2 * i + 1], p[2 * j + 1]) - y0) * sy | 0), d = Math.min(G - 1, (Math.max(p[2 * i + 1], p[2 * j + 1]) - y0) * sy | 0);
+    for (let u = a; u <= b; u++) for (let v = c; v <= d; v++) cells[v * G + u].push(i);
+  }
+  const X = (ax, ay, bx, by, cx, cy) => (bx - ax) * (cy - ay) - (by - ay) * (cx - ax);
+  for (const L of cells) for (let s = 0; s < L.length; s++) for (let t = s + 1; t < L.length; t++) {
+    const i = L[s], k = L[t], d = Math.abs(i - k); if (d <= 1 || d >= n - 1) continue;
+    const i2 = (i + 1) % n, k2 = (k + 1) % n, ax = p[2 * i], ay = p[2 * i + 1], bx = p[2 * i2], by = p[2 * i2 + 1], cx = p[2 * k], cy = p[2 * k + 1], dx = p[2 * k2], dy = p[2 * k2 + 1];
+    if (X(ax, ay, bx, by, cx, cy) * X(ax, ay, bx, by, dx, dy) < 0 && X(cx, cy, dx, dy, ax, ay) * X(cx, cy, dx, dy, bx, by) < 0) return false;
+  }
+  return true;
+}
+function iou(a, b) {                                  // raster overlap of two unit polygons
+  const A = box(a), B = box(b), x0 = Math.min(A[0], B[0]), y0 = Math.min(A[1], B[1]), s = Math.max(A[2], B[2]) - x0, t = Math.max(A[3], B[3]) - y0, G = 72, px = Math.max(s, t) / G;
+  const mv = p => { const o = new Float64Array(p.length); for (let i = 0; i < p.length; i += 2) { o[i] = p[i] - x0; o[i + 1] = p[i + 1] - y0; } return o; };
+  const m = new Uint8Array(G * G); let i = 0, u = 0;
+  scan(mv(a), px, G, G, j => { m[j] = 1; }); scan(mv(b), px, G, G, j => { m[j] |= 2; });
+  for (let j = 0; j < m.length; j++) { if (m[j] === 3) i++; if (m[j]) u++; }
+  return u ? i / u : 0;
+}
+function chaikin(p, times) {
+  for (let t = 0; t < times; t++) {
+    const n = p.length >> 1, o = new Float64Array(4 * n);
+    for (let i = 0; i < n; i++) {
+      const j = (i + 1) % n, ax = p[2 * i], ay = p[2 * i + 1], bx = p[2 * j], by = p[2 * j + 1];
+      o[4 * i] = .75 * ax + .25 * bx; o[4 * i + 1] = .75 * ay + .25 * by; o[4 * i + 2] = .25 * ax + .75 * bx; o[4 * i + 3] = .25 * ay + .75 * by;
+    }
+    p = o;
+  }
+  return p;
+}
+function edt2(seed, w, h) {                           // squared Euclidean distance (cells) to the nearest seed cell
+  const n = Math.max(w, h), f = new Float64Array(n), d = new Float64Array(n), v = new Int32Array(n), z = new Float64Array(n + 1), out = new Float32Array(w * h);
+  const dt = len => {
+    let k = 0; v[0] = 0; z[0] = -Infinity; z[1] = Infinity;
+    for (let q = 1; q < len; q++) {
+      let s = ((f[q] + q * q) - (f[v[k]] + v[k] * v[k])) / (2 * q - 2 * v[k]);
+      while (s <= z[k]) { k--; s = ((f[q] + q * q) - (f[v[k]] + v[k] * v[k])) / (2 * q - 2 * v[k]); }
+      k++; v[k] = q; z[k] = s; z[k + 1] = Infinity;
+    }
+    for (let q = 0, k2 = 0; q < len; q++) { while (z[k2 + 1] < q) k2++; d[q] = (q - v[k2]) * (q - v[k2]) + f[v[k2]]; }
+  };
+  for (let x = 0; x < w; x++) { for (let y = 0; y < h; y++) f[y] = seed[y * w + x] ? 0 : 1e20; dt(h); for (let y = 0; y < h; y++) out[y * w + x] = d[y]; }
+  for (let y = 0; y < h; y++) { const r = y * w; for (let x = 0; x < w; x++) f[x] = out[r + x]; dt(w); for (let x = 0; x < w; x++) out[r + x] = d[x]; }
+  return out;
+}
+function components(mask, w, h) {                     // 4-connected components of mask (0 = background) -> ids 1.., sizes
+  const id = new Int32Array(w * h), size = [0], st = [];
+  for (let s = 0; s < w * h; s++) {
+    if (!mask[s] || id[s]) continue;
+    const c = size.length; let k = 0; id[s] = c; st.push(s);
+    while (st.length) {
+      const i = st.pop(), x = i % w; k++;
+      if (x > 0 && mask[i - 1] && !id[i - 1]) { id[i - 1] = c; st.push(i - 1); }
+      if (x < w - 1 && mask[i + 1] && !id[i + 1]) { id[i + 1] = c; st.push(i + 1); }
+      if (i >= w && mask[i - w] && !id[i - w]) { id[i - w] = c; st.push(i - w); }
+      if (i < w * h - w && mask[i + w] && !id[i + w]) { id[i + w] = c; st.push(i + w); }
+    }
+    size.push(k);
+  }
+  return { id, size };
+}
+
+// ---------------------------------------------------------------- creatures
+const MIXES = [['trilobite'], ['coral', 'dendrite'], ['trilobite', 'coral', 'dendrite']];
+const SRCP = FAM.map((_, k) => flatten(SRC, 3, 2 * NC * k));
+const DB = 1 / 34, DI = 2.2 / 34;                     // fit samples: ~1 mm along the outline, ~2.2 mm inside, at a 34 mm piece
+
+function shape(out) {
+  const poly = flatten(out, 3), n = poly.length >> 1, sg = area(poly) >= 0 ? 1 : -1;
+  const bnd = [], nrm = [];
+  let carry = 0;
+  for (let i = 0; i < n; i++) {
+    const j = (i + 1) % n, ax = poly[2 * i], ay = poly[2 * i + 1], dx = poly[2 * j] - ax, dy = poly[2 * j + 1] - ay, L = Math.hypot(dx, dy) || 1e-12;
+    for (let t = carry; t < L; t += DB) { bnd.push(ax + dx * t / L, ay + dy * t / L); nrm.push(sg * dy / L, -sg * dx / L); }
+    carry = (carry - L) % DB; if (carry < 0) carry += DB;
+  }
+  const [x0, y0, x1, y1] = box(poly), inn = [], xs = [];
+  for (let y = y0 + DI / 2; y < y1; y += DI) {
+    xs.length = 0;
+    for (let i = 0, j = n - 1; i < n; j = i++) { const yi = poly[2 * i + 1], yj = poly[2 * j + 1]; if ((yi > y) !== (yj > y)) xs.push(poly[2 * j] + (y - yj) * (poly[2 * i] - poly[2 * j]) / (yi - yj)); }
+    xs.sort((a, b) => a - b);
+    for (let m = 0; m + 1 < xs.length; m += 2) for (let x = x0 + DI / 2 + Math.ceil((xs[m] - x0 - DI / 2) / DI) * DI; x < xs[m + 1]; x += DI) inn.push(x, y);
+  }
+  return { poly, area: Math.abs(area(poly)), bnd: Float64Array.from(bnd), nrm: Float64Array.from(nrm), inn: Float64Array.from(inn), tol: Math.floor(.01 * (bnd.length + inn.length) / 2), rin: -1, pole: null };
+}
+function inner(sh) {                                  // pole of inaccessibility: the widest disc inside the outline
+  if (sh.rin >= 0) return sh;
+  const { poly, inn } = sh, n = poly.length >> 1, [x0, y0, x1, y1] = box(poly); let rin = 0, pole = [(x0 + x1) / 2, (y0 + y1) / 2];
+  for (let a = 0; a < inn.length; a += 2) {
+    let d = Infinity; const px = inn[a], py = inn[a + 1];
+    for (let i = 0, j = n - 1; i < n; j = i++) {
+      const ax = poly[2 * j], ay = poly[2 * j + 1], ex = poly[2 * i] - ax, ey = poly[2 * i + 1] - ay;
+      const t = Math.max(0, Math.min(1, ((px - ax) * ex + (py - ay) * ey) / (ex * ex + ey * ey + 1e-18))), qx = ax + t * ex - px, qy = ay + t * ey - py;
+      d = Math.min(d, qx * qx + qy * qy); if (d < rin * rin) break;
+    }
+    if (d > rin * rin) { rin = Math.sqrt(d); pole = [px, py]; }
+  }
+  sh.rin = rin; sh.pole = pole; return sh;
+}
+function creature(k, R, zr) {                         // fossil_net.sample: a latent inside the family's safe radius that still reads as its drawing
+  const r = zr ?? FAM[k].r;
+  for (let t = 0; t < 40; t++) {
+    const z = new Float32Array(ZD); if (t < 39) for (let i = 0; i < ZD; i++) z[i] = (2 * R() - 1) * r;
+    const out = decode(k, z), sh = shape(out);
+    if (t === 39 || (simple(sh.poly) && iou(sh.poly, SRCP[k]) >= .8)) return { k, z, out, sh };
+  }
+}
+function thin(p) {                                   // fossil_field v2: a 1.5 mm erosion of the cut-size outline must stay one piece
+  const px = .3, [x0, y0, x1, y1] = box(p), w = Math.ceil((x1 - x0) / px) + 4, h = Math.ceil((y1 - y0) / px) + 4, q = new Float64Array(p.length), out = new Uint8Array(w * h).fill(1);
+  for (let i = 0; i < p.length; i += 2) { q[i] = p[i] - x0 + 2 * px; q[i + 1] = p[i + 1] - y0 + 2 * px; }
+  scan(q, px, w, h, j => { out[j] = 0; });
+  const d2 = edt2(out, w, h), core = new Uint8Array(w * h), lim = (1.5 / px + .5) ** 2;
+  for (let j = 0; j < w * h; j++) core[j] = d2[j] >= lim ? 1 : 0;
+  return components(core, w, h).size.length !== 2;
+}
+function choose(cats, n, R) {
+  let keys = [...new Set(FAM.filter(f => cats.includes(f.c)).map(f => f.key))], picks = [];
+  if (!keys.length) keys = [...new Set(FAM.map(f => f.key))];
+  for (let i = 0; i < n; i++) {
+    const key = keys[i % keys.length], m = R() < .5 ? 1 : 0;
+    let k = FAM.findIndex(f => f.key === key && f.m === m); if (k < 0) k = FAM.findIndex(f => f.key === key);
+    picks.push(k);
+  }
+  for (let i = picks.length - 1; i > 0; i--) { const j = R() * (i + 1) | 0; [picks[i], picks[j]] = [picks[j], picks[i]]; }
+  return { picks, keys };
+}
+
+// ---------------------------------------------------------------- layout (field.pack, greedy docking then growth)
+const G1 = 1;                                          // layout grid, mm
+function board(W, H) {
+  const gw = W / G1, gh = H / G1, own = new Int32Array(gw * gh).fill(-1), D = new Float32Array(gw * gh);
+  for (let r = 0; r < gh; r++) for (let c = 0; c < gw; c++) { const x = (c + .5) * G1, y = (r + .5) * G1; D[r * gw + c] = Math.min(x, W - x, y, H - y); }
+  return { W, H, gw, gh, own, D, spots: [] };
+}
+function placed(sh, p) {
+  const co = Math.cos(p.th), si = Math.sin(p.th), a = sh.poly, o = new Float64Array(a.length);
+  for (let i = 0; i < a.length; i += 2) { o[i] = p.x + p.s * (co * a[i] - si * a[i + 1]); o[i + 1] = p.y + p.s * (si * a[i] + co * a[i + 1]); }
+  return o;
+}
+function fits(B, sh, x, y, co, si, s, id) {
+  const { W, H, own, gw } = B; let bad = 0;
+  for (const pts of [sh.bnd, sh.inn]) for (let j = 0; j < pts.length; j += 2) {
+    const u = pts[j], v = pts[j + 1], X = x + s * (co * u - si * v), Y = y + s * (si * u + co * v);
+    if (X < 0 || Y < 0 || X >= W || Y >= H) { if (++bad > sh.tol) return false; continue; }
+    const o = own[(Y / G1 | 0) * gw + (X / G1 | 0)];
+    if (o >= 0 && o !== id && ++bad > sh.tol) return false;
+  }
+  return true;
+}
+function touch(B, sh, x, y, co, si, s, id) {
+  const { W, H, own, gw } = B, b = sh.bnd, nr = sh.nrm, off = 1.5 / s; let t = 0;
+  for (let j = 0; j < b.length; j += 2) {
+    const u = b[j] + nr[j] * off, v = b[j + 1] + nr[j + 1] * off, X = x + s * (co * u - si * v), Y = y + s * (si * u + co * v);
+    if (X < 0 || Y < 0 || X >= W || Y >= H) { t++; continue; }
+    const o = own[(Y / G1 | 0) * gw + (X / G1 | 0)]; if (o >= 0 && o !== id) t++;
+  }
+  return t;
+}
+function dock(B, c, s, R) {
+  const { gw, gh, own, D, spots } = B, sh = inner(c.sh), need = sh.rin * s;
+  spots.length = 0;
+  for (let r = 0; r < gh; r += 2) for (let x = (r >> 1) & 1; x < gw; x += 2) { const i = r * gw + x, d = D[i]; if (d >= need && d <= need + 3 && own[i] < 0) spots.push(i); }
+  if (spots.length < 6) for (let i = 0; i < gw * gh; i += 3) if (D[i] >= need && own[i] < 0) spots.push(i);
+  if (!spots.length) return null;
+  let best = null, top = -Infinity;
+  for (let t = 0; t < 36; t++) {
+    const i = spots[R() * spots.length | 0], sx = (i % gw + .5) * G1, sy = ((i / gw | 0) + .5) * G1, a0 = R() * Math.PI / 8;
+    for (let a = 0; a < 16; a++) {
+      const th = a0 + a * Math.PI / 8, co = Math.cos(th), si = Math.sin(th), x = sx - s * (co * sh.pole[0] - si * sh.pole[1]), y = sy - s * (si * sh.pole[0] + co * sh.pole[1]);
+      if (!fits(B, sh, x, y, co, si, s, c.id)) continue;
+      const sc = touch(B, sh, x, y, co, si, s, c.id) + .5 * R();
+      if (sc > top) { top = sc; best = { x, y, th, s }; }
+    }
+  }
+  return best;
+}
+function stamp(B, c, on, near) {
+  const { gw, gh, own, D } = B, poly = placed(c.sh, c.p);
+  let r0 = Infinity, r1 = -1, c0 = Infinity, c1 = -1;
+  scan(poly, G1, gw, gh, (i, r, x) => { if (on) { if (own[i] < 0) own[i] = c.id; } else if (own[i] === c.id) own[i] = -1; r0 = Math.min(r0, r); r1 = Math.max(r1, r); c0 = Math.min(c0, x); c1 = Math.max(c1, x); });
+  if (!on || !near || r1 < 0) return;
+  const P = 26, a = Math.max(0, r0 - P), b = Math.min(gh - 1, r1 + P), e = Math.max(0, c0 - P), f = Math.min(gw - 1, c1 + P), w = f - e + 1, h = b - a + 1, seed = new Uint8Array(w * h);
+  for (let r = a; r <= b; r++) for (let x = e; x <= f; x++) if (own[r * gw + x] === c.id) seed[(r - a) * w + x - e] = 1;
+  const d2 = edt2(seed, w, h);
+  for (let r = a; r <= b; r++) for (let x = e; x <= f; x++) { const i = r * gw + x, d = (Math.sqrt(d2[(r - a) * w + x - e]) - .5) * G1; if (d < D[i]) D[i] = d; }
+}
+
+// ---------------------------------------------------------------- partition (field_large.partition: first arrival, bay rule, spur repair)
+const HP = .5, BAY = 32;
+class Heap {
+  constructor(n) { this.k = new Float32Array(n); this.v = new Int32Array(n); this.n = 0; this.top = 0; }
+  push(key, val) {
+    if (this.n === this.k.length) { const k = new Float32Array(this.n * 2), v = new Int32Array(this.n * 2); k.set(this.k); v.set(this.v); this.k = k; this.v = v; }
+    const k = this.k, v = this.v; let i = this.n++;
+    while (i > 0) { const p = (i - 1) >> 1; if (k[p] <= key) break; k[i] = k[p]; v[i] = v[p]; i = p; }
+    k[i] = key; v[i] = val;
+  }
+  pop() {
+    const k = this.k, v = this.v, rv = v[0]; this.top = k[0];
+    const n = --this.n, lk = k[n], lv = v[n]; let i = 0;
+    for (;;) { let c = 2 * i + 1; if (c >= n) break; if (c + 1 < n && k[c + 1] < k[c]) c++; if (k[c] >= lk) break; k[i] = k[c]; v[i] = v[c]; i = c; }
+    k[i] = lk; v[i] = lv; return rv;
+  }
+}
+async function arrival(polys, W, H, live) {
+  const w = W / HP, hh = H / HP, N = w * hh, lab = new Int32Array(N).fill(-1), T = new Float32Array(N).fill(Infinity), fin = new Uint8Array(N), solid = new Uint8Array(N);
+  const BD = new Float32Array(N).fill(Infinity), heap = new Heap(N);
+  const hulls = polys.map(p => {                       // a piece's own front is 1 + BAY times slower inside its convex hull
+    const hp = hull(p), [x0, y0, x1, y1] = box(hp), c0 = Math.max(0, Math.floor(x0 / HP)), r0 = Math.max(0, Math.floor(y0 / HP));
+    const hw = Math.min(w - 1, Math.ceil(x1 / HP)) - c0 + 1, hh2 = Math.min(hh - 1, Math.ceil(y1 / HP)) - r0 + 1, m = new Uint8Array(hw * hh2);
+    for (let i = 0; i < hp.length; i += 2) { hp[i] -= c0 * HP; hp[i + 1] -= r0 * HP; }
+    scan(hp, HP, hw, hh2, j => { m[j] = 1; });
+    return { c0, r0, w: hw, h: hh2, m };
+  });
+  const slow = (L, r, c) => { const q = hulls[L], qr = r - q.r0, qc = c - q.c0; return (qr >= 0 && qc >= 0 && qr < q.h && qc < q.w && q.m[qr * q.w + qc]) ? 1 + BAY : 1; };
+  polys.forEach((p, i) => scan(p, HP, w, hh, j => { if (lab[j] < 0) { lab[j] = i; T[j] = 0; } solid[j] = 1; }));
+  const dist = new Float32Array(N).fill(Infinity), band = 1.5 * HP, touched = [];
+  polys.forEach((p, i) => {                            // exact distance to the outline in a thin band: the fronts start sub-pixel exact
+    const n = p.length >> 1; touched.length = 0;
+    for (let s = 0, t = n - 1; s < n; t = s++) {
+      const ax = p[2 * t], ay = p[2 * t + 1], ex = p[2 * s] - ax, ey = p[2 * s + 1] - ay, ee = ex * ex + ey * ey + 1e-18;
+      const c0 = Math.max(0, Math.ceil((Math.min(ax, ax + ex) - band) / HP - .5)), c1 = Math.min(w - 1, Math.floor((Math.max(ax, ax + ex) + band) / HP - .5));
+      const r0 = Math.max(0, Math.ceil((Math.min(ay, ay + ey) - band) / HP - .5)), r1 = Math.min(hh - 1, Math.floor((Math.max(ay, ay + ey) + band) / HP - .5));
+      for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) {
+        const x = (c + .5) * HP - ax, y = (r + .5) * HP - ay, u = Math.max(0, Math.min(1, (x * ex + y * ey) / ee)), dx = x - u * ex, dy = y - u * ey, d = Math.sqrt(dx * dx + dy * dy), j = r * w + c;
+        if (d < dist[j]) { if (dist[j] === Infinity) touched.push(j); dist[j] = d; }
+      }
+    }
+    for (const j of touched) {
+      const d = dist[j]; dist[j] = Infinity; if (d > band) continue;
+      if (solid[j]) { if (lab[j] === i) T[j] = -d; continue; }
+      if (d < BD[j]) BD[j] = d;
+      const r = j / w | 0, t = d * slow(i, r, j - r * w);
+      if (t < T[j]) { T[j] = t; lab[j] = i; }
+    }
+  });
+  for (let j = 0; j < N; j++) if (lab[j] >= 0) heap.push(T[j], j);
+  const upd = (x, r, c, L) => {
+    let a = Infinity, b = Infinity;
+    if (c > 0 && fin[x - 1] && lab[x - 1] === L) a = T[x - 1];
+    if (c < w - 1 && fin[x + 1] && lab[x + 1] === L && T[x + 1] < a) a = T[x + 1];
+    if (r > 0 && fin[x - w] && lab[x - w] === L) b = T[x - w];
+    if (r < hh - 1 && fin[x + w] && lab[x + w] === L && T[x + w] < b) b = T[x + w];
+    const f = HP * slow(L, r, c);
+    let t;
+    if (a === Infinity) t = b + f; else if (b === Infinity) t = a + f;
+    else { const d = a - b; t = Math.abs(d) < f ? .5 * (a + b + Math.sqrt(2 * f * f - d * d)) : Math.min(a, b) + f; }
+    if (t < T[x]) { T[x] = t; lab[x] = L; heap.push(t, x); }
+  };
+  let ops = 0;
+  while (heap.n) {
+    const y = heap.pop();
+    if (fin[y] || heap.top > T[y]) continue;
+    fin[y] = 1; const L = lab[y], r = y / w | 0, c = y - r * w;
+    if (c > 0 && !fin[y - 1]) upd(y - 1, r, c - 1, L);
+    if (c < w - 1 && !fin[y + 1]) upd(y + 1, r, c + 1, L);
+    if (r > 0 && !fin[y - w]) upd(y - w, r - 1, c, L);
+    if (r < hh - 1 && !fin[y + w]) upd(y + w, r + 1, c, L);
+    if ((++ops & 16383) === 0 && !(await live())) return null;
+  }
+  return { lab, first: lab.slice(), T, solid, BD, slow, w, hh, n: polys.length };
+}
+function bounds(P) {
+  const { lab, w, hh, n } = P, b = new Int32Array(4 * n).fill(-1);
+  for (let i = 0; i < n; i++) { b[4 * i] = hh; b[4 * i + 2] = w; }
+  for (let r = 0; r < hh; r++) for (let c = 0; c < w; c++) {
+    const L = lab[r * w + c]; if (L < 0) continue; const o = 4 * L;
+    if (r < b[o]) b[o] = r; if (r > b[o + 1]) b[o + 1] = r; if (c < b[o + 2]) b[o + 2] = c; if (c > b[o + 3]) b[o + 3] = c;
+  }
+  return b;
+}
+function flood(lab, w, hh, from) {                    // hand cells marked -1 to the label that reaches them first
+  let q = from, k = 0;
+  while (q.length) {
+    const nx = [];
+    for (const i of q) {
+      const L = lab[i], x = i % w;
+      if (x > 0 && lab[i - 1] === -1) { lab[i - 1] = L; nx.push(i - 1); k++; }
+      if (x < w - 1 && lab[i + 1] === -1) { lab[i + 1] = L; nx.push(i + 1); k++; }
+      if (i >= w && lab[i - w] === -1) { lab[i - w] = L; nx.push(i - w); k++; }
+      if (i < w * hh - w && lab[i + w] === -1) { lab[i + w] = L; nx.push(i + w); k++; }
+    }
+    q = nx;
+  }
+  return k;
+}
+function connect(P) {                                 // field.connect: keep each piece's largest 4-connected part
+  const { lab, w, hh, n } = P, N = w * hh, id = new Int32Array(N), size = [0], owner = [-1], st = [];
+  for (let s = 0; s < N; s++) {
+    if (id[s] || lab[s] < 0) continue;
+    const c = size.length, L = lab[s]; let k = 0; id[s] = c; st.push(s);
+    while (st.length) {
+      const i = st.pop(), x = i % w; k++;
+      if (x > 0 && !id[i - 1] && lab[i - 1] === L) { id[i - 1] = c; st.push(i - 1); }
+      if (x < w - 1 && !id[i + 1] && lab[i + 1] === L) { id[i + 1] = c; st.push(i + 1); }
+      if (i >= w && !id[i - w] && lab[i - w] === L) { id[i - w] = c; st.push(i - w); }
+      if (i < N - w && !id[i + w] && lab[i + w] === L) { id[i + w] = c; st.push(i + w); }
+    }
+    size.push(k); owner.push(L);
+  }
+  const keep = new Int32Array(n).fill(0);
+  for (let c = 1; c < size.length; c++) { const L = owner[c]; if (!keep[L] || size[c] > size[keep[L]]) keep[L] = c; }
+  let stray = 0;
+  for (let i = 0; i < N; i++) if (lab[i] >= 0 && id[i] !== keep[lab[i]]) { lab[i] = -1; stray++; }
+  if (!stray) return 0;
+  const from = [];
+  for (let i = 0; i < N; i++) if (lab[i] >= 0) { const x = i % w; if ((x > 0 && lab[i - 1] < 0) || (x < w - 1 && lab[i + 1] < 0) || (i >= w && lab[i - w] < 0) || (i < N - w && lab[i + w] < 0)) from.push(i); }
+  flood(lab, w, hh, from);
+  return stray;
+}
+function despike(P, only) {                           // field.despike: gap material a 1.5 mm disc cannot enter goes to the neighbour
+  const { lab, solid, w, hh, n } = P, k = Math.max(1, Math.round(1.5 / HP)), pad = k + 1, reach = 2 / HP, bb = bounds(P), touched = new Set();
+  let moved = 0;
+  for (let i = 0; i < n; i++) {
+    if (bb[4 * i + 1] < 0 || (only && !only.has(i))) continue;
+    const r0 = Math.max(0, bb[4 * i] - pad), r1 = Math.min(hh - 1, bb[4 * i + 1] + pad), c0 = Math.max(0, bb[4 * i + 2] - pad), c1 = Math.min(w - 1, bb[4 * i + 3] + pad);
+    const sw = c1 - c0 + 1 + 2 * pad, sh = r1 - r0 + 1 + 2 * pad, S = sw * sh, m = new Uint8Array(S), non = new Uint8Array(S).fill(1);
+    for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) if (lab[r * w + c] === i) { const j = (r - r0 + pad) * sw + c - c0 + pad; m[j] = 1; non[j] = 0; }
+    const din = edt2(non, sw, sh), core = new Uint8Array(S);
+    for (let j = 0; j < S; j++) core[j] = m[j] && din[j] > k * k ? 1 : 0;
+    const cc = components(core, sw, sh); if (cc.size.length < 2) continue;
+    let main = 1; for (let c = 2; c < cc.size.length; c++) if (cc.size[c] > cc.size[main]) main = c;
+    const seed = new Uint8Array(S); for (let j = 0; j < S; j++) seed[j] = cc.id[j] === main ? 1 : 0;
+    const dm = edt2(seed, sw, sh), body = new Uint8Array(S), loose = new Uint8Array(S); let any = false;
+    for (let j = 0; j < S; j++) { if (!m[j]) continue; if (dm[j] <= (k + 1) * (k + 1)) body[j] = 1; else { loose[j] = 1; any = true; } }
+    if (!any) continue;
+    const far = edt2(body, sw, sh), lc = components(loose, sw, sh), hit = new Uint8Array(lc.size.length);
+    for (let j = 0; j < S; j++) { const c = lc.id[j]; if (!c) continue; if ((cc.id[j] && cc.id[j] !== main) || far[j] > reach * reach) hit[c] = 1; }
+    const drop = [];
+    for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) {
+      const j = (r - r0 + pad) * sw + c - c0 + pad, g = r * w + c;
+      if (lc.id[j] && hit[lc.id[j]] && !solid[g]) { lab[g] = -1; drop.push(g); }
+    }
+    if (!drop.length) continue;
+    const from = [];
+    for (const g of drop) { const x = g % w; for (const nb of [x > 0 ? g - 1 : -1, x < w - 1 ? g + 1 : -1, g - w, g + w]) if (nb >= 0 && nb < w * hh && lab[nb] >= 0 && lab[nb] !== i) { from.push(nb); } }
+    const got = flood(lab, w, hh, from);
+    for (const g of drop) { if (lab[g] === -1) lab[g] = i; else touched.add(lab[g]); }  // unreachable spur cells stay where they were
+    if (got) { moved += got; touched.add(i); }
+  }
+  return { moved, touched };
+}
+
+// ---------------------------------------------------------------- seams (field.trace + field.seams)
+function trace(P) {
+  const { lab, first, T, solid, BD, slow, w, hh } = P, NH = (hh + 1) * w, NV = hh * (w + 1), W1 = w + 1;
+  const cross = (a, b, ra, ca, rb, cb) => {            // where the two competing fronts meet between cell centres a and b (field.trace)
+    const A = lab[a], B = lab[b];
+    if (first[a] !== A || first[b] !== B || (solid[a] && solid[b])) return .5;
+    let t;
+    if (solid[a]) t = -T[a] / (-T[a] + Math.min(BD[b], HP));
+    else if (solid[b]) t = 1 + T[b] / (-T[b] + Math.min(BD[a], HP));
+    else { const sA = slow(A, rb, cb), sB = slow(B, ra, ca); t = (T[b] - T[a] + HP * sB) / (HP * (sA + sB)); }
+    return t > .98 ? .98 : t < .02 ? .02 : t;
+  };
+  const la = (r, c) => (r >= 0 && r < hh && c >= 0 && c < w) ? lab[r * w + c] : -1;
+  const ex = new Uint8Array(NH + NV);
+  for (let r = 0; r <= hh; r++) for (let c = 0; c < w; c++) if (la(r - 1, c) !== la(r, c)) ex[r * w + c] = 1;
+  for (let r = 0; r < hh; r++) for (let c = 0; c <= w; c++) if (la(r, c - 1) !== la(r, c)) ex[NH + r * W1 + c] = 1;
+  const inc = (nd, out) => {                           // cracks meeting at grid corner nd
+    const r = nd / W1 | 0, c = nd - r * W1; let k = 0;
+    if (c > 0 && ex[r * w + c - 1]) out[k++] = r * w + c - 1;
+    if (c < w && r <= hh && ex[r * w + c]) out[k++] = r * w + c;
+    if (r > 0 && ex[NH + (r - 1) * W1 + c]) out[k++] = NH + (r - 1) * W1 + c;
+    if (r < hh && ex[NH + r * W1 + c]) out[k++] = NH + r * W1 + c;
+    return k;
+  };
+  const ends = e => e < NH ? [((e / w | 0) * W1) + e % w, ((e / w | 0) * W1) + e % w + 1] : [e - NH, e - NH + W1];
+  const pt = e => {
+    if (e < NH) { const r = e / w | 0, c = e % w; return [(c + .5) * HP, r > 0 && r < hh ? (r - .5 + cross((r - 1) * w + c, r * w + c, r - 1, c, r, c)) * HP : r * HP]; }
+    const v = e - NH, r = v / W1 | 0, c = v % W1;
+    return [c > 0 && c < w ? (c - .5 + cross(r * w + c - 1, r * w + c, r, c - 1, r, c)) * HP : c * HP, (r + .5) * HP];
+  };
+  const pair = e => { let a, b; if (e < NH) { const r = e / w | 0, c = e % w; a = la(r - 1, c); b = la(r, c); } else { const v = e - NH, r = v / W1 | 0, c = v % W1; a = la(r, c - 1); b = la(r, c); } return a < b ? [a, b] : [b, a]; };
+  const NN = (hh + 1) * W1, stop = new Uint8Array(NN), tmp = [0, 0, 0, 0];
+  for (let nd = 0; nd < NN; nd++) {
+    const k = inc(nd, tmp); if (!k) continue; const r = nd / W1 | 0, c = nd - r * W1;
+    if (k !== 2 || ((r === 0 || r === hh) && (c === 0 || c === w))) stop[nd] = 1;
+  }
+  const pos = nd => {
+    const r = nd / W1 | 0, c = nd - r * W1, k = inc(nd, tmp); let x = 0, y = 0, m = 0;
+    for (let i = 0; i < k; i++) { const [a] = pair(tmp[i]); if (a < 0) continue; const p = pt(tmp[i]); x += p[0]; y += p[1]; m++; }
+    if (!m) { x = c * HP; y = r * HP; } else { x /= m; y /= m; }
+    if (r === 0 || r === hh) y = r * HP; if (c === 0 || c === w) x = c * HP;
+    return [x, y];
+  };
+  const used = new Uint8Array(NH + NV), arcs = [], t2 = [0, 0, 0, 0];
+  const walk = (n0, e0) => {
+    const path = [e0]; used[e0] = 1; let [a, b] = ends(e0), nd = a === n0 ? b : a, prev = e0, loop = false;
+    while (!stop[nd]) {
+      inc(nd, t2); const e = t2[0] === prev ? t2[1] : t2[0];
+      if (used[e]) { loop = true; break; }
+      used[e] = 1; path.push(e); prev = e; [a, b] = ends(e); nd = a === nd ? b : a;
+    }
+    const xy = []; if (!loop) xy.push(pos(n0)); for (const e of path) xy.push(pt(e)); if (!loop) xy.push(pos(nd));
+    arcs.push({ pair: pair(e0), xy, loop });
+  };
+  for (let nd = 0; nd < NN; nd++) if (stop[nd]) { const k = inc(nd, tmp), es = tmp.slice(0, k); for (const e of es) if (!used[e]) walk(nd, e); }
+  for (let e = 0; e < NH + NV; e++) if (ex[e] && !used[e]) walk(ends(e)[0], e);
+  return arcs;
+}
+function smooth(xy, sigma, loop) {                    // Gaussian along the arc, ends pinned
+  const n = xy.length; if (n < 4) return xy;
+  let L = 0; for (let i = 1; i < n; i++) L += Math.hypot(xy[i][0] - xy[i - 1][0], xy[i][1] - xy[i - 1][1]);
+  const s = sigma / (L / (n - 1) + 1e-9), R = Math.ceil(3 * s), k = []; let ks = 0;
+  for (let i = -R; i <= R; i++) { const v = Math.exp(-.5 * i * i / (s * s)); k.push(v); ks += v; }
+  const get = loop ? i => xy[((i % n) + n) % n] : i => {
+    if (i < 0) { const a = xy[0], b = xy[Math.min(n - 1, -i)]; return [2 * a[0] - b[0], 2 * a[1] - b[1]]; }
+    if (i >= n) { const a = xy[n - 1], b = xy[Math.max(0, 2 * (n - 1) - i)]; return [2 * a[0] - b[0], 2 * a[1] - b[1]]; }
+    return xy[i];
+  };
+  const out = xy.map((_, i) => { let x = 0, y = 0; for (let j = -R; j <= R; j++) { const p = get(i + j), v = k[j + R]; x += v * p[0]; y += v * p[1]; } return [x / ks, y / ks]; });
+  if (!loop) { out[0] = xy[0]; out[n - 1] = xy[n - 1]; }
+  return out;
+}
+function simplify(xy, tol) {                          // Douglas-Peucker
+  if (xy.length < 3) return xy;
+  const keep = new Uint8Array(xy.length); keep[0] = keep[xy.length - 1] = 1; const st = [[0, xy.length - 1]];
+  while (st.length) {
+    const [a, b] = st.pop(), [ax, ay] = xy[a], [bx, by] = xy[b], dx = bx - ax, dy = by - ay, L = Math.hypot(dx, dy) || 1e-12; let m = -1, md = tol;
+    for (let i = a + 1; i < b; i++) { const d = Math.abs((xy[i][0] - ax) * dy - (xy[i][1] - ay) * dx) / L; if (d > md) { md = d; m = i; } }
+    if (m > 0) { keep[m] = 1; st.push([a, m], [m, b]); }
+  }
+  return xy.filter((_, i) => keep[i]);
+}
+
+// ---------------------------------------------------------------- engraving (fossil_field.export_engraving)
+function engraving(P, pieces, polys) {
+  const { lab, w, hh } = P, N = w * hh, edge = new Uint8Array(N);
+  for (let i = 0; i < N; i++) {
+    const x = i % w, L = lab[i];
+    if (x === 0 || x === w - 1 || i < w || i >= N - w || lab[i - 1] !== L || lab[i + 1] !== L || lab[i - w] !== L || lab[i + w] !== L) edge[i] = 1;
+  }
+  const d2 = edt2(edge, w, hh);
+  const inside = (i, x, y, clear) => { const c = x / HP | 0, r = y / HP | 0; if (c < 0 || r < 0 || c >= w || r >= hh) return false; const g = r * w + c; return lab[g] === i && (Math.sqrt(d2[g]) + .5) * HP >= clear; };
+  const loops = [], lines = [];
+  pieces.forEach((pc, i) => {
+    const nf = FAM[pc.k].e, co = Math.cos(pc.p.th), si = Math.sin(pc.p.th), s = pc.p.s;
+    for (let j = 0; j < nf; j++) {
+      const raw = new Float64Array(2 * FP); for (let q = 0; q < 2 * FP; q++) raw[q] = pc.out[2 * NC + j * 2 * FP + q];
+      const lp = chaikin(raw, 2), b = new Float64Array(lp.length); let ok = true;
+      for (let q = 0; q < lp.length; q += 2) { b[q] = pc.p.x + s * (co * lp[q] - si * lp[q + 1]); b[q + 1] = pc.p.y + s * (si * lp[q] + co * lp[q + 1]); if (!inside(i, b[q], b[q + 1], 1)) ok = false; }
+      if (ok && Math.abs(area(b)) > .2) loops.push(b);
+    }
+    const p = polys[i], n = p.length >> 1, ok = new Uint8Array(n); let start = -1;
+    for (let q = 0; q < n; q++) { ok[q] = inside(i, p[2 * q], p[2 * q + 1], 1) ? 1 : 0; if (!ok[q] && start < 0) start = q; }
+    if (start < 0) { lines.push({ xy: Array.from({ length: n + 1 }, (_, q) => [p[2 * (q % n)], p[2 * (q % n) + 1]]) }); return; }
+    let run = [];
+    for (let t = 1; t <= n; t++) {
+      const q = (start + t) % n;
+      if (ok[q]) run.push([p[2 * q], p[2 * q + 1]]);
+      if (!ok[q] || t === n) {
+        let L = 0; for (let a = 1; a < run.length; a++) L += Math.hypot(run[a][0] - run[a - 1][0], run[a][1] - run[a - 1][1]);
+        if (L >= 3) lines.push({ xy: run }); run = [];
+      }
+    }
+  });
+  return { loops, lines };
+}
+
+// ---------------------------------------------------------------- drawing
+const fmt = v => (Math.round(v * 100) / 100).toString();
+const dline = xy => 'M' + xy.map(p => fmt(p[0]) + ' ' + fmt(p[1])).join('L');
+const dpoly = p => { let s = 'M'; for (let i = 0; i < p.length; i += 2) s += (i ? 'L' : '') + fmt(p[i]) + ' ' + fmt(p[i + 1]); return s + 'Z'; };
+const el = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+
+let gen = 0, mix = 2, current = null;
+const relax = () => new Promise(r => setTimeout(r, 0));
+function frame() {
+  const r = svg.getBoundingClientRect(), cw = Math.max(240, r.width), ch = Math.max(240, r.height), port = ch > cw;
+  const scale = Math.max(3, port ? cw / 390 : cw / 570, port ? ch / 570 : ch / 390);
+  return { W: Math.max(60, Math.floor(cw / scale)), H: Math.max(60, Math.floor(ch / scale)), scale };
+}
+
+async function draw(seed, at) {
+  const me = ++gen, R = mulberry(seed);
+  let t0 = performance.now();
+  const live = async () => { if (performance.now() - t0 > 12) { await relax(); t0 = performance.now(); } return me === gen; };
+  const { W, H, scale } = frame(), px = v => (v / scale).toFixed(3);
+  for (const g of svg.querySelectorAll('g')) { g.classList.add('gone'); setTimeout(() => g.remove(), 700); }
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  const ghost = el('g', { class: 'ghost', 'stroke-width': px(.8) }, svg);
+
+  let sel = FAM.filter(f => MIXES[mix].includes(f.c) && !f.m); if (!sel.length) sel = FAM;
+  const unit = sel.reduce((a, f) => a + f.a, 0) / sel.length;   // fossil_field.auto_pieces: mean motif about 34 mm
+  const { picks, keys } = choose(MIXES[mix], Math.max(4, Math.round(.75 * W * H / (34 * 34 * unit))), R);
+  const all = [];
+  for (const k of picks) { all.push(creature(k, R)); if (!(await live())) return; }
+  const sum = all.reduce((a, c) => a + c.sh.area, 0), sref = Math.sqrt(.75 * W * H / sum), slo = Math.max(BASE, .75 * sref), shi = Math.max(slo * 1.05, 1.3 * sref);
+  const s0 = Math.sqrt(.82 * W * H / sum), B = board(W, H), pieces = [];
+  all.forEach(c => { c.want = Math.min(shi, Math.max(slo, (.86 + .28 * R()) * s0)); });
+  all.sort((a, b) => b.want - a.want);
+  const put = c => { c.id = pieces.length; pieces.push(c); stamp(B, c, true, true); el('path', { d: dpoly(placed(c.sh, c.p)) }, ghost); };
+  for (const c of all) {
+    c.id = pieces.length;
+    for (const m of [1, .92, .84]) { const s = Math.max(slo, c.want * m); c.p = dock(B, c, s, R); if (c.p || s === slo) break; }
+    if (c.p) put(c);
+    if (!(await live())) return;
+  }
+  for (let miss = 0, j = 0; miss < 18; j++) {          // fill what is left with the smallest pieces
+    const key = keys[(R() * keys.length) | 0], m = R() < .5 ? 1 : 0; let k = FAM.findIndex(f => f.key === key && f.m === m); if (k < 0) k = FAM.findIndex(f => f.key === key);
+    const c = creature(k, R); c.id = pieces.length; c.p = dock(B, c, slo * (1 + .08 * R()), R);
+    if (c.p) { put(c); miss = 0; } else miss++;
+    if (!(await live())) return;
+  }
+  let budget = 700;                                    // ms of latent search: the network bends a creature into the room it has
+  for (let sweep = 0; sweep < 3; sweep++) {            // grow every piece into the room around it
+    for (const c of pieces) {
+      stamp(B, c, false);
+      let p = c.p;
+      for (let t = 0; t < 6; t++) {
+        const q = { x: p.x + .8 * gauss(R), y: p.y + .8 * gauss(R), th: p.th + .05 * gauss(R), s: Math.min(shi, p.s * (1.015 + .03 * R())) };
+        if (q.s > p.s && fits(B, c.sh, q.x, q.y, Math.cos(q.th), Math.sin(q.th), q.s, c.id)) p = q;
+      }
+      if (budget > 0) {
+        const t1 = performance.now(), r = FAM[c.k].r, z = c.z.map(v => Math.max(-r, Math.min(r, v + .35 * r * gauss(R)))), out = decode(c.k, z), sh = shape(out), s = Math.min(shi, p.s * 1.01);
+        if (fits(B, sh, p.x, p.y, Math.cos(p.th), Math.sin(p.th), s, c.id) && simple(sh.poly) && iou(sh.poly, SRCP[c.k]) >= .8 && !thin(placed(sh, { ...p, s }))) { Object.assign(c, { z, out, sh }); p = { ...p, s }; }
+        budget -= performance.now() - t1;
+      }
+      c.p = p; stamp(B, c, true);
+      if (!(await live())) return;
+    }
+  }
+  const polys = pieces.map(c => placed(c.sh, c.p));
+  ghost.replaceChildren(...polys.map(p => el('path', { d: dpoly(p), style: 'animation:none' })));
+
+  const P = await arrival(polys, W, H, live); if (!P) return;
+  connect(P);
+  for (let i = 0, only = null; i < 3; i++) { const d = despike(P, only); if (!d.moved) break; only = d.touched; }
+  connect(P);
+  if (!(await live())) return;
+  const arcs = trace(P).map(a => ({ pair: a.pair, xy: a.pair[0] < 0 ? [a.xy[0], a.xy[a.xy.length - 1]] : simplify(smooth(a.xy, .4, a.loop), .02), loop: a.loop }));
+  const { loops, lines } = engraving(P, pieces, polys);
+  if (!(await live())) return;
+
+  const ox = at ? at[0] : W / 2, oy = at ? at[1] : H / 2, far = Math.hypot(Math.max(ox, W - ox), Math.max(oy, H - oy));
+  const eng = el('g', { class: 'eng', 'stroke-width': px(.75) });
+  for (const l of lines) el('path', { d: dline(l.xy) }, eng);
+  for (const p of loops) el('path', { d: dpoly(p) }, eng);
+  const cut = el('g', { class: 'cut', 'stroke-width': px(1.1) });
+  for (const a of arcs) {
+    const m = a.xy[a.xy.length >> 1], d = Math.hypot(m[0] - ox, m[1] - oy) / far;
+    el('path', { d: dline(a.loop ? [...a.xy, a.xy[0]] : a.xy), pathLength: 1, style: `--t:${(.05 + 1.1 * d).toFixed(3)}s` }, cut);
+  }
+  svg.append(eng, cut); ghost.classList.add('gone'); setTimeout(() => ghost.remove(), 800);
+  current = { W, H, arcs, loops, lines, seed, mix, n: pieces.length };
+}
+
+// ---------------------------------------------------------------- export: cut red, engraving blue, 1:1 mm (fossil-field-production.svg)
+let downloads = null;
+if (window.claude && window.claude.use) window.claude.use('downloads').then(d => { downloads = d; }, () => {});
+function production() {
+  const { W, H, arcs, loops, lines } = current;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}mm" height="${H}mm" viewBox="0 0 ${W} ${H}">\n`
+    + `<g id="engrave" fill="none" stroke="#0000ff" stroke-width="0.1">${loops.map(p => `<path d="${dpoly(p)}"/>`).join('')}${lines.map(l => `<path d="${dline(l.xy)}"/>`).join('')}</g>`
+    + `<g id="cut" fill="none" stroke="#ff0000" stroke-width="0.1" stroke-linecap="round" stroke-linejoin="round">${arcs.map(a => `<path d="${dline(a.loop ? [...a.xy, a.xy[0]] : a.xy)}"/>`).join('')}</g>\n</svg>`;
+}
+async function save() {
+  if (!current) return;
+  const name = `fossilnet-${['trilobites', 'reef', 'fossil-sea'][current.mix]}-${current.seed}.svg`, data = production();
+  if (downloads) { try { await downloads.save({ filename: name, data }); } catch (e) { /* declined or unavailable */ } return; }
+  if (window.claude) return;
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([data], { type: 'image/svg+xml' })); a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+
+// ---------------------------------------------------------------- the only controls: tap for a new board; keys 1 2 3 pick the mix, S saves
+const seed = () => (Math.random() * 2 ** 31) >>> 0;
+const local = e => { const r = svg.getBoundingClientRect(), b = svg.viewBox.baseVal, k = Math.min(r.width / b.width, r.height / b.height); return [(e.clientX - r.left - (r.width - b.width * k) / 2) / k, (e.clientY - r.top - (r.height - b.height * k) / 2) / k]; };
+document.addEventListener('pointerup', e => { if (e.button === 0) draw(seed(), local(e)); });
+let resized = 0;
+addEventListener('resize', () => { clearTimeout(resized); resized = setTimeout(() => { const f = frame(), b = svg.viewBox.baseVal; if (Math.abs(f.W - b.width) > .12 * b.width || Math.abs(f.H - b.height) > .12 * b.height) draw(seed()); }, 300); });
+document.addEventListener('keydown', e => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  if (e.key === 's' || e.key === 'S') { e.preventDefault(); save(); }
+  else if ('123'.includes(e.key)) { mix = +e.key - 1; draw(seed()); }
+  else if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); draw(seed()); }
+});
+draw(seed());
+})();
+</script>
+</html>

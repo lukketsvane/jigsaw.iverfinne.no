@@ -42,7 +42,7 @@ def raster_mask(points, label):
     return mask
 
 
-def build_catalog(out: Path, pieces: int = 32):
+def build_catalog(out: Path, pieces: int = 32, logo_scale: float = 2.6):
     if pieces < 27:
         raise ValueError("Use at least 27 pieces for the logo and all 26 letters")
     dataset = json.loads((ROOT / DATASET).read_text(encoding="utf-8"))
@@ -62,7 +62,7 @@ def build_catalog(out: Path, pieces: int = 32):
 
     add("aphex-logo", "logo", "aphex_logo", "Aphex Twin logo", "logo", REFERENCE,
         flatten(np.asarray(reference["logo_control_points"]), steps=8),
-        area_scale=2.6, source_image=LOGO_IMAGE.as_posix(), source_record="logo_control_points",
+        area_scale=float(logo_scale), source_image=LOGO_IMAGE.as_posix(), source_record="logo_control_points",
         license="Logo rights not cleared")
     for letter in LETTERS:
         row = glyphs[letter]
@@ -108,12 +108,13 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out", type=Path, required=True, help="Fresh target folder")
     parser.add_argument("--pieces", type=int, default=32, help="Piece count including one logo (minimum 27)")
+    parser.add_argument("--logo-scale", type=float, default=2.6, help="Target area multiplier for the centerpiece logo")
     args = parser.parse_args()
     if args.out.exists():
         parser.error(f"Output already exists: {args.out}")
     if args.pieces < 27:
         parser.error("--pieces must be at least 27")
-    records = build_catalog(args.out, args.pieces)
+    records = build_catalog(args.out, args.pieces, logo_scale=args.logo_scale)
     print(f"Wrote {len(records)} Aphex targets to {args.out / 'catalog.json'}")
 
 

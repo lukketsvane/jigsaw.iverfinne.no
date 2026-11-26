@@ -1,0 +1,313 @@
+{
+ "architecture": "family embedding (64) + 8-d latent -> MLP 3x320 SiLU -> 192 periodic cubic B-spline controls + 4x16 feature points",
+ "parameters": 394816,
+ "families": 26,
+ "train_contours": 41600,
+ "val_contours": 3120,
+ "epochs": 150,
+ "trace": [
+  {
+   "epoch": 1,
+   "train_mse": 0.14514326093288568,
+   "val_mse": 0.06958658248186111,
+   "val_feature_mse": 0.05452835187315941,
+   "seconds": 1.0
+  },
+  {
+   "epoch": 11,
+   "train_mse": 0.0010858720139815257,
+   "val_mse": 0.0010204521240666509,
+   "val_feature_mse": 0.000538816093467176,
+   "seconds": 7.9
+  },
+  {
+   "epoch": 21,
+   "train_mse": 0.000297962014312641,
+   "val_mse": 0.0002800211077556014,
+   "val_feature_mse": 5.4290190746542066e-05,
+   "seconds": 14.8
+  },
+  {
+   "epoch": 31,
+   "train_mse": 0.0001741538059566385,
+   "val_mse": 8.429380250163376e-05,
+   "val_feature_mse": 1.9521236026776023e-05,
+   "seconds": 22.2
+  },
+  {
+   "epoch": 41,
+   "train_mse": 3.980706298114875e-05,
+   "val_mse": 9.123679046751931e-05,
+   "val_feature_mse": 8.279784378828481e-05,
+   "seconds": 28.9
+  },
+  {
+   "epoch": 51,
+   "train_mse": 4.5771411991714e-05,
+   "val_mse": 0.00010134936746908352,
+   "val_feature_mse": 0.00016664281429257244,
+   "seconds": 36.2
+  },
+  {
+   "epoch": 61,
+   "train_mse": 1.6921591536979227e-05,
+   "val_mse": 1.7435828340239823e-05,
+   "val_feature_mse": 3.65449050150346e-05,
+   "seconds": 43.8
+  },
+  {
+   "epoch": 71,
+   "train_mse": 2.1432407766741773e-05,
+   "val_mse": 2.0383722585393116e-05,
+   "val_feature_mse": 1.8755054043140262e-05,
+   "seconds": 51.9
+  },
+  {
+   "epoch": 81,
+   "train_mse": 9.34872021809077e-06,
+   "val_mse": 1.244535087607801e-05,
+   "val_feature_mse": 1.0122801541001536e-05,
+   "seconds": 60.2
+  },
+  {
+   "epoch": 91,
+   "train_mse": 7.132540186620855e-06,
+   "val_mse": 1.0753830792964436e-05,
+   "val_feature_mse": 1.1256177458562888e-05,
+   "seconds": 69.0
+  },
+  {
+   "epoch": 101,
+   "train_mse": 3.563742921659678e-06,
+   "val_mse": 3.180155090376502e-06,
+   "val_feature_mse": 1.7097363524953835e-06,
+   "seconds": 76.7
+  },
+  {
+   "epoch": 111,
+   "train_mse": 2.266785659930275e-06,
+   "val_mse": 2.3083646283339476e-06,
+   "val_feature_mse": 1.1631635743469815e-06,
+   "seconds": 84.4
+  },
+  {
+   "epoch": 121,
+   "train_mse": 1.7603311943485797e-06,
+   "val_mse": 1.8248417745780898e-06,
+   "val_feature_mse": 7.026015964584076e-07,
+   "seconds": 92.1
+  },
+  {
+   "epoch": 131,
+   "train_mse": 1.4569742457891923e-06,
+   "val_mse": 1.5066252672113478e-06,
+   "val_feature_mse": 4.5585417751681234e-07,
+   "seconds": 100.2
+  },
+  {
+   "epoch": 141,
+   "train_mse": 1.300399628165066e-06,
+   "val_mse": 1.327416839558282e-06,
+   "val_feature_mse": 3.896417979376565e-07,
+   "seconds": 108.3
+  },
+  {
+   "epoch": 150,
+   "train_mse": 1.2532530165397194e-06,
+   "val_mse": 1.2893826806248398e-06,
+   "val_feature_mse": 3.64072633374235e-07,
+   "seconds": 115.8
+  }
+ ],
+ "device": "cuda",
+ "mean_val_target_iou": 0.9933255797823259,
+ "min_val_target_iou": 0.9665117942146034,
+ "valid_rate": 0.9993589743589744,
+ "per_family": {
+  "trilobite/rib-skeleton": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9912691024495625,
+   "min_target_iou": 0.9763148050082419,
+   "source_iou": 0.6325603872573464
+  },
+  "trilobite/rib-skeleton (mirrored)": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9910995823366568,
+   "min_target_iou": 0.9783327588000383,
+   "source_iou": 0.6369668578434172
+  },
+  "trilobite/lobster": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9954091746212993,
+   "min_target_iou": 0.9913575552509696,
+   "source_iou": 0.7865159210560108
+  },
+  "trilobite/lobster (mirrored)": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9956172904115128,
+   "min_target_iou": 0.9905036169826822,
+   "source_iou": 0.7901489543229469
+  },
+  "trilobite/enrolled": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9951939243141474,
+   "min_target_iou": 0.9880106204829087,
+   "source_iou": 0.7899044572239499
+  },
+  "trilobite/enrolled (mirrored)": {
+   "valid_rate": 1.0,
+   "target_iou": 0.99540420556947,
+   "min_target_iou": 0.9900783687776643,
+   "source_iou": 0.7943861874440737
+  },
+  "trilobite/many-legs": {
+   "valid_rate": 0.9916666666666667,
+   "target_iou": 0.9949095566708359,
+   "min_target_iou": 0.9896264743824665,
+   "source_iou": 0.7726037147416498
+  },
+  "trilobite/many-legs (mirrored)": {
+   "valid_rate": 0.9916666666666667,
+   "target_iou": 0.9947227293809928,
+   "min_target_iou": 0.9884679087251109,
+   "source_iou": 0.768281317188185
+  },
+  "dendrite/antler": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9876167495746857,
+   "min_target_iou": 0.9665117942146034,
+   "source_iou": 0.5779444468126006
+  },
+  "dendrite/antler (mirrored)": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9875044652708825,
+   "min_target_iou": 0.9714899875586526,
+   "source_iou": 0.5757540316786873
+  },
+  "trilobite/side-glance": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9936856105905056,
+   "min_target_iou": 0.9879326349195512,
+   "source_iou": 0.73997742234738
+  },
+  "trilobite/side-glance (mirrored)": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9939312996253535,
+   "min_target_iou": 0.9860138249950687,
+   "source_iou": 0.754538555022647
+  },
+  "trilobite/crescent": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9916778652928138,
+   "min_target_iou": 0.9838155126085318,
+   "source_iou": 0.7179678489931225
+  },
+  "trilobite/crescent (mirrored)": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9916581176203423,
+   "min_target_iou": 0.9820337978136049,
+   "source_iou": 0.707096750094009
+  },
+  "trilobite/scalloped": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9971554219215494,
+   "min_target_iou": 0.9942626063254774,
+   "source_iou": 0.8427512074696468
+  },
+  "trilobite/scalloped (mirrored)": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9969629162165558,
+   "min_target_iou": 0.993551882267442,
+   "source_iou": 0.8452034682807715
+  },
+  "coral/terraces": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9915107651085773,
+   "min_target_iou": 0.9850352307009858,
+   "source_iou": 0.7212128492751565
+  },
+  "coral/terraces (mirrored)": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9916289612973962,
+   "min_target_iou": 0.9841554874758921,
+   "source_iou": 0.7245252806757232
+  },
+  "trilobite/spined": {
+   "valid_rate": 1.0,
+   "target_iou": 0.995256881825906,
+   "min_target_iou": 0.9883874565377213,
+   "source_iou": 0.7925558215741247
+  },
+  "trilobite/spined (mirrored)": {
+   "valid_rate": 1.0,
+   "target_iou": 0.994879465304898,
+   "min_target_iou": 0.9897119233364085,
+   "source_iou": 0.7821740351525326
+  },
+  "trilobite/centipede": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9927422070927534,
+   "min_target_iou": 0.9786835997605459,
+   "source_iou": 0.7065837857927271
+  },
+  "trilobite/centipede (mirrored)": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9931282255729509,
+   "min_target_iou": 0.9808138795927692,
+   "source_iou": 0.7150963835728137
+  },
+  "coral/fork": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9907228869451139,
+   "min_target_iou": 0.9782563391809901,
+   "source_iou": 0.686539968238167
+  },
+  "coral/fork (mirrored)": {
+   "valid_rate": 1.0,
+   "target_iou": 0.990447814484547,
+   "min_target_iou": 0.9725592451195825,
+   "source_iou": 0.6663742117866289
+  },
+  "trilobite/fan-tail": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9959460242543828,
+   "min_target_iou": 0.9900029454903599,
+   "source_iou": 0.8041667158516119
+  },
+  "trilobite/fan-tail (mirrored)": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9963838305867835,
+   "min_target_iou": 0.992824647834033,
+   "source_iou": 0.8059856466126744
+  }
+ },
+ "safe_latent_radius": {
+  "trilobite/rib-skeleton": 0.2,
+  "trilobite/rib-skeleton (mirrored)": 0.2,
+  "trilobite/lobster": 0.3,
+  "trilobite/lobster (mirrored)": 0.3,
+  "trilobite/enrolled": 0.4,
+  "trilobite/enrolled (mirrored)": 0.4,
+  "trilobite/many-legs": 0.3,
+  "trilobite/many-legs (mirrored)": 0.3,
+  "dendrite/antler": 0.15,
+  "dendrite/antler (mirrored)": 0.15,
+  "trilobite/side-glance": 0.3,
+  "trilobite/side-glance (mirrored)": 0.3,
+  "trilobite/crescent": 0.25,
+  "trilobite/crescent (mirrored)": 0.25,
+  "trilobite/scalloped": 0.6,
+  "trilobite/scalloped (mirrored)": 0.5,
+  "coral/terraces": 0.25,
+  "coral/terraces (mirrored)": 0.25,
+  "trilobite/spined": 0.3,
+  "trilobite/spined (mirrored)": 0.3,
+  "trilobite/centipede": 0.25,
+  "trilobite/centipede (mirrored)": 0.25,
+  "coral/fork": 0.2,
+  "coral/fork (mirrored)": 0.2,
+  "trilobite/fan-tail": 0.4,
+  "trilobite/fan-tail (mirrored)": 0.4
+ },
+ "scope": "held-out deformations of the supplied drawings; not new species, not a human recognition test"
+}

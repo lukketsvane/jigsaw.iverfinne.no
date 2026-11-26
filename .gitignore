@@ -22,3 +22,6 @@ resources/*.zip
 .env
 /TRANSFER_MANIFEST.json
 /RAW_RESEARCH_MANIFEST.json
+
+# FossilNet browser model (weights and drawings), rebuilt by web/fossilnet/export.py
+/web/fossilnet/fossilnet.js

@@ -162,10 +162,17 @@ function buildBoard() {
     const id = p.id, x = p.outline.map(q => q[0]), y = p.outline.map(q => q[1]);
     bounds[id] = [Math.min(...x), Math.min(...y), Math.max(...x), Math.max(...y)];
     $('shapes').append(node('path', {id: 'lizard-' + id, d: pathData(p.outline) + 'Z'}));
+    let fill = p.color;
+    if (p.gradient?.stops?.length >= 2) {
+      const grad = node('linearGradient', {id: 'grad-' + id, gradientUnits: 'userSpaceOnUse', x1: p.gradient.x1, y1: p.gradient.y1, x2: p.gradient.x2, y2: p.gradient.y2});
+      p.gradient.stops.forEach((c, idx) => grad.append(node('stop', {offset: (idx / (p.gradient.stops.length - 1) * 100) + '%', 'stop-color': c})));
+      $('shapes').append(grad);
+      fill = 'url(#grad-' + id + ')';
+    }
     const wood = node('use', {href: '#lizard-' + id, fill: '#573d29', stroke: '#573d29', 'stroke-width': stroke * 1.05});
     underside.append(wood);
     const g = node('g', {class: 'piece', 'data-id': id});
-    const face = node('use', {href: '#lizard-' + id, fill: p.color, class: 'face', stroke: '#4e431f', 'stroke-opacity': .75, 'stroke-width': stroke});
+    const face = node('use', {href: '#lizard-' + id, fill, class: 'face', stroke: '#4e431f', 'stroke-opacity': .75, 'stroke-width': stroke});
     g.append(face);
     if (p.spine?.length) g.append(node('path', {d: pathData(p.spine), fill: 'none', stroke: '#504124', 'stroke-opacity': .91, 'stroke-width': stroke * .95, 'pointer-events': 'none'}));
     for (const [cx, cy] of p.eyes || []) g.append(node('circle', {cx, cy, r: p.eyeRadius || step * .025, fill: '#4b381d', 'pointer-events': 'none'}));

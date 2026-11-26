@@ -1,0 +1,285 @@
+{
+ "architecture": "family embedding (64) + 8-d latent -> MLP 3x320 SiLU -> 192 periodic cubic B-spline controls + 4x16 feature points",
+ "parameters": 394816,
+ "families": 26,
+ "train_contours": 41600,
+ "val_contours": 3120,
+ "epochs": 150,
+ "trace": [
+  {
+   "epoch": 1,
+   "train_mse": 0.08335816582808128,
+   "val_mse": 0.04064207524061203,
+   "val_feature_mse": 0.02923479676246643,
+   "seconds": 1.1
+  },
+  {
+   "epoch": 11,
+   "train_mse": 0.0006703900277184753,
+   "val_mse": 0.0006314772763289511,
+   "val_feature_mse": 0.0003460110747255385,
+   "seconds": 6.5
+  },
+  {
+   "epoch": 21,
+   "train_mse": 0.0001601713578342102,
+   "val_mse": 0.000140290183480829,
+   "val_feature_mse": 2.564101669122465e-05,
+   "seconds": 11.3
+  },
+  {
+   "epoch": 31,
+   "train_mse": 6.560313461634975e-05,
+   "val_mse": 4.853792779613286e-05,
+   "val_feature_mse": 1.7455487977713346e-05,
+   "seconds": 15.8
+  },
+  {
+   "epoch": 41,
+   "train_mse": 3.27614608193891e-05,
+   "val_mse": 9.708417928777635e-05,
+   "val_feature_mse": 0.00010796439164550975,
+   "seconds": 19.8
+  },
+  {
+   "epoch": 51,
+   "train_mse": 2.5715181959989983e-05,
+   "val_mse": 3.0367555154953152e-05,
+   "val_feature_mse": 4.98488916491624e-05,
+   "seconds": 24.1
+  },
+  {
+   "epoch": 61,
+   "train_mse": 1.397194592685152e-05,
+   "val_mse": 6.333825149340555e-05,
+   "val_feature_mse": 2.3042422981234267e-05,
+   "seconds": 28.5
+  },
+  {
+   "epoch": 71,
+   "train_mse": 7.583989140235084e-06,
+   "val_mse": 8.449885172012728e-06,
+   "val_feature_mse": 7.856478987378068e-06,
+   "seconds": 32.9
+  },
+  {
+   "epoch": 81,
+   "train_mse": 8.69216695718933e-06,
+   "val_mse": 6.65997140458785e-06,
+   "val_feature_mse": 7.34851710149087e-06,
+   "seconds": 37.3
+  },
+  {
+   "epoch": 91,
+   "train_mse": 2.9166291782390686e-06,
+   "val_mse": 3.5000252864847425e-06,
+   "val_feature_mse": 2.3618365503352834e-06,
+   "seconds": 41.8
+  },
+  {
+   "epoch": 101,
+   "train_mse": 2.2188281267377674e-06,
+   "val_mse": 2.1484372609847924e-06,
+   "val_feature_mse": 1.596382958268805e-06,
+   "seconds": 46.2
+  },
+  {
+   "epoch": 111,
+   "train_mse": 1.4081372424138513e-06,
+   "val_mse": 1.509285425527196e-06,
+   "val_feature_mse": 1.471889504500723e-06,
+   "seconds": 50.0
+  },
+  {
+   "epoch": 121,
+   "train_mse": 1.0759990093972121e-06,
+   "val_mse": 1.124592927226331e-06,
+   "val_feature_mse": 4.371856050511269e-07,
+   "seconds": 54.4
+  },
+  {
+   "epoch": 131,
+   "train_mse": 8.889708741522694e-07,
+   "val_mse": 9.107748724090925e-07,
+   "val_feature_mse": 3.260450114339619e-07,
+   "seconds": 58.3
+  },
+  {
+   "epoch": 141,
+   "train_mse": 7.939203615373676e-07,
+   "val_mse": 8.163345910361386e-07,
+   "val_feature_mse": 2.5883488774525176e-07,
+   "seconds": 62.5
+  },
+  {
+   "epoch": 150,
+   "train_mse": 7.647344995558132e-07,
+   "val_mse": 7.925182217149995e-07,
+   "val_feature_mse": 2.429289054362016e-07,
+   "seconds": 66.2
+  }
+ ],
+ "device": "cuda",
+ "mean_val_target_iou": 0.9936539593936461,
+ "min_val_target_iou": 0.9725515788221478,
+ "valid_rate": 0.9980769230769231,
+ "per_family": {
+  "trilobite/rib-skeleton": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9924214521617343,
+   "min_target_iou": 0.979461192483371,
+   "source_iou": 0.6376790191045536
+  },
+  "trilobite/rib-skeleton (mirrored)": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9923563335802416,
+   "min_target_iou": 0.9794468521724713,
+   "source_iou": 0.6414602219617966
+  },
+  "trilobite/lobster": {
+   "valid_rate": 1.0,
+   "target_iou": 0.993911041289902,
+   "min_target_iou": 0.9882643205556065,
+   "source_iou": 0.7433641215745627
+  },
+  "trilobite/lobster (mirrored)": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9940288854656069,
+   "min_target_iou": 0.9891578251076829,
+   "source_iou": 0.7426241582193174
+  },
+  "trilobite/enrolled": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9935402959867476,
+   "min_target_iou": 0.9847520873477961,
+   "source_iou": 0.7452431624227555
+  },
+  "trilobite/enrolled (mirrored)": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9939940662081239,
+   "min_target_iou": 0.9882818495117053,
+   "source_iou": 0.7563568670788716
+  },
+  "trilobite/many-legs": {
+   "valid_rate": 0.95,
+   "target_iou": 0.9938889073010249,
+   "min_target_iou": 0.9854821528557463,
+   "source_iou": 0.733621822229533
+  },
+  "trilobite/many-legs (mirrored)": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9934603971765825,
+   "min_target_iou": 0.9847988682439561,
+   "source_iou": 0.7283010994861433
+  },
+  "dendrite/antler": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9898188002348289,
+   "min_target_iou": 0.9789423497810223,
+   "source_iou": 0.5780114864598667
+  },
+  "dendrite/antler (mirrored)": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9897922572849932,
+   "min_target_iou": 0.9725515788221478,
+   "source_iou": 0.5755897647363383
+  },
+  "trilobite/side-glance": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9931391382638423,
+   "min_target_iou": 0.984514999726073,
+   "source_iou": 0.7098006717797126
+  },
+  "trilobite/side-glance (mirrored)": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9933456791210762,
+   "min_target_iou": 0.983319469712572,
+   "source_iou": 0.7319344481487495
+  },
+  "trilobite/crescent": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9935439935362782,
+   "min_target_iou": 0.9839386970521207,
+   "source_iou": 0.717945805815468
+  },
+  "trilobite/crescent (mirrored)": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9933442270204281,
+   "min_target_iou": 0.9843207664845322,
+   "source_iou": 0.7072306599908109
+  },
+  "trilobite/scalloped": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9965170763214728,
+   "min_target_iou": 0.9912201968425358,
+   "source_iou": 0.8028568628636614
+  },
+  "trilobite/scalloped (mirrored)": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9964153358832811,
+   "min_target_iou": 0.9924474276827152,
+   "source_iou": 0.8112629396297852
+  },
+  "coral/terraces": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9933594897488888,
+   "min_target_iou": 0.98738466419515,
+   "source_iou": 0.721071108894561
+  },
+  "coral/terraces (mirrored)": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9933574942249419,
+   "min_target_iou": 0.9859771372527353,
+   "source_iou": 0.7242107623663273
+  },
+  "trilobite/spined": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9963214003550147,
+   "min_target_iou": 0.9910932315743092,
+   "source_iou": 0.7926104663268936
+  },
+  "trilobite/spined (mirrored)": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9961139215180459,
+   "min_target_iou": 0.9913555858373071,
+   "source_iou": 0.7821063193618668
+  },
+  "trilobite/centipede": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9936889763371158,
+   "min_target_iou": 0.9820150740895156,
+   "source_iou": 0.7041688194827856
+  },
+  "trilobite/centipede (mirrored)": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9938204451658345,
+   "min_target_iou": 0.9801505828340579,
+   "source_iou": 0.7124093639990661
+  },
+  "coral/fork": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9922782911169613,
+   "min_target_iou": 0.9832644243189512,
+   "source_iou": 0.6865308646099273
+  },
+  "coral/fork (mirrored)": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9915971209407128,
+   "min_target_iou": 0.9728294902605853,
+   "source_iou": 0.6664443534184772
+  },
+  "trilobite/fan-tail": {
+   "valid_rate": 1.0,
+   "target_iou": 0.9953880506555745,
+   "min_target_iou": 0.9895210266251167,
+   "source_iou": 0.762133897105798
+  },
+  "trilobite/fan-tail (mirrored)": {
+   "valid_rate": 1.0,
+   "target_iou": 0.995559867335545,
+   "min_target_iou": 0.9916115024091319,
+   "source_iou": 0.7685872906190727
+  }
+ },
+ "scope": "held-out deformations of the supplied drawings; not new species, not a human recognition test"
+}

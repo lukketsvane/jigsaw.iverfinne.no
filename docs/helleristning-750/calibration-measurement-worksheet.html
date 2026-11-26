@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Supplier Laser Calibration Worksheet — Helleristning 750</title>
+<style>
+  @page { size: A4; margin: 12mm; }
+  body { font-family: "Segoe UI", Arial, sans-serif; color: #1a1816; font-size: 10.5pt; line-height: 1.35; max-width: 195mm; margin: 0 auto; padding: 8px; }
+  h1 { font-size: 15pt; margin: 0 0 4px 0; border-bottom: 2px solid #8b3a2b; padding-bottom: 4px; }
+  h2 { font-size: 11.5pt; margin: 14px 0 6px 0; color: #5b261c; }
+  .meta { font-size: 9pt; color: #444; margin-bottom: 10px; }
+  .note { background: #fbf4e9; border-left: 3px solid #b56035; padding: 6px 10px; font-size: 9.2pt; margin: 8px 0; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 9.2pt; }
+  th, td { border: 1px solid #b7afa2; padding: 5px 6px; text-align: left; vertical-align: middle; }
+  th { background: #efe9de; font-weight: 600; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .field-box { border: 1px solid #b7afa2; padding: 6px 8px; border-radius: 3px; background: #fff; font-size: 9.2pt; }
+  .field-line { border-bottom: 1px dotted #888; min-height: 18px; margin-top: 2px; }
+  .sign-row { display: grid; grid-template-columns: 1fr 1fr 0.6fr; gap: 14px; margin-top: 14px; font-size: 9.5pt; }
+  @media print { .no-print { display: none; } body { padding: 0; } }
+</style>
+</head>
+<body>
+  <div class="no-print" style="text-align:right;margin-bottom:8px;">
+    <button onclick="window.print()" style="padding:6px 12px;cursor:pointer;">Print / Save as PDF</button>
+  </div>
+  <h1>Supplier Laser Calibration Measurement Worksheet — Helleristning 750</h1>
+  <div class="meta">
+    Coupon SVG: <code>runs/helleristning-750-commercial/calibration_coupon.svg</code> (240 &times; 185 mm, 1:1 mm) &nbsp;|&nbsp;
+    Cut order: <strong>1. Green (#engraving)</strong> &rarr; <strong>2. Red (#interior-cuts)</strong> &rarr; <strong>3. Blue (#exterior-cuts)</strong>
+  </div>
+  <div class="note">
+    <strong>Mandatory Setup:</strong> Cut at exact 100% scale (1:1 mm) with automatic kerf compensation <strong>OFF</strong>.
+    Align birch plywood top face grain horizontally with the engraved <code>GRAIN ---&gt;</code> arrow.
+  </div>
+
+  <h2>1. Material, Origin &amp; Laser Parameters</h2>
+  <div class="grid2">
+    <div class="field-box"><strong>Supplier / Operator / Date:</strong><div class="field-line"></div></div>
+    <div class="field-box"><strong>Birch Plywood Grade &amp; Origin (Non-RU/BY?):</strong><div class="field-line">&#9744; Non-RU/BY Verified &nbsp; &#9744; FSC/PEFC CoC</div></div>
+    <div class="field-box"><strong>Thickness (Nom / 4-Corner Caliper mm):</strong><div class="field-line"></div></div>
+    <div class="field-box"><strong>Adhesive / REACH Entry 77 (&le;0.062 mg/m&sup3;):</strong><div class="field-line">&#9744; Lab Report Attached &nbsp; &#9744; Pending</div></div>
+    <div class="field-box"><strong>Laser Machine / Lens / Masking:</strong><div class="field-line"></div></div>
+    <div class="field-box"><strong>Cut (P% / Spd / Hz) &amp; Engrave Settings:</strong><div class="field-line"></div></div>
+  </div>
+
+  <h2>2. Section A — Kerf Step Gauge &amp; 10-Cut Caliper Block</h2>
+  <p style="margin:4px 0;">10-Cut Total Gap: ________________ mm &nbsp;&rarr;&nbsp; <strong>Measured Kerf (Gap / 10): ________________ mm</strong> &nbsp;|&nbsp; Recommended Design Kerf: ________ mm</p>
+  <table>
+    <thead><tr><th>Slot (mm)</th><th>0.08</th><th>0.10</th><th>0.12</th><th>0.15</th><th>0.18</th><th>0.20</th><th>0.22</th><th>0.25</th><th>0.28</th><th>0.30</th></tr></thead>
+    <tbody><tr><td><strong>Fit (L/S/T/X)</strong></td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr></tbody>
+  </table>
+
+  <h2>3. Section B — 50.00 &times; 50.00 mm Dimensional Accuracy</h2>
+  <table>
+    <thead><tr><th>Axis</th><th>Nominal</th><th>Measured (mm)</th><th>Error (mm)</th><th>Pass (&plusmn;0.20 mm)</th></tr></thead>
+    <tbody>
+      <tr><td>X (With Grain)</td><td>50.00 mm</td><td></td><td></td><td>&#9744; Pass &nbsp; &#9744; Fail</td></tr>
+      <tr><td>Y (Cross Grain)</td><td>50.00 mm</td><td></td><td></td><td>&#9744; Pass &nbsp; &#9744; Fail</td></tr>
+      <tr><td>Diagonals (D1 / D2)</td><td>70.71 mm</td><td></td><td></td><td>&#9744; Pass &nbsp; &#9744; Fail</td></tr>
+    </tbody>
+  </table>
+
+  <h2>4. Section C — Neck-Strength Torture Bars (0&deg; With-Grain vs. 90&deg; Cross-Grain)</h2>
+  <table>
+    <thead>
+      <tr><th>Nominal Neck</th><th>0&deg; Actual (mm)</th><th>0&deg; Strength (1–5)</th><th>90&deg; Actual (mm)</th><th>90&deg; Strength (1–5)</th><th>Char / Splinter / Delam Notes</th></tr>
+    </thead>
+    <tbody><tr><td><strong>2.0 mm</strong></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td><strong>2.5 mm</strong></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td><strong>3.0 mm</strong></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td><strong>3.5 mm</strong></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td><strong>4.0 mm</strong></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td><strong>5.0 mm</strong></td><td></td><td></td><td></td><td></td><td></td></tr></tbody>
+  </table>
+
+  <h2>5. Section D — Interlocking Tab/Socket Fit Pairs</h2>
+  <table>
+    <thead><tr><th>Pair</th><th>Kerf Offset</th><th>Fit Feel (Loose/Ideal/Tight)</th><th>Lifts Together?</th><th>Char Rub-Off</th><th>Notes</th></tr></thead>
+    <tbody><tr><td><strong>Pair 0</strong></td><td>0.00 mm (Common-Line)</td><td></td><td>&#9744; Yes &nbsp; &#9744; No</td><td></td><td></td></tr>
+<tr><td><strong>Pair 1</strong></td><td>+0.05 mm radial</td><td></td><td>&#9744; Yes &nbsp; &#9744; No</td><td></td><td></td></tr>
+<tr><td><strong>Pair 2</strong></td><td>+0.10 mm radial</td><td></td><td>&#9744; Yes &nbsp; &#9744; No</td><td></td><td></td></tr>
+<tr><td><strong>Pair 3</strong></td><td>+0.15 mm radial</td><td></td><td>&#9744; Yes &nbsp; &#9744; No</td><td></td><td></td></tr>
+<tr><td><strong>Pair 4</strong></td><td>+0.20 mm radial</td><td></td><td>&#9744; Yes &nbsp; &#9744; No</td><td></td><td></td></tr></tbody>
+  </table>
+
+  <h2>6. Real 750-Piece Seam Samples (Follow-Up Cut Verification)</h2>
+  <table>
+    <thead><tr><th>Sample SVG</th><th>Target Neck / Pair</th><th>Intact?</th><th>Fits?</th><th>Flex OK?</th><th>Notes</th></tr></thead>
+    <tbody><tr><td><code>seam_sample_01.svg</code></td><td></td><td>&#9744; Y &#9744; N</td><td>&#9744; Y &#9744; N</td><td>&#9744; Y &#9744; N</td><td></td></tr>
+<tr><td><code>seam_sample_02.svg</code></td><td></td><td>&#9744; Y &#9744; N</td><td>&#9744; Y &#9744; N</td><td>&#9744; Y &#9744; N</td><td></td></tr>
+<tr><td><code>seam_sample_03.svg</code></td><td></td><td>&#9744; Y &#9744; N</td><td>&#9744; Y &#9744; N</td><td>&#9744; Y &#9744; N</td><td></td></tr>
+<tr><td><code>seam_sample_04.svg</code></td><td></td><td>&#9744; Y &#9744; N</td><td>&#9744; Y &#9744; N</td><td>&#9744; Y &#9744; N</td><td></td></tr>
+<tr><td><code>seam_sample_05.svg</code></td><td></td><td>&#9744; Y &#9744; N</td><td>&#9744; Y &#9744; N</td><td>&#9744; Y &#9744; N</td><td></td></tr>
+<tr><td><code>seam_sample_06.svg</code></td><td></td><td>&#9744; Y &#9744; N</td><td>&#9744; Y &#9744; N</td><td>&#9744; Y &#9744; N</td><td></td></tr></tbody>
+  </table>
+
+  <div class="sign-row">
+    <div><strong>Supplier Sign-Off:</strong><div class="field-line"></div></div>
+    <div><strong>Producer Sign-Off:</strong><div class="field-line"></div></div>
+    <div><strong>Date:</strong><div class="field-line"></div></div>
+  </div>
+</body>
+</html>
