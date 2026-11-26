@@ -56,6 +56,6 @@ def framed_margin(faces, W, H, top=12., step=.125):
 
 
 if __name__ == '__main__':
-    run = Path(sys.argv[1]); lines, W, H = read_cut(run / 'aphex-field-puzzle.svg'); faces = list(polygonize(union_all(lines)))
+    run = Path(sys.argv[1]); lines, W, H = read_cut(run / (sys.argv[2] if len(sys.argv) > 2 else "aphex-field-puzzle.svg")); faces = list(polygonize(union_all(lines)))
     res = dict(pieces=len(faces), lock_margin_no_frame_mm=fl.lock_margin(faces), lock_margin_with_frame_mm=framed_margin(faces, W, H))
     print(json.dumps(res)); (run / 'frame-lock.json').write_text(json.dumps(res, indent=1))

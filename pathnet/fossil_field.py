@@ -24,6 +24,25 @@ from field import DEV, BIG, T
 
 fl.GL = 1.3                    # canonical distance grids must hold the larger families (size factors up to 1.9)
 fl.GRES = 169                  # ... at the same sample spacing as field.py's 129 samples over [-1, 1]
+_despike = fl.despike
+def _despike_with_margin(lab, solid, n, px, r=1.75, reach=2.):
+    """field.despike with a 3.5 mm disc: seam smoothing after vectorising can narrow a raster neck by a few tenths of a mm"""
+    return _despike(lab, solid, n, px, r, reach)
+fl.despike = _despike_with_margin       # field_large.partition calls field.despike through the module
+
+
+def blunt(polys, r=1.5):
+    """the outline that is cut: anything a 2r disc cannot reach (pointed spines, thin tips) is rounded off, as a maker would;
+    the full drawing is still engraved, so the spine stays visible on the piece"""
+    out, removed = [], 0.
+    for xy in polys:
+        p = Polygon(xy).buffer(0); o = p.buffer(-r).buffer(r, quad_segs=8)
+        if o.is_empty: out.append(np.asarray(xy)); continue
+        if o.geom_type != 'Polygon': o = max(o.geoms, key=lambda g: g.area)
+        removed += p.area - o.area; out.append(np.asarray(o.exterior.coords)[:-1])
+    return out, removed
+
+
 MIXES = {'trilobites': ('trilobite',), 'reef': ('coral', 'dendrite'), 'fossil-sea': ('trilobite', 'coral', 'dendrite')}
 
 
@@ -121,8 +140,9 @@ def compose(mix='fossil-sea', seed=1, W=570., H=390., n=0, restarts=4, base_mm=f
             tried.append({'packing_score': score, 'lock_margin_mm': m}); log(f'  layout {li} (packing score {score:.3f}): lock margin {m:.2f} mm ({time.time() - t0:.0f}s)')
         if best is None or (m is not None and m > best[0]): best = (m if m is not None else 0., c, th, size, z, (rv, thin))
     _, c, th, size, z, (reverted, reverted_thin) = best
-    polys = outlines(net, k, z, c, th, size); lay = fl.measure(fl.distance_stack(polys, W, H, 1., 80.), W, H)
-    thin_final = sum(1 for xy in polys if (lambda e: e.is_empty or e.geom_type != 'Polygon')(Polygon(xy).buffer(-1.5)))   # silhouettes still holding a part under 3 mm
+    drawn = outlines(net, k, z, c, th, size)
+    thin_final = sum(1 for xy in drawn if (lambda e: e.is_empty or e.geom_type != 'Polygon')(Polygon(xy).buffer(-1.5)))   # silhouettes still holding a part under 3 mm
+    polys, blunted = blunt(drawn); lay = fl.measure(fl.distance_stack(polys, W, H, 1., 80.), W, H)
     log(f'  silhouettes cover {lay["covered"]:.3f} of the board, rms gap {lay["rms_gap_mm"]:.2f} mm, deepest overlap {lay["max_overlap_depth_mm"]:.2f} mm ({time.time() - t0:.0f}s)')
     if out is not None: fll.snapshot(out, '2-refined', polys, W, H, f'Refined: poses, sizes and network latents optimised together ({time.time() - t0:.0f} s)')
     res = fll.partition(polys, W, H, px, bay=bay, margin=margin); bis = fll.partition(polys, W, H, px, bay=0., margin=margin)
@@ -140,7 +160,7 @@ def compose(mix='fossil-sea', seed=1, W=570., H=390., n=0, restarts=4, base_mm=f
         meta[i]['drawing_iou'] = src_iou[-1]
     import hashlib
     report = {'model_sha256': hashlib.sha256((fn.DATA / 'fossilnet.pt').read_bytes()).hexdigest(), 'seed': seed, 'mix': mix, 'categories': list(categories), 'width_mm': W, 'height_mm': H, 'requested_pieces': n, 'device': str(DEV), 'model': 'FossilNet (pathnet/fossil_net.py)',
-              'layout': lay, 'layouts_compared': tried, 'latents_reverted': reverted, 'latents_reverted_for_thin_parts': reverted_thin, 'silhouettes_with_parts_under_3mm': thin_final, 'size_range_mm': [float(size.min()), float(size.max())],
+              'layout': lay, 'layouts_compared': tried, 'latents_reverted': reverted, 'latents_reverted_for_thin_parts': reverted_thin, 'silhouettes_with_parts_under_3mm': thin_final, 'thin_tips_rounded_off_mm2': round(blunted, 1), 'size_range_mm': [float(size.min()), float(size.max())],
               'extent_range_mm': [min(m['extent_mm'] for m in meta), max(m['extent_mm'] for m in meta)],
               'drawing_iou': {'mean': float(np.mean(src_iou)), 'min': float(np.min(src_iou))},
               'families_used': {fams[j]['label']: int((k == j).sum()) for j in sorted(set(ks))},
@@ -149,7 +169,7 @@ def compose(mix='fossil-sea', seed=1, W=570., H=390., n=0, restarts=4, base_mm=f
               'field': {'trained': False, 'steps': 0, 'interlock_without_field': slides(res['faces']), 'interlock_plain_bisectors': slides(bis['faces'])}}
     state = {'seed': seed, 'mix': mix, 'k': k.cpu(), 'z': z.cpu(), 'c': c.cpu(), 'th': th.cpu(), 'size': size.cpu(), 'W': W, 'H': H, 'bay': bay, 'log_slowness': None, 'field': None}
     report['seconds'] = time.time() - t0
-    return res, polys, meta, report, state, engravings(net, fams, k, z, c, th, size)
+    return res, polys, meta, report, state, engravings(net, fams, k, z, c, th, size), drawn
 
 
 def export_engraving(out, faces, loops, W, H, polys=None, clearance=1.0, line_clearance=1.0, min_line=3.0, tag='fossil-field'):
@@ -208,13 +228,13 @@ if __name__ == '__main__':
     a.add_argument('--mean-size', type=float, default=34., help='typical board size in mm before each family size factor (at least 30)')
     a.add_argument('--restarts', type=int, default=4); a.add_argument('--layouts', type=int, default=3); a.add_argument('--bay', type=float, default=32.)
     a.add_argument('--output', type=Path, required=True); a = a.parse_args(); log = lambda s: print(s, flush=True)
-    res, polys, meta, report, state, loops = compose(a.mix, a.seed, a.width, a.height, a.pieces, a.restarts, bay=a.bay, layouts=a.layouts, out=a.output, mean_size=a.mean_size, log=log)
+    res, polys, meta, report, state, loops, drawn = compose(a.mix, a.seed, a.width, a.height, a.pieces, a.restarts, bay=a.bay, layouts=a.layouts, out=a.output, mean_size=a.mean_size, log=log)
     faces = fl.export(a.output, res, polys, meta, report, state, tag='fossil-field')
-    kept, lines, dropped = export_engraving(a.output, faces, loops, a.width, a.height, polys)
+    kept, lines, dropped = export_engraving(a.output, faces, loops, a.width, a.height, drawn)
     report = json.loads((a.output / 'field-report.json').read_text())
     report['engraving'] = {'features_kept': sum(map(len, kept)), 'features_dropped_for_clearance': dropped, 'clearance_mm': 1.0,
                            'outline_lines': sum(map(len, lines)), 'outline_engraved_mm': round(sum(float(np.linalg.norm(np.diff(l, axis=0), axis=1).sum()) for ls in lines for l in ls), 1)}
     (a.output / 'field-report.json').write_text(json.dumps(report, indent=2))
-    render(a.output, faces, polys, kept, meta, a.width, a.height, lines)
+    render(a.output, faces, drawn, kept, meta, a.width, a.height, lines)
     fll.snapshot(a.output, '4-final', polys, a.width, a.height, f'Final: {report["pieces"]} pieces, lock margin {report["interlock"]["assembly_lock_margin_mm"]:.2f} mm, {report["erosion_flags_2_5mm"]} fragile', faces)
     print(json.dumps({k: v for k, v in report.items() if k not in ('motifs', 'field')}, indent=1))
