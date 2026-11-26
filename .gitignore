@@ -1,5 +1,25 @@
 __pycache__/
 *.py[cod]
 .venv/
+.pytest_cache/
+.claude/
 pathnet/generated/
 .DS_Store
+
+# Reproducible raw archive downloads & generated per-motif tensor/raster caches
+# (Recreate from manifests via fetch_*.py and python -m hellerisninger.pipeline.run_pipeline)
+hellerisninger/sources/*/raw/
+hellerisninger/processed/svg/
+hellerisninger/processed/masks/
+hellerisninger/processed/polygons/
+hellerisninger/processed/sdf/
+hellerisninger/processed/contact_sheets/
+hellerisninger/processed/catalog.json
+hellerisninger/processed/catalog.csv
+hellerisninger/processed/ingest_log.json
+resources/*.zip
+
+/runs/
+*.pt
+*.pth
+*.ckpt
