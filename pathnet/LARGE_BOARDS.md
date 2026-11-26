@@ -28,6 +28,8 @@ The board fits a 600 × 400 mm laser bed. `--min-size 34` keeps the logo intact:
 | Assembly lock margin | 1.69 mm | 3.47 mm |
 | Cut length | 30.6 m | 27.1 m |
 
+With a fixed frame or tray around the board (`frame_lock.py`: every border segment of an edge piece becomes a wall that stops outward motion), the same 300-logo board holds to 11.06 mm against 8.34 mm for the reference. Every group that limits the frameless margin therefore leaves through the board edge.
+
 Logo sizes run from 34 to 55 mm. The pieces keep 83% of their logo's outline within 2 mm on average (51% for the worst piece). Their overlap with their own silhouette averages 0.69, because about a third of the board is gap material shared out as tabs. The weakest interlock is a block of 56 pieces in one corner that can slide out together just above 1.69 mm; the other layouts of this seed reached 1.88 mm (on the coarse cut), 0 mm and a layout with fragile pieces. Raising the margin needs seams that hook across that fault line.
 
 These are geometric checks of the cutting file. Nothing here has been cut, assembled or tested in a material, and the logo is not cleared for commercial use.
