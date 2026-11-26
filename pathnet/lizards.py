@@ -13,13 +13,14 @@ from PIL import Image, ImageDraw, ImageFilter
 from shapely import get_parts, polygonize
 from shapely.geometry import LineString, Point, Polygon
 
-from .lizard_net import make_warp, training_report
+from .lizard_net import ElasticWarp, make_warp, training_report
 from .lizard_tile import EYE_RADIUS, make_tiles
 
 
 HERE = Path(__file__).resolve().parent
 # Use integer ticks so wrapped paths, game outlines and the exported cuts share vertices.
 TICKS = 10000
+MIN_OUTLINE_IOU = .75
 PALETTE = np.array([
     [0, 187, 151], [30, 183, 87], [114, 177, 42], [179, 184, 39],
     [237, 198, 42], [252, 162, 36], [248, 110, 36], [237, 69, 49],
@@ -50,16 +51,42 @@ def path_key(line):
     return min(raw, reverse)
 
 
+def outline_iou(template, contour):
+    """Compare corresponding outlines allowing rotation and at most 1.5:1 stretch."""
+    a = template - template.mean(axis=0)
+    b = contour - contour.mean(axis=0)
+    transform = np.linalg.lstsq(a, b, rcond=None)[0]
+    left, scales, right = np.linalg.svd(transform)
+    if np.linalg.det(transform) <= 0:
+        return 0.
+    ratio = math.sqrt(min(scales[0] / scales[1], 1.5))
+    scales = math.sqrt(np.prod(scales)) * np.array([ratio, 1/ratio])
+    ref, actual = Polygon(a @ ((left * scales) @ right)), Polygon(b)
+    intersection = ref.intersection(actual).area
+    return intersection / (ref.area + actual.area - intersection)
+
+
 def build(seed=387, cols=9, rows=4, width=298.45):
     if not math.isfinite(width) or width < 1 or cols < 1 or rows < 1 or seed < 0:
         raise ValueError("Use positive cell counts, a width of at least 1 mm and a nonnegative seed.")
     units, tiles = make_tiles(cols, rows)
-    units = np.asarray(units)
+    warp = make_warp(seed, *units, piece_count=len(tiles))
+    # A few extreme elastic fields need less deformation to keep every lizard legible.
+    # Use the same latent draw and taper the whole field so the neighbours still agree.
+    for attempt in range(8):
+        data, cuts, report = assemble(seed, width, units, tiles, warp)
+        if report["min_outline_iou"] >= MIN_OUTLINE_IOU:
+            report["deformation_scale"] = .8 ** attempt
+            return data, cuts, report
+        warp = ElasticWarp(units, warp.controls * .8)
+    raise ValueError("No deformation met the outline fidelity threshold")
+
+
+def assemble(seed, width, units, tiles, warp):
     # The rectangular repeat is rounded first, so period lifts are exact in SVG precision.
     lengths = np.diag(units)
     period_ticks = np.rint(lengths * (width / lengths[0]) * TICKS).astype(np.int64)
     periods = np.diag(period_ticks / TICKS)
-    warp = make_warp(seed, *units, piece_count=len(tiles))
 
     def ticks(points):
         # Evaluate translated and rotated copies at identical inputs to the model,
@@ -70,6 +97,7 @@ def build(seed=387, cols=9, rows=4, width=298.45):
         return lift * period_ticks + np.rint(warped / lengths * period_ticks).astype(np.int64)
 
     joins, cuts, pieces, polygons = defaultdict(list), {}, [], []
+    outline_scores = []
     # Index both lifts of every torus seam. Keep each physical cut once in the plane.
     for index, tile in enumerate(tiles):
         curves = [*tile.edges, tile.eyes, tile.spine]
@@ -81,6 +109,7 @@ def build(seed=387, cols=9, rows=4, width=298.45):
         poly = Polygon(outline)
         if not poly.is_valid or poly.is_empty or poly.area == 0:
             raise ValueError(f"Invalid outline at piece {index}")
+        outline_scores.append(outline_iou(tile.outline, outline))
         polygons.append(poly)
         for edge in edges:
             key = path_key(edge % period_ticks)
@@ -132,6 +161,7 @@ def build(seed=387, cols=9, rows=4, width=298.45):
                   seams_crossing_y=int(wrapping[1]), physical_cut_paths=len(cuts),
                   torus_area_error_mm2=area_error, min_area_mm2=min(p.area for p in polygons),
                   max_area_mm2=max(p.area for p in polygons),
+                  min_outline_iou=min(outline_scores), median_outline_iou=float(np.median(outline_scores)),
                   warp_jacobian_lower_bound=float(warp.jacobian_lower_bound))
     return data, [line / TICKS for line in cuts.values()], report
 

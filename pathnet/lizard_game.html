@@ -359,7 +359,7 @@ function wrap() {
   layoutIndex = (layoutIndex + 1) % 5;
   previewOffsets = pieces.map(() => [0,0]);
   if (layoutIndex !== 0) {
-    const phase = layoutIndex*1.318;
+    const phase = (layoutIndex % 4 + 1)*1.318;
     const center = pieces.reduce((c,p) => [c[0]+p.center[0]/count, c[1]+p.center[1]/count], [0,0]);
     // Each piece can be lifted by any whole lattice period. Choose the copy
     // closest to a lobed silhouette, leaving a small opening near its centre.
@@ -504,7 +504,10 @@ $('action').onclick=()=>{
 $('startNew').onclick=()=>{ $('restart').close(); newRound($('newMode').value); };
 $('cancelNew').onclick=()=>$('restart').close();
 $('help').onclick=()=>$('instructions').showModal(); $('closeHelp').onclick=()=>$('instructions').close();
-buildBoard(); restore(); drawAll(); fit(); refresh();
+buildBoard(); restore();
+if (count >= 24) wrap();
+else { drawAll(); fit(); }
+refresh();
 new ResizeObserver(fit).observe(svg);
 </script>
 </body>
