@@ -27,8 +27,9 @@
 |---|---|---|---|---|---|---|
 | Trilobites | 97 | 0 | 1.87 mm | 0.66 mm | 12 mm (cap) | 19.5 m, 100 eyes |
 | Fossil sea | 116 (89 trilobites, 18 corals, 9 dendrites) | 1 (a 2.5–3 mm neck) | 1.90 mm | 0.38 mm | 12 mm (cap) | 19.0 m, 90 eyes |
+| Reef (`--mean-size 38`) | 292 (194 corals, 98 dendrites) | 0 | 2.62 mm | 1.31 mm | 9.09 mm | 19.0 m |
 
-Screens are `audit_field.py`'s, run on the re-read cut file: kerf 0.10–0.25 mm, 2.5 and 3 mm necks, thin tips over 3 mm, holes, size. Every board has zero coverage error, overlap and duplicate cut segments. In a frame or tray the boards lock firmly. Without one, edge pieces can slide outward at under 1 mm, the same limitation as the large Aphex boards (`LARGE_BOARDS.md`).
+Screens are `audit_field.py`'s, run on the re-read cut file: kerf 0.10–0.25 mm, 2.5 and 3 mm necks, thin tips over 3 mm, holes, size. Every board has zero coverage error, overlap and duplicate cut segments. Corals and antlers keep 73% of their outline within 2 mm of the cut, trilobites about 51-58%: their notches are narrower, so more of their drawing is engraved rather than cut. In a frame or tray the boards lock firmly. Without one, edge pieces can slide outward at under 1 mm, the same limitation as the large Aphex boards (`LARGE_BOARDS.md`).
 
 The first trilobite board (v1, before notch sizing and engraving) kept only 60% of its outlines within 2 mm and read as generic blobs. That board and the v2 boards are kept under `runs/fossil-boards` for comparison.
 
