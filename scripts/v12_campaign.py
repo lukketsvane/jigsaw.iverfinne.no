@@ -8,6 +8,7 @@ verified runs are only read, never written.
     python scripts/v12_campaign.py compose --workers 7
     python scripts/v12_campaign.py lock --top 3 --workers 6
     python scripts/v12_campaign.py audit --workers 6
+    python scripts/v12_campaign.py repair --workers 4   # thin tips only, then audit again
     python scripts/v12_campaign.py select
 """
 
@@ -141,15 +142,38 @@ def lock(args):
     pool(jobs, args.workers)
 
 
-def audit(args):
+def candidates():
+    return sorted(list((OUT / "locked").glob("*/*")) + list((OUT / "repaired").glob("*/*")))
+
+
+def repair(args):
     jobs = []
     for run in sorted((OUT / "locked").glob("*/*")):
+        if args.family and run.parent.name not in args.family:
+            continue
+        thin = run / "thin-feature-audit.json"
+        if not (run / "rigid-motion-screen.json").exists() or json.loads(thin.read_text())["worst_tip_loss_mm"] <= 6.0:
+            continue
+        out = OUT / "repaired" / run.parent.name / run.name
+        if (out / "production-audit.json").exists():
+            continue
+        if out.exists():
+            shutil.rmtree(out)
+        jobs.append(([PY, "-m", "heller_jigsaw", "repair-tips", "--run-dir", str(run), "--out", str(out)],
+                     OUT / "logs" / f"repair-{run.parent.name}-{run.name}.log"))
+    print(len(jobs), "repair jobs", flush=True)
+    pool(jobs, args.workers)
+
+
+def audit(args):
+    jobs = []
+    for run in candidates():
         if (run / "production-audit.json").exists() and not (run / "rigid-motion-screen.json").exists():
             jobs.append(([PY, "-m", "heller_jigsaw", "audit-fabrication", "--run-dir", str(run), "--rigid"],
                          OUT / "logs" / f"audit-{run.parent.name}-{run.name}.log"))
     print(len(jobs), "audit jobs", flush=True)
     pool(jobs, args.workers)
-    for run in sorted((OUT / "locked").glob("*/*")):
+    for run in candidates():
         if (run / "rigid-motion-screen.json").exists() and not (run / "fidelity-audit.json").exists():
             cfg = json.loads((run / "config.json").read_text())
             from heller_jigsaw.production.fidelity import fidelity_audit
@@ -189,12 +213,12 @@ def select(_):
     manifest = {}
     for fam in FAMILIES:
         rows = []
-        for run in sorted((OUT / "locked" / fam).glob("*")):
+        for run in sorted(list((OUT / "locked" / fam).glob("*")) + list((OUT / "repaired" / fam).glob("*"))):
             if not (run / "fidelity-audit.json").exists():
                 continue
             ok, info = gates(run)
             fid = json.loads((run / "fidelity-audit.json").read_text())["summary"]
-            rows.append(dict(run=str(run), gates_pass=ok, **info, bed=bed_fit(run),
+            rows.append(dict(run=str(run), stage=run.parent.parent.name, gates_pass=ok, **info, bed=bed_fit(run),
                              fidelity_score=fid["fidelity"]["score"], fidelity_mean=fid["fidelity"]["mean"],
                              fidelity_min=fid["fidelity"]["minimum"], boundary_f=fid["boundary_f"]["mean"],
                              bay_fill=fid["bay_fill"]["mean"], iou=fid["iou"]["mean"]))
@@ -220,7 +244,7 @@ def select(_):
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
-    p.add_argument("stage", choices=["baseline", "compose", "lock", "audit", "select"])
+    p.add_argument("stage", choices=["baseline", "compose", "lock", "audit", "repair", "select"])
     p.add_argument("--workers", type=int, default=max(1, (os.cpu_count() or 2) - 1))
     p.add_argument("--top", type=int, default=3)
     p.add_argument("--family", nargs="*", help="Limit compose/lock to these families")

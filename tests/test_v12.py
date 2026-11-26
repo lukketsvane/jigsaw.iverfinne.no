@@ -56,3 +56,28 @@ def test_wider_deeper_vae_round_trips_through_checkpoint():
 def test_standard_partition_configs_unchanged():
     assert CONFIG_SETS["standard"] == CONFIGS == [(1, 2, 0), (2, 2, 0), (2, 3, 0), (2, 3, 4), (3, 3, 0), (3, 5, 0)]
     assert CONFIG_SETS["extended"][:6] == CONFIGS
+
+
+def test_protrusions_find_a_needle_but_not_a_square():
+    from heller_jigsaw.production.tips import protrusions
+
+    needle = Polygon([(0, 0), (40, 0), (40, 19.5), (60, 19.5), (60, 20.5), (40, 20.5), (40, 40), (0, 40)])
+    assert protrusions(box(0, 0, 40, 40)) == []
+    found = protrusions(needle)
+    assert found and found[0][0] > 15
+
+
+def test_interior_spike_is_handed_to_its_neighbour():
+    from heller_jigsaw.production.audit import measure
+    from heller_jigsaw.production.tips import _interior_proposals
+
+    # Piece 0 sends a 2 mm wide, 14 mm long spike into piece 1.
+    a = Polygon([(0, 0), (30, 0), (30, 14), (44, 15), (30, 16), (30, 30), (0, 30)])
+    b = box(30, 0, 60, 30).difference(a).buffer(0)
+    assert measure(a)["max_tip_loss_mm"] > 6
+    props = _interior_proposals(0, [a, b], measure(a)["max_tip_loss_mm"], 6.0)
+    assert props
+    best = min(props, key=lambda r: r[0])
+    qi, qj = best[2], best[3]
+    assert measure(qi)["max_tip_loss_mm"] <= 6
+    assert abs(qi.area + qj.area - (a.area + b.area)) < 1e-3

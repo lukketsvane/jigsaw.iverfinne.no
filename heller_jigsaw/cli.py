@@ -464,6 +464,13 @@ def cmd_render_previews(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_repair_tips(args: argparse.Namespace) -> int:
+    from .production.tips import repair_tips
+
+    repair_tips(args.run_dir, args.out, args.max_tip_mm)
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="heller_jigsaw",
@@ -579,6 +586,12 @@ def build_parser() -> argparse.ArgumentParser:
     a.add_argument("--max-tip-mm", type=float, default=6.0)
     a.add_argument("--rigid", action="store_true", help="Also sample individual planar rotations and translations")
     a.set_defaults(func=cmd_fabrication_audit)
+
+    rt = sub.add_parser("repair-tips", help="Thicken or trim thin exterior tips of a locked run without moving seams")
+    rt.add_argument("--run-dir", required=True)
+    rt.add_argument("--out", required=True)
+    rt.add_argument("--max-tip-mm", type=float, default=6.0)
+    rt.set_defaults(func=cmd_repair_tips)
 
     fa = sub.add_parser("audit-fidelity", help="Measure silhouette fidelity of each piece against its source mask")
     fa.add_argument("--run-dir", required=True)
