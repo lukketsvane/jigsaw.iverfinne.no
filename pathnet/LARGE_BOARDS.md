@@ -32,4 +32,16 @@ With a fixed frame or tray around the board (`frame_lock.py`: every border segme
 
 Logo sizes run from 34 to 55 mm. The pieces keep 83% of their logo's outline within 2 mm on average (51% for the worst piece). Their overlap with their own silhouette averages 0.69, because about a third of the board is gap material shared out as tabs. The weakest interlock is a block of 56 pieces in one corner that can slide out together just above 1.69 mm; the other layouts of this seed reached 1.88 mm (on the coarse cut), 0 mm and a layout with fragile pieces. Raising the margin needs seams that hook across that fault line.
 
+## Seeds 22-24
+
+Same settings, three seeds. Every board has 300 pieces and no erosion flags, and keeps about 83% of its logo outlines within 2 mm.
+
+| Seed | Lock margin, frameless | Lock margin in a frame | Layouts compared (0.5 mm cut) |
+|---|---|---|---|
+| 22 | 1.69 mm | 11.06 mm | 1.31, 0.00, 1.88, fragile |
+| 23 | 0.09 mm | 9.47 mm | 0.47, fragile, 0.09, 0.38 |
+| 24 | 1.31 mm | 9.28 mm | 0.28, 0.00, 0.00, 1.22 |
+
+Inside a frame every board holds between 9 and 11 mm. Without one the margin ranges from 0.1 to 1.7 mm, set each time by a block of pieces that slides out through the board edge, so more seeds alone will not reach the reference's 3.5 mm.
+
 These are geometric checks of the cutting file. Nothing here has been cut, assembled or tested in a material, and the logo is not cleared for commercial use.
