@@ -19,7 +19,7 @@
 :root[data-theme="dark"] { --paper: #101112; --ink: #e7e5e0; --engrave: #708096; --ghost: #383c41; color-scheme: dark; }
 html, body { height: 100%; }
 body {
-  margin: 0; background: var(--paper); overflow: hidden; box-sizing: border-box;
+  margin: 0; background: var(--paper); overflow: hidden; box-sizing: border-box; touch-action: none;
   padding-block: 16px;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
@@ -50,21 +50,19 @@ g { fill: none; stroke-linecap: round; stroke-linejoin: round; transition: opaci
 const M = window.FOSSILNET, svg = document.getElementById('board'), NS = 'http://www.w3.org/2000/svg';
 if (!M) return;
 
-// ---------------------------------------------------------------- the network (fossil_net.FossilNet, inference only)
-const NC = M.N, ZD = M.Z, NF = M.FEAT, FP = M.FP, E = M.E, BASE = M.base || 30;
-const f32 = s => { const b = atob(s), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return new Float32Array(u.buffer); };
-const LAY = M.layers.map(l => ({ i: l.i, o: l.o, w: f32(l.w), b: f32(l.b) })), EMB = f32(M.emb), SRC = f32(M.q), FAM = M.fam;
-const H0 = FAM.map((_, k) => {                       // embedding part of the first layer, once per family
-  const l = LAY[0], o = new Float32Array(l.o);
-  for (let j = 0; j < l.o; j++) { let s = l.b[j]; const r = j * l.i; for (let e = 0; e < E; e++) s += l.w[r + e] * EMB[k * E + e]; o[j] = s; }
+// ---------------------------------------------------------------- the network (fossil_morph.Morph decoder, inference only)
+const NC = M.N, ZD = M.Z, NF = M.FEAT, FP = M.FP, BASE = M.base || 30;
+const f16 = s => {                                   // half-precision weights, little-endian
+  const b = atob(s), n = b.length >> 1, o = new Float32Array(n);
+  for (let i = 0; i < n; i++) { const h = b.charCodeAt(2 * i) | b.charCodeAt(2 * i + 1) << 8, e = h >> 10 & 31, m = h & 1023; o[i] = (h >> 15 ? -1 : 1) * (e ? (1 + m / 1024) * 2 ** (e - 15) : m * 5.960464477539063e-8); }
   return o;
-});
+};
+const LAY = M.layers.map(l => ({ i: l.i, o: l.o, w: f16(l.w), b: f16(l.b) })), STD = f16(M.std), BANK = f16(M.bank), ANCH = f16(M.anchors);
 const silu = x => x / (1 + Math.exp(-x));
-function decode(k, z) {
-  let l = LAY[0], h = new Float32Array(l.o); const h0 = H0[k];
-  for (let j = 0; j < l.o; j++) { let s = h0[j]; const r = j * l.i + E; for (let t = 0; t < ZD; t++) s += l.w[r + t] * z[t]; h[j] = silu(s); }
-  for (let li = 1; li < LAY.length; li++) {
-    l = LAY[li]; const o = new Float32Array(l.o), w = l.w, n = l.i, last = li === LAY.length - 1;
+function decode(z) {
+  let h = z;
+  for (let li = 0; li < LAY.length; li++) {
+    const l = LAY[li], o = new Float32Array(l.o), w = l.w, n = l.i, last = li === LAY.length - 1;
     for (let j = 0; j < l.o; j++) { let s = l.b[j]; const r = j * n; for (let i = 0; i < n; i++) s += w[r + i] * h[i]; o[j] = last ? s : silu(s); }
     h = o;
   }
@@ -129,14 +127,6 @@ function simple(p) {                                  // no two non-adjacent edg
   }
   return true;
 }
-function iou(a, b) {                                  // raster overlap of two unit polygons
-  const A = box(a), B = box(b), x0 = Math.min(A[0], B[0]), y0 = Math.min(A[1], B[1]), s = Math.max(A[2], B[2]) - x0, t = Math.max(A[3], B[3]) - y0, G = 72, px = Math.max(s, t) / G;
-  const mv = p => { const o = new Float64Array(p.length); for (let i = 0; i < p.length; i += 2) { o[i] = p[i] - x0; o[i + 1] = p[i + 1] - y0; } return o; };
-  const m = new Uint8Array(G * G); let i = 0, u = 0;
-  scan(mv(a), px, G, G, j => { m[j] = 1; }); scan(mv(b), px, G, G, j => { m[j] |= 2; });
-  for (let j = 0; j < m.length; j++) { if (m[j] === 3) i++; if (m[j]) u++; }
-  return u ? i / u : 0;
-}
 function chaikin(p, times) {
   for (let t = 0; t < times; t++) {
     const n = p.length >> 1, o = new Float64Array(4 * n);
@@ -181,8 +171,6 @@ function components(mask, w, h) {                     // 4-connected components 
 }
 
 // ---------------------------------------------------------------- creatures
-const MIXES = [['trilobite'], ['coral', 'dendrite'], ['trilobite', 'coral', 'dendrite']];
-const SRCP = FAM.map((_, k) => flatten(SRC, 3, 2 * NC * k));
 const DB = 1 / 34, DI = 2.2 / 34;                     // fit samples: ~1 mm along the outline, ~2.2 mm inside, at a 34 mm piece
 
 function shape(out) {
@@ -217,14 +205,6 @@ function inner(sh) {                                  // pole of inaccessibility
   }
   sh.rin = rin; sh.pole = pole; return sh;
 }
-function creature(k, R, zr) {                         // fossil_net.sample: a latent inside the family's safe radius that still reads as its drawing
-  const r = zr ?? FAM[k].r;
-  for (let t = 0; t < 40; t++) {
-    const z = new Float32Array(ZD); if (t < 39) for (let i = 0; i < ZD; i++) z[i] = (2 * R() - 1) * r;
-    const out = decode(k, z), sh = shape(out);
-    if (t === 39 || (simple(sh.poly) && iou(sh.poly, SRCP[k]) >= .8)) return { k, z, out, sh };
-  }
-}
 function thin(p) {                                   // fossil_field v2: a 1.5 mm erosion of the cut-size outline must stay one piece
   const px = .3, [x0, y0, x1, y1] = box(p), w = Math.ceil((x1 - x0) / px) + 4, h = Math.ceil((y1 - y0) / px) + 4, q = new Float64Array(p.length), out = new Uint8Array(w * h).fill(1);
   for (let i = 0; i < p.length; i += 2) { q[i] = p[i] - x0 + 2 * px; q[i + 1] = p[i + 1] - y0 + 2 * px; }
@@ -233,21 +213,24 @@ function thin(p) {                                   // fossil_field v2: a 1.5 m
   for (let j = 0; j < w * h; j++) core[j] = d2[j] >= lim ? 1 : 0;
   return components(core, w, h).size.length !== 2;
 }
-function choose(cats, n, R) {
-  let keys = [...new Set(FAM.filter(f => cats.includes(f.c)).map(f => f.key))], picks = [];
-  if (!keys.length) keys = [...new Set(FAM.map(f => f.key))];
-  for (let i = 0; i < n; i++) {
-    const key = keys[i % keys.length], m = R() < .5 ? 1 : 0;
-    let k = FAM.findIndex(f => f.key === key && f.m === m); if (k < 0) k = FAM.findIndex(f => f.key === key);
-    picks.push(k);
+function make(z) {                                   // a latent -> a creature whose 3 mm parts hold at the smallest piece size, or null
+  const out = decode(z), sh = shape(out), p = sh.poly.map(v => v * BASE);
+  return simple(sh.poly) && !thin(p) ? { z, out, sh } : null;
+}
+const NA = ANCH.length / ZD, NB = BANK.length / ZD;
+function creature(R) {                                // a drawing, a drawing crossed with a grown creature, or a grown creature, each a little varied
+  for (let t = 0; t < 40; t++) {
+    const z = new Float32Array(ZD), u = R(), a = (R() * NA | 0) * ZD, b = (R() * NB | 0) * ZD, k = .15 + .35 * R();
+    for (let i = 0; i < ZD; i++) z[i] = u < .2 ? ANCH[a + i] + .15 * STD[i] * gauss(R) : u < .5 ? ANCH[a + i] + k * (BANK[b + i] - ANCH[a + i]) : BANK[b + i] + .15 * STD[i] * gauss(R);
+    const c = make(z); if (c) return c;
   }
-  for (let i = picks.length - 1; i > 0; i--) { const j = R() * (i + 1) | 0; [picks[i], picks[j]] = [picks[j], picks[i]]; }
-  return { picks, keys };
+  const z = ANCH.slice((R() * NA | 0) * ZD).slice(0, ZD), out = decode(z);
+  return { z, out, sh: shape(out) };
 }
 
 // ---------------------------------------------------------------- layout (field.pack, greedy docking then growth)
 const G1 = 1;                                          // layout grid, mm
-function board(W, H) {
+function grid(W, H) {
   const gw = W / G1, gh = H / G1, own = new Int32Array(gw * gh).fill(-1), D = new Float32Array(gw * gh);
   for (let r = 0; r < gh; r++) for (let c = 0; c < gw; c++) { const x = (c + .5) * G1, y = (r + .5) * G1; D[r * gw + c] = Math.min(x, W - x, y, H - y); }
   return { W, H, gw, gh, own, D, spots: [] };
@@ -334,6 +317,8 @@ async function arrival(polys, W, H, live) {
   });
   const slow = (L, r, c) => { const q = hulls[L], qr = r - q.r0, qc = c - q.c0; return (qr >= 0 && qc >= 0 && qr < q.h && qc < q.w && q.m[qr * q.w + qc]) ? 1 + BAY : 1; };
   polys.forEach((p, i) => scan(p, HP, w, hh, j => { if (lab[j] < 0) { lab[j] = i; T[j] = 0; } solid[j] = 1; }));
+  const k2 = (1.5 / HP) ** 2, din = edt2(solid.map(v => 1 - v), w, hh), core = din.map(v => v > k2 ? 1 : 0), dc = edt2(core, w, hh), tip = new Uint8Array(N);
+  for (let j = 0; j < N; j++) if (solid[j] && dc[j] > k2 + 1e-6) { solid[j] = 0; lab[j] = -1; T[j] = Infinity; tip[j] = 1; }   // thin tips are opened off the cut outline
   const dist = new Float32Array(N).fill(Infinity), band = 1.5 * HP, touched = [];
   polys.forEach((p, i) => {                            // exact distance to the outline in a thin band: the fronts start sub-pixel exact
     const n = p.length >> 1; touched.length = 0;
@@ -348,6 +333,7 @@ async function arrival(polys, W, H, live) {
     }
     for (const j of touched) {
       const d = dist[j]; dist[j] = Infinity; if (d > band) continue;
+      if (tip[j]) continue;
       if (solid[j]) { if (lab[j] === i) T[j] = -d; continue; }
       if (d < BD[j]) BD[j] = d;
       const r = j / w | 0, t = d * slow(i, r, j - r * w);
@@ -428,8 +414,8 @@ function connect(P) {                                 // field.connect: keep eac
   flood(lab, w, hh, from);
   return stray;
 }
-function despike(P, only) {                           // field.despike: gap material a 1.5 mm disc cannot enter goes to the neighbour
-  const { lab, solid, w, hh, n } = P, k = Math.max(1, Math.round(1.5 / HP)), pad = k + 1, reach = 2 / HP, bb = bounds(P), touched = new Set();
+function despike(P, only) {                           // field.despike: gap material a 3.5 mm disc cannot enter goes to the neighbour
+  const { lab, solid, w, hh, n } = P, k = Math.max(1, Math.round(1.75 / HP)), pad = k + 1, reach = 2 / HP, bb = bounds(P), touched = new Set();
   let moved = 0;
   for (let i = 0; i < n; i++) {
     if (bb[4 * i + 1] < 0 || (only && !only.has(i))) continue;
@@ -555,8 +541,9 @@ function engraving(P, pieces, polys) {
   const inside = (i, x, y, clear) => { const c = x / HP | 0, r = y / HP | 0; if (c < 0 || r < 0 || c >= w || r >= hh) return false; const g = r * w + c; return lab[g] === i && (Math.sqrt(d2[g]) + .5) * HP >= clear; };
   const loops = [], lines = [];
   pieces.forEach((pc, i) => {
-    const nf = FAM[pc.k].e, co = Math.cos(pc.p.th), si = Math.sin(pc.p.th), s = pc.p.s;
-    for (let j = 0; j < nf; j++) {
+    const co = Math.cos(pc.p.th), si = Math.sin(pc.p.th), s = pc.p.s;
+    for (let j = 0; j < NF; j++) {
+      if (pc.out[2 * NC + 2 * NF * FP + j] <= 0) continue;
       const raw = new Float64Array(2 * FP); for (let q = 0; q < 2 * FP; q++) raw[q] = pc.out[2 * NC + j * 2 * FP + q];
       const lp = chaikin(raw, 2), b = new Float64Array(lp.length); let ok = true;
       for (let q = 0; q < lp.length; q += 2) { b[q] = pc.p.x + s * (co * lp[q] - si * lp[q + 1]); b[q + 1] = pc.p.y + s * (si * lp[q] + co * lp[q + 1]); if (!inside(i, b[q], b[q + 1], 1)) ok = false; }
@@ -584,30 +571,31 @@ const dline = xy => 'M' + xy.map(p => fmt(p[0]) + ' ' + fmt(p[1])).join('L');
 const dpoly = p => { let s = 'M'; for (let i = 0; i < p.length; i += 2) s += (i ? 'L' : '') + fmt(p[i]) + ' ' + fmt(p[i + 1]); return s + 'Z'; };
 const el = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
 
-let gen = 0, mix = 2, current = null;
+let gen = 0, current = null, board = null, zoom = 1;
 const relax = () => new Promise(r => setTimeout(r, 0));
-function frame() {
+const ticker = me => { let t0 = performance.now(); return async () => { if (performance.now() - t0 > 12) { await relax(); t0 = performance.now(); } return me === gen; }; };
+function limits() {
   const r = svg.getBoundingClientRect(), cw = Math.max(240, r.width), ch = Math.max(240, r.height), port = ch > cw;
-  const scale = Math.max(3, port ? cw / 390 : cw / 570, port ? ch / 570 : ch / 390);
-  return { W: Math.max(60, Math.floor(cw / scale)), H: Math.max(60, Math.floor(ch / scale)), scale };
+  const lo = Math.max(1.2, cw / (port ? 390 : 570), ch / (port ? 570 : 390));      // never more than a 570 x 390 mm sheet
+  const base = Math.max(3, lo);
+  return { cw, ch, lo, base, hi: Math.min(14, 3 * base) };
 }
+function frame() {                                    // the window is the board, at the scale the pinch or wheel left it
+  const { cw, ch, lo, base, hi } = limits(), scale = Math.min(hi, Math.max(lo, base * zoom)); zoom = scale / base;
+  return { W: Math.max(40, Math.floor(cw / scale)), H: Math.max(40, Math.floor(ch / scale)), scale };
+}
+function clear(ms = 700) { for (const g of svg.querySelectorAll('g')) { g.classList.add('gone'); setTimeout(() => g.remove(), ms); } }
 
-async function draw(seed, at) {
-  const me = ++gen, R = mulberry(seed);
-  let t0 = performance.now();
-  const live = async () => { if (performance.now() - t0 > 12) { await relax(); t0 = performance.now(); } return me === gen; };
-  const { W, H, scale } = frame(), px = v => (v / scale).toFixed(3);
-  for (const g of svg.querySelectorAll('g')) { g.classList.add('gone'); setTimeout(() => g.remove(), 700); }
-  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-  const ghost = el('g', { class: 'ghost', 'stroke-width': px(.8) }, svg);
-
-  let sel = FAM.filter(f => MIXES[mix].includes(f.c) && !f.m); if (!sel.length) sel = FAM;
-  const unit = sel.reduce((a, f) => a + f.a, 0) / sel.length;   // fossil_field.auto_pieces: mean motif about 34 mm
-  const { picks, keys } = choose(MIXES[mix], Math.max(4, Math.round(.75 * W * H / (34 * 34 * unit))), R);
-  const all = [];
-  for (const k of picks) { all.push(creature(k, R)); if (!(await live())) return; }
+async function build(seed, at) {
+  const me = ++gen, R = mulberry(seed), live = ticker(me), { W, H, scale } = frame(), px = v => (v / scale).toFixed(3);
+  clear(); board = null; svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  const ghost = el('g', { class: 'ghost', 'stroke-width': px(.8) }, svg), all = [];
+  for (let i = 0; i < 24; i++) { all.push(creature(R)); if (!(await live())) return; }
+  const unit = all.reduce((a, c) => a + c.sh.area, 0) / all.length, n = Math.max(4, Math.round(.75 * W * H / (34 * 34 * unit)));   // fossil_field.auto_pieces
+  while (all.length < n) { all.push(creature(R)); if (!(await live())) return; }
+  all.length = n;
   const sum = all.reduce((a, c) => a + c.sh.area, 0), sref = Math.sqrt(.75 * W * H / sum), slo = Math.max(BASE, .75 * sref), shi = Math.max(slo * 1.05, 1.3 * sref);
-  const s0 = Math.sqrt(.82 * W * H / sum), B = board(W, H), pieces = [];
+  const s0 = Math.sqrt(.82 * W * H / sum), B = grid(W, H), pieces = [];
   all.forEach(c => { c.want = Math.min(shi, Math.max(slo, (.86 + .28 * R()) * s0)); });
   all.sort((a, b) => b.want - a.want);
   const put = c => { c.id = pieces.length; pieces.push(c); stamp(B, c, true, true); el('path', { d: dpoly(placed(c.sh, c.p)) }, ghost); };
@@ -618,8 +606,7 @@ async function draw(seed, at) {
     if (!(await live())) return;
   }
   for (let miss = 0, j = 0; miss < 18; j++) {          // fill what is left with the smallest pieces
-    const key = keys[(R() * keys.length) | 0], m = R() < .5 ? 1 : 0; let k = FAM.findIndex(f => f.key === key && f.m === m); if (k < 0) k = FAM.findIndex(f => f.key === key);
-    const c = creature(k, R); c.id = pieces.length; c.p = dock(B, c, slo * (1 + .08 * R()), R);
+    const c = creature(R); c.id = pieces.length; c.p = dock(B, c, slo * (1 + .08 * R()), R);
     if (c.p) { put(c); miss = 0; } else miss++;
     if (!(await live())) return;
   }
@@ -633,17 +620,21 @@ async function draw(seed, at) {
         if (q.s > p.s && fits(B, c.sh, q.x, q.y, Math.cos(q.th), Math.sin(q.th), q.s, c.id)) p = q;
       }
       if (budget > 0) {
-        const t1 = performance.now(), r = FAM[c.k].r, z = c.z.map(v => Math.max(-r, Math.min(r, v + .35 * r * gauss(R)))), out = decode(c.k, z), sh = shape(out), s = Math.min(shi, p.s * 1.01);
-        if (fits(B, sh, p.x, p.y, Math.cos(p.th), Math.sin(p.th), s, c.id) && simple(sh.poly) && iou(sh.poly, SRCP[c.k]) >= .8 && !thin(placed(sh, { ...p, s }))) { Object.assign(c, { z, out, sh }); p = { ...p, s }; }
+        const t1 = performance.now(), n2 = make(c.z.map((v, i) => v + .12 * STD[i] * gauss(R))), s = Math.min(shi, p.s * 1.01);
+        if (n2 && fits(B, n2.sh, p.x, p.y, Math.cos(p.th), Math.sin(p.th), s, c.id)) { Object.assign(c, n2); p = { ...p, s }; }
         budget -= performance.now() - t1;
       }
       c.p = p; stamp(B, c, true);
       if (!(await live())) return;
     }
   }
-  const polys = pieces.map(c => placed(c.sh, c.p));
-  ghost.replaceChildren(...polys.map(p => el('path', { d: dpoly(p), style: 'animation:none' })));
+  board = { W, H, scale, pieces, B, slo, ghost };
+  await cut(me, at);
+}
 
+async function cut(me, at) {                          // first arrival with the bay rule, spur repair, seams, engraving, drawn in from `at`
+  const { W, H, scale, pieces } = board, live = ticker(me), px = v => (v / scale).toFixed(3), polys = pieces.map(c => placed(c.sh, c.p));
+  board.ghost.replaceChildren(...polys.map(p => el('path', { d: dpoly(p), style: 'animation:none' })));
   const P = await arrival(polys, W, H, live); if (!P) return;
   connect(P);
   for (let i = 0, only = null; i < 3; i++) { const d = despike(P, only); if (!d.moved) break; only = d.touched; }
@@ -652,18 +643,61 @@ async function draw(seed, at) {
   const arcs = trace(P).map(a => ({ pair: a.pair, xy: a.pair[0] < 0 ? [a.xy[0], a.xy[a.xy.length - 1]] : simplify(smooth(a.xy, .4, a.loop), .02), loop: a.loop }));
   const { loops, lines } = engraving(P, pieces, polys);
   if (!(await live())) return;
-
-  const ox = at ? at[0] : W / 2, oy = at ? at[1] : H / 2, far = Math.hypot(Math.max(ox, W - ox), Math.max(oy, H - oy));
+  const [ox, oy] = at ? local(at[0], at[1]) : [W / 2, H / 2], far = Math.hypot(Math.max(ox, W - ox), Math.max(oy, H - oy));
   const eng = el('g', { class: 'eng', 'stroke-width': px(.75) });
   for (const l of lines) el('path', { d: dline(l.xy) }, eng);
   for (const p of loops) el('path', { d: dpoly(p) }, eng);
-  const cut = el('g', { class: 'cut', 'stroke-width': px(1.1) });
+  const cutg = el('g', { class: 'cut', 'stroke-width': px(1.1) });
   for (const a of arcs) {
     const m = a.xy[a.xy.length >> 1], d = Math.hypot(m[0] - ox, m[1] - oy) / far;
-    el('path', { d: dline(a.loop ? [...a.xy, a.xy[0]] : a.xy), pathLength: 1, style: `--t:${(.05 + 1.1 * d).toFixed(3)}s` }, cut);
+    el('path', { d: dline(a.loop ? [...a.xy, a.xy[0]] : a.xy), pathLength: 1, style: `--t:${(.05 + 1.1 * d).toFixed(3)}s` }, cutg);
   }
-  svg.append(eng, cut); ghost.classList.add('gone'); setTimeout(() => ghost.remove(), 800);
-  current = { W, H, arcs, loops, lines, seed, mix, n: pieces.length };
+  const g = board.ghost; svg.append(eng, cutg); g.classList.add('gone'); setTimeout(() => g.remove(), 800);
+  current = { W, H, arcs, loops, lines };
+}
+
+// ---------------------------------------------------------------- sculpting: a drag carries the creature it starts on across the others, like a smudge
+let drag = null;
+function grab(at) {
+  if (!board) return false;
+  ++gen; clear(400);
+  const g = el('g', { class: 'ghost', 'stroke-width': (.8 / board.scale).toFixed(3) }, svg);
+  const src = board.pieces.reduce((a, c) => Math.hypot(c.p.x - at[0], c.p.y - at[1]) < Math.hypot(a.p.x - at[0], a.p.y - at[1]) ? c : a);
+  board.ghost = g; drag = { at, src: src.z.slice(), paths: board.pieces.map(c => el('path', { d: dpoly(placed(c.sh, c.p)), style: 'animation:none' }, g)), moved: new Set() };
+  return true;
+}
+function knead(at) {                                  // ~25 mm of rubbing turns a creature into the carried one; the carried form picks up a little of each
+  const step = Math.hypot(at[0] - drag.at[0], at[1] - drag.at[1]); drag.at = at;
+  for (const c of board.pieces) {
+    const t = Math.min(1, step / 25 * Math.exp(-((c.p.x - at[0]) ** 2 + (c.p.y - at[1]) ** 2) / 2000)); if (t < .01) continue;
+    const z = (c.z2 || c.z).slice();
+    for (let i = 0; i < ZD; i++) { const v = z[i]; z[i] += t * (drag.src[i] - v); drag.src[i] += .15 * t * (v - drag.src[i]); }
+    c.z2 = z; drag.moved.add(c); drag.paths[c.id].setAttribute('d', dpoly(placed({ poly: flatten(decode(z), 3) }, c.p)));
+  }
+}
+async function release(at) {                          // keep every reshaped creature that still holds together and fits, then cut again
+  const me = ++gen, B = board.B;
+  for (const c of drag.moved) {
+    const n2 = make(c.z2); delete c.z2;
+    if (!n2) continue;
+    stamp(B, c, false); const old = { z: c.z, out: c.out, sh: c.sh, p: c.p }; Object.assign(c, n2);
+    let p = c.p, ok = false;
+    for (let t = 0; t < 14 && !ok; t++) { ok = fits(B, c.sh, p.x, p.y, Math.cos(p.th), Math.sin(p.th), p.s, c.id); if (!ok) p = { ...p, s: Math.max(board.slo, p.s * .96) }; }
+    if (ok) c.p = p; else Object.assign(c, old);
+    stamp(B, c, true);
+  }
+  drag = null;
+  await cut(me, at);
+}
+
+// ---------------------------------------------------------------- zoom: pinch or wheel scales the sheet under the finger; it is cut again at the new size
+let pinch = 1, settle = 0, focus = null;
+function magnify(k, client) {
+  if (!board) return;
+  const { lo, base, hi } = limits(), at = local(client[0], client[1]);
+  pinch = Math.max(lo / base / zoom, Math.min(hi / base / zoom, pinch * k)); focus = client;
+  for (const g of svg.querySelectorAll('g')) g.setAttribute('transform', `translate(${at[0]} ${at[1]}) scale(${pinch}) translate(${-at[0]} ${-at[1]})`);
+  clearTimeout(settle); settle = setTimeout(() => { zoom *= pinch; pinch = 1; build(seed(), focus); }, 420);
 }
 
 // ---------------------------------------------------------------- export: cut red, engraving blue, 1:1 mm (fossil-field-production.svg)
@@ -677,26 +711,45 @@ function production() {
 }
 async function save() {
   if (!current) return;
-  const name = `fossilnet-${['trilobites', 'reef', 'fossil-sea'][current.mix]}-${current.seed}.svg`, data = production();
+  const name = `fossilnet-${current.W}x${current.H}mm.svg`, data = production();
   if (downloads) { try { await downloads.save({ filename: name, data }); } catch (e) { /* declined or unavailable */ } return; }
   if (window.claude) return;
   const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([data], { type: 'image/svg+xml' })); a.download = name; a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 4000);
 }
 
-// ---------------------------------------------------------------- the only controls: tap for a new board; keys 1 2 3 pick the mix, S saves
+// ---------------------------------------------------------------- no visible controls: tap, drag, pinch or wheel; S saves
 const seed = () => (Math.random() * 2 ** 31) >>> 0;
-const local = e => { const r = svg.getBoundingClientRect(), b = svg.viewBox.baseVal, k = Math.min(r.width / b.width, r.height / b.height); return [(e.clientX - r.left - (r.width - b.width * k) / 2) / k, (e.clientY - r.top - (r.height - b.height * k) / 2) / k]; };
-document.addEventListener('pointerup', e => { if (e.button === 0) draw(seed(), local(e)); });
+const local = (x, y) => { const r = svg.getBoundingClientRect(), b = svg.viewBox.baseVal, k = Math.min(r.width / b.width, r.height / b.height); return [(x - r.left - (r.width - b.width * k) / 2) / k, (y - r.top - (r.height - b.height * k) / 2) / k]; };
+const ptrs = new Map(); let gest = null;
+document.addEventListener('pointerdown', e => {
+  ptrs.set(e.pointerId, [e.clientX, e.clientY]);
+  if (ptrs.size === 1) gest = { kind: 'tap', x: e.clientX, y: e.clientY };
+  else if (ptrs.size === 2) { if (drag) release(); const [a, b] = [...ptrs.values()]; gest = { kind: 'pinch', d: Math.hypot(a[0] - b[0], a[1] - b[1]) }; }
+});
+document.addEventListener('pointermove', e => {
+  if (!ptrs.has(e.pointerId) || !gest) return;
+  ptrs.set(e.pointerId, [e.clientX, e.clientY]);
+  if (gest.kind === 'tap' && Math.hypot(e.clientX - gest.x, e.clientY - gest.y) > 6) gest.kind = grab(local(gest.x, gest.y)) ? 'drag' : 'none';
+  if (gest.kind === 'drag' && drag) { drag.next = local(e.clientX, e.clientY); if (!drag.raf) drag.raf = requestAnimationFrame(() => { if (drag) { drag.raf = 0; knead(drag.next); } }); }
+  if (gest.kind === 'pinch' && ptrs.size === 2) { const [a, b] = [...ptrs.values()], d = Math.hypot(a[0] - b[0], a[1] - b[1]); magnify(d / gest.d, [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2]); gest.d = d; }
+});
+const up = e => {
+  if (!ptrs.delete(e.pointerId) || !gest) return;
+  if (gest.kind === 'tap' && e.type === 'pointerup') build(seed(), [e.clientX, e.clientY]);
+  else if (gest.kind === 'drag' && drag) release([e.clientX, e.clientY]);
+  if (gest.kind !== 'pinch' || !ptrs.size) gest = ptrs.size ? { kind: 'none' } : null;
+};
+document.addEventListener('pointerup', up); document.addEventListener('pointercancel', up);
+addEventListener('wheel', e => { e.preventDefault(); magnify(Math.exp(-e.deltaY * .0015), [e.clientX, e.clientY]); }, { passive: false });
 let resized = 0;
-addEventListener('resize', () => { clearTimeout(resized); resized = setTimeout(() => { const f = frame(), b = svg.viewBox.baseVal; if (Math.abs(f.W - b.width) > .12 * b.width || Math.abs(f.H - b.height) > .12 * b.height) draw(seed()); }, 300); });
+addEventListener('resize', () => { clearTimeout(resized); resized = setTimeout(() => { const f = frame(), b = svg.viewBox.baseVal; if (Math.abs(f.W - b.width) > .12 * b.width || Math.abs(f.H - b.height) > .12 * b.height) build(seed()); }, 300); });
 document.addEventListener('keydown', e => {
   if (e.metaKey || e.ctrlKey || e.altKey) return;
   if (e.key === 's' || e.key === 'S') { e.preventDefault(); save(); }
-  else if ('123'.includes(e.key)) { mix = +e.key - 1; draw(seed()); }
-  else if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); draw(seed()); }
+  else if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); build(seed()); }
 });
-draw(seed());
+build(seed());
 })();
 </script>
 </html>

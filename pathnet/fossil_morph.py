@@ -317,17 +317,16 @@ def train(epochs=60, Z=32, width=512, batch=512, beta=(1e-7, 3e-6), warps=200, s
     with torch.no_grad():
         mu = torch.cat([model.enc(pack(*(t.cpu() for t in (q[i:i + 4096], F[i:i + 4096], P[i:i + 4096])))).chunk(2, 1)[0] for i in range(0, n, 4096)])
         anchors = model.enc(pack(*(torch.from_numpy(np.stack(v)) for v in list(zip(*draw))[:3]))).chunk(2, 1)[0]
-    pcs = torch.linalg.svd(mu - mu.mean(0), full_matrices=False)[2][:4]           # main directions of the creature space, for gestures
-    pcsd = ((mu - mu.mean(0)) @ pcs.T).std(0)
-    torch.save(dict(state=model.state_dict(), Z=Z, width=width, N=N, FEAT=FEAT, FP=FP, mean=mu.mean(0), std=mu.std(0), pcs=pcs, pcsd=pcsd, anchors=anchors,
+    bank = mu[torch.from_numpy(rng.choice(n, min(2048, n), replace=False))]        # codes of real creatures: sampling near them stays on the creatures
+    torch.save(dict(state=model.state_dict(), Z=Z, width=width, N=N, FEAT=FEAT, FP=FP, mean=mu.mean(0), std=mu.std(0), bank=bank, anchors=anchors,
                     labels=[x[4] for x in draw], factors=[float(x[3]) for x in draw], trace=trace, creatures=n), out)
     log(f'saved {out}')
 
 
 def sheet(out=DATA / 'fossil-morph-samples.png', seed=1, cols=12, rows=8, cell=120):
-    """samples from the prior (top rows) and walks between drawings (bottom rows)"""
+    """creatures near the latent bank (top rows) and walks between drawings (bottom rows)"""
     ck = torch.load(DATA / 'fossilnet-v3.pt', weights_only=False); model = Morph(ck['Z'], ck['width']); model.load_state_dict(ck['state']); model.eval()
-    g = torch.Generator().manual_seed(seed); z = torch.randn(cols * rows // 2, ck['Z'], generator=g) * ck['std'] + ck['mean']
+    g = torch.Generator().manual_seed(seed); b = ck['bank']; z = b[torch.randint(len(b), (cols * rows // 2,), generator=g)] + .15 * ck['std'] * torch.randn(cols * rows // 2, ck['Z'], generator=g)
     a = ck['anchors']; walks = torch.cat([a[i] + (a[(i * 7 + 3) % len(a)] - a[i]) * torch.linspace(0, 1, cols)[:, None] for i in range(0, 2 * (rows // 2), 2)])
     with torch.no_grad(): qs = model.decode(torch.cat([z, walks]))[0].numpy()
     img = np.full((rows * cell, cols * cell), 255, np.uint8)
