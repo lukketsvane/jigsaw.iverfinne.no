@@ -13,11 +13,11 @@ f16 = lambda a: base64.b64encode(np.ascontiguousarray(a, '<f2').tobytes()).decod
 layers = [dict(i=int(w.shape[1]), o=int(w.shape[0]), w=f16(w), b=f16(b)) for w, b in ((w1z, b1f), (w2, b2), (w3, b3))]
 ref = json.load(open(os.path.join(ROOT, 'pathnet', 'reference.json')))['logo_control_points']
 out = dict(N=d['points'], Z=d['latent'], range=0.28, layers=layers, ref=ref)
-open(os.path.join(ROOT, 'web', 'sound-in-pieces', 'js', 'pathnet-logo.js'), 'w').write('window.PATHNET_LOGO=' + json.dumps(out, separators=(',', ':')) + ';\n')
+open(os.path.join(ROOT, 'web', 'sound-in-pieces', 'public', 'js', 'pathnet-logo.js'), 'w').write('window.PATHNET_LOGO=' + json.dumps(out, separators=(',', ':')) + ';\n')
 # check: decode z=0 with float32 numpy vs folded f16 path
 silu = lambda x: x / (1 + np.exp(-x))
 z = np.zeros(6, np.float32)
 full = (np.concatenate([emb, z]))
 h = silu(w1 @ full + b1); h = silu(w2 @ h + b2); q = (w3 @ h + b3).reshape(-1, 2)
 h2 = silu(w1z @ z + b1f); h2 = silu(w2 @ h2 + b2); q2 = (w3 @ h2 + b3).reshape(-1, 2)
-print('max diff', float(np.abs(q - q2).max()), 'span', q.min(0), q.max(0), 'bytes', len(open(os.path.join(ROOT, 'web', 'sound-in-pieces', 'js', 'pathnet-logo.js')).read()))
+print('max diff', float(np.abs(q - q2).max()), 'span', q.min(0), q.max(0), 'bytes', len(open(os.path.join(ROOT, 'web', 'sound-in-pieces', 'public', 'js', 'pathnet-logo.js')).read()))

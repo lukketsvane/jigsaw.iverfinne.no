@@ -1,4 +1,5 @@
 {
+ "outputDirectory": "public",
  "headers": [
   {
    "source": "/sw.js",
@@ -19,11 +20,20 @@
    ]
   },
   {
-   "source": "/(img|fonts|media|icons|splash|data|js|models)/(.*)",
+   "source": "/(js|data|models)/(.*)",
    "headers": [
     {
      "key": "Cache-Control",
-     "value": "public, max-age=604800"
+     "value": "public, max-age=0, must-revalidate"
+    }
+   ]
+  },
+  {
+   "source": "/(img|fonts|media|icons|splash)/(.*)",
+   "headers": [
+    {
+     "key": "Cache-Control",
+     "value": "public, max-age=3600"
     }
    ]
   }
