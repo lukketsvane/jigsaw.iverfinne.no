@@ -57,8 +57,8 @@ section:last-child{padding-bottom:calc(clamp(64px,8vw,120px) + env(safe-area-ins
 .hero .r:last-child :nth-child(2){text-align:center}.hero .r:last-child :last-child{text-align:right}
 @media (max-width:700px){.hero figure img{width:116vw;max-width:none;max-height:none;justify-self:start;margin-inline:calc(50% - 58vw)}}
 .hero figure{position:relative}
-.gl{position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity 1.4s cubic-bezier(.2,.7,0,1);touch-action:pan-y;cursor:grab}
-.gl.down{cursor:grabbing}.live .gl{opacity:1}
+.gl{position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity 1.4s cubic-bezier(.2,.7,0,1);touch-action:pan-y;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.gl.orbit{cursor:grabbing}.live .gl{opacity:1}
 
 /* seed 22: the three stages change as you scroll */
 .seq{height:300svh;padding:0}
