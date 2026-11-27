@@ -83,8 +83,7 @@ section:last-child{padding-bottom:calc(clamp(64px,8vw,120px) + env(safe-area-ins
 .w1168{max-width:1168px;width:81.1vw}.w1210{max-width:1210px;width:84vw}.w1320{max-width:1320px;width:91.7vw}
 @media (max-width:700px){.w710{width:84vw}.w956,.w1056,.w1168,.w1210,.w1320{width:100%}}
 .ed{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(10px,1.4vw,20px)}
-.duo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(10px,1.4vw,20px)}
-@media (max-width:700px){.ed,.duo{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:700px){.ed{grid-template-columns:minmax(0,1fr)}}
 .fa{width:55.6%}.fb{width:60.8%;margin-left:auto}.ang{width:82.4%;margin-left:auto}
 @media (max-width:700px){.fa,.fb,.ang{width:100%}}
 
@@ -174,10 +173,7 @@ body::after{content:"";position:fixed;z-index:10;inset:-120px;pointer-events:non
 <section id="packaging">
   <figure class="pl ang">{{img angled | (max-width: 700px) 100vw, 82vw | The board angled on felt with loose pieces.}}</figure>
   <figure class="pl bleed">{{img boxpouch | 100vw | A birch box with a drawstring pouch.}}</figure>
-  <div class="pl duo">
-    <figure>{{img pack-closed | (max-width: 700px) 100vw, 50vw | The closed charcoal box.}}</figure>
-    <figure>{{img pack-open | (max-width: 700px) 100vw, 50vw | Lid set aside, the framed puzzle in the tray.}}</figure>
-  </div>
+  <figure class="pl w956">{{img pack-open | (max-width: 700px) 100vw, min(66vw, 956px) | Lid set aside, the framed puzzle in the tray.}}</figure>
 </section>
 
 <section class="door">

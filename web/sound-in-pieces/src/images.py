@@ -28,7 +28,6 @@ SRC = {
     'seed-2':      (f'{D}/drive/seed-2-refined.png',   [700, 1200, 1800], 82, {'crop_top': 44, 'invert': True}),
     'seed-3':      (f'{D}/drive/seed-3-cut.png',       [700, 1200, 1800], 82, {'crop_top': 44, 'invert': True}),
     'exploded':    (f'{D}/drive/st07-exploded.png',    [700, 1100, 1500], 80, {}),
-    'pack-closed': (f'{D}/drive/st07-pack-closed.png', [700, 1100, 1500], 80, {}),
     'pack-open':   (f'{D}/drive/st07-pack-open.png',   [700, 1200, 1800], 80, {}),
     'cut-detail':  (f'{D}/drive/cut-detail.png',       [700, 1400], 80, {}),
     'box-original':  (f'{D}/figma/k04-box-original.jpg',  [700, 1200, 1900], 80, {}),
