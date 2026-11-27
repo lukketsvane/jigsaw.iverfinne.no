@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Sound in Pieces</title>
-<meta name="description" content="SOUND IN PIECES / APHEX 398. A framed jigsaw concept: 183 logo-derived pieces cut through one familiar cover. Unofficial design concept.">
+<meta name="description" content="SOUND IN PIECES / APHEX TWIN / 398 × 398 MM / 183 PIECES">
 <meta name="theme-color" content="#000000">
 <meta name="color-scheme" content="dark">
 <link rel="manifest" href="manifest.webmanifest">
@@ -30,741 +30,236 @@
 <link rel="apple-touch-startup-image" href="splash/launch-1620x2160.png" media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
 <link rel="apple-touch-startup-image" href="splash/launch-1488x2266.png" media="(device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
 <link rel="preload" href="fonts/plex-mono-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" as="image" href="img/hero-1400.webp" imagesrcset="img/hero-800.webp 800w, img/hero-1400.webp 1400w, img/hero-2000.webp 2000w, img/hero-2480.webp 2480w" imagesizes="(max-width: 700px) 116vw, min(1240px, 100vw)" fetchpriority="high">
+<link rel="preload" as="image" href="img/hero-1400.webp" imagesrcset="img/hero-800.webp 800w, img/hero-1400.webp 1400w, img/hero-2000.webp 2000w, img/hero-2480.webp 2480w" imagesizes="(max-width: 700px) 116vw, min(86vw, 1240px)" fetchpriority="high">
 <style>
 /*
-VOICE   a specimen catalogue for a jigsaw: quiet, exact, black, measured in millimetres
-IDEA    the scroll behaves like a natural history plate book; every piece is a numbered specimen
-PICTURE the renders, plus the real cut geometry drawn live: field, atlas and plan share one dataset
-COLOUR  black spine; paper for technical plates; lime, moss and sky only in the campaign interludes
-TYPE    IBM Plex Mono for every label and figure, Inter (optical sizes) for statements
-LAYOUT  full-bleed movements, mono rows at the corners, interludes at full height
+VOICE   the SOUND IN PIECES scroll: black, quiet, images first
+IDEA    a specimen catalogue; every label is a measurement
+PICTURE the renders, plus the real cut geometry drawn live
+COLOUR  black, two greys of ink; lime only where a piece is touched
+TYPE    IBM Plex Mono only, as in the Figma
+LAYOUT  the 1440 Figma proportions, scaled fluidly
 */
-@font-face{font-family:Inter;src:url(fonts/inter.woff2) format("woff2");font-weight:100 900;font-display:swap}
 @font-face{font-family:Plex;src:url(fonts/plex-mono-400.woff2) format("woff2");font-weight:400;font-display:swap}
-@font-face{font-family:Plex;src:url(fonts/plex-mono-500.woff2) format("woff2");font-weight:500;font-display:swap}
-:root{color-scheme:dark;--lime:#ccf44b;--sky:#55b8ed;--plan:#315bff;
+:root{color-scheme:dark;--ink:#edf0f2;--dim:#858c91;--lime:#ccf44b;
 --g:clamp(20px,4.45vw,64px);--gl:max(var(--g),env(safe-area-inset-left));--gr:max(var(--g),env(safe-area-inset-right));
---fm:Plex,ui-monospace,"SF Mono",Menlo,Consolas,monospace;--fs:Inter,-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
---mono:clamp(11.5px,.25vw + 10.6px,15px);--hh:calc(52px + env(safe-area-inset-top));--ease:cubic-bezier(.2,.7,0,1);
---bg:#000;--ink:#edf0f2;--dim:#858c91;--rule:#24282c;--chip:#0b0c0d}
-.t-paper{--bg:#f1efe8;--ink:#101010;--dim:#6b6963;--rule:#d5d1c7;--chip:#e7e4db}
-.t-lime{--bg:#ccf44b;--ink:#101215;--dim:#101215;--rule:#101215}
-.t-moss{--bg:#142016;--ink:#ccf44b;--dim:#ccf44b;--rule:#ccf44b}
-.t-form{--bg:#eeece4;--ink:#101215;--dim:#101215;--rule:#101215}
-.t-night{--bg:#111316;--ink:#f5f4ef;--dim:#a0a4a6;--rule:#55b8ed}
+--l:clamp(11.5px,.5vw + 7.8px,15px);--s:clamp(10.5px,.45vw + 7.5px,14px);--n:clamp(22px,2.3vw,33px)}
 *,*::before,*::after{box-sizing:border-box;min-width:0}
-html{background:#000;scroll-padding-top:var(--hh);-webkit-text-size-adjust:100%;text-size-adjust:100%}
-html.lock{overflow:hidden}
-@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
-body{margin:0;background:#000;color:#edf0f2;font:400 17px/1.5 var(--fs);font-optical-sizing:auto;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;-webkit-tap-highlight-color:transparent}
+html{background:#000;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{margin:0;background:#000;color:var(--ink);font:400 var(--l)/1.3 Plex,ui-monospace,"SF Mono",Menlo,monospace;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+body::before{content:"";position:fixed;z-index:9;inset:0 0 auto;height:env(safe-area-inset-top);background:#000}
 main{overflow-x:clip}
 img,video,svg{display:block;max-width:100%}img,video{height:auto}
-a{color:inherit;text-decoration:none}
-button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;touch-action:manipulation;border-radius:0}
-h1,h2,h3,p,figure,dl,dd,ol,ul{margin:0}ol,ul{padding:0;list-style:none}
+figure,p{margin:0}
 ::selection{background:var(--lime);color:#000}
-:focus-visible{outline:1.5px solid var(--lime);outline-offset:3px}
-.m{font:400 var(--mono)/1.35 var(--fm);letter-spacing:.01em;font-variant-numeric:tabular-nums}
-.d{color:var(--dim)}.l{color:var(--lime)}
-.row{display:flex;justify-content:space-between;align-items:baseline;gap:8px 24px}
-.row>:last-child{text-align:right}
-.js img.f{opacity:0;transition:opacity .9s var(--ease)}.js img.f.ld{opacity:1}
-@media (prefers-reduced-motion:reduce){.js img.f{transition:none}}
-.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
-
-/* header */
-.top{position:fixed;z-index:20;inset:0 0 auto;height:var(--hh);padding:env(safe-area-inset-top) var(--gr) 0 var(--gl);display:flex;justify-content:space-between;align-items:center;gap:16px;background:var(--bg);color:var(--ink);transition:background-color .35s,color .35s}
-.top a{font:400 clamp(13px,.45vw + 11.2px,18px)/1 var(--fm);letter-spacing:.01em;white-space:nowrap}
-.idx{display:flex;align-items:center;gap:12px;min-height:44px;font:400 var(--mono)/1 var(--fm);white-space:nowrap}
-.idx i{position:relative;width:14px;height:14px;flex:none}
-.idx i::before,.idx i::after{content:"";position:absolute;left:0;right:0;top:4px;border-top:1.5px solid currentColor}
-.idx i::after{top:10px}
-
-/* movements */
-.mv{position:relative;background:var(--bg);color:var(--ink);padding:calc(var(--hh) + 12px) var(--gr) clamp(56px,8vw,120px) var(--gl)}
-.mv>.row:first-child{margin-bottom:clamp(28px,4.5vw,60px)}
-.foot{margin-top:clamp(20px,2.6vw,36px)}
+.js img.f{opacity:0;transition:opacity 1s cubic-bezier(.2,.7,0,1)}.js img.f.ld{opacity:1}
+section{position:relative;padding:calc(clamp(26px,3vw,44px) + env(safe-area-inset-top)) var(--gr) clamp(36px,4.2vw,60px) var(--gl)}
+.r{display:flex;justify-content:space-between;align-items:baseline;gap:16px;white-space:nowrap}
+.d{color:var(--dim)}.s{font-size:var(--s)}.n{font-size:var(--n);line-height:1}
+.pl{margin:clamp(26px,3.6vw,52px) auto clamp(22px,2.6vw,38px)}
+.pl img,.pl video,.pl svg{width:100%}
 .bleed{margin-inline:calc(-1*var(--gl)) calc(-1*var(--gr))}
-.c{margin-inline:auto}
-.cap{margin-top:12px}
-h2.h{font:700 clamp(34px,5.4vw,78px)/.98 var(--fs);letter-spacing:-.035em;text-wrap:balance;margin-bottom:clamp(28px,4vw,56px)}
-.lead{font:400 clamp(18px,1.4vw + 12px,30px)/1.3 var(--fs);letter-spacing:-.012em;color:var(--dim);max-width:30ch;text-wrap:pretty}
-.note{font:400 clamp(15px,.5vw + 13px,19px)/1.45 var(--fs);color:var(--dim);max-width:62ch;text-wrap:pretty}
-.big{font:400 clamp(28px,2.4vw,40px)/1 var(--fm);letter-spacing:-.01em}
+.gap{margin-top:clamp(22px,2.2vw,32px)}
+@media (prefers-reduced-motion:reduce){.js img.f,.stage img{transition:none}}
 
-/* 01 object */
-.hero{min-height:100svh;display:grid;grid-template-rows:1fr auto;padding-bottom:clamp(24px,5vh,56px)}
-.hero figure{display:grid;place-items:center;padding-block:clamp(12px,3vh,40px);margin-inline:calc(-1*var(--gl)) calc(-1*var(--gr));overflow:hidden;grid-template-columns:minmax(0,1fr)}
-.hero img{width:min(1240px,100%);max-height:calc(100svh - var(--hh) - 140px);object-fit:contain}
-.hero .row{display:grid;grid-template-columns:1fr auto 1fr}
-.hero .row>:nth-child(2){text-align:center}
-@media (max-width:700px){.hero img{width:116vw;max-width:none;max-height:none;justify-self:start;margin-inline:calc(50% - 58vw)}}
-.state{padding-block:clamp(72px,12vw,180px)}
-.state h1{font:700 clamp(42px,7vw,104px)/.94 var(--fs);letter-spacing:-.04em;text-wrap:balance;max-width:13ch}
-.state .lead{margin-top:clamp(20px,2.4vw,36px)}
-.figs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:28px 24px;margin-top:clamp(56px,8vw,120px);padding-top:clamp(20px,2vw,28px);border-top:1px solid var(--rule)}
-.figs dd{font:700 clamp(48px,7.2vw,112px)/.9 var(--fs);letter-spacing:-.045em;font-variant-numeric:tabular-nums}
-.figs div,.spec div{display:flex;flex-direction:column-reverse;justify-content:flex-end}
-.figs dt{margin-top:12px}
-@media (max-width:820px){.figs{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* object */
+.hero{min-height:100svh;display:grid;grid-template-rows:auto 1fr auto}
+.hero .t{font-size:clamp(14px,.6vw + 11.4px,20px)}
+.hero figure{display:grid;place-items:center;grid-template-columns:minmax(0,1fr);overflow:hidden;margin:clamp(20px,3vh,48px) calc(-1*var(--gr)) clamp(20px,3vh,48px) calc(-1*var(--gl))}
+.hero figure img{width:min(86vw,1240px);max-height:calc(100svh - 160px);object-fit:contain}
+.hero .r:last-child{display:grid;grid-template-columns:1fr auto 1fr}
+.hero .r:last-child :nth-child(2){text-align:center}.hero .r:last-child :last-child{text-align:right}
+@media (max-width:700px){.hero figure img{width:116vw;max-width:none;max-height:none;justify-self:start;margin-inline:calc(50% - 58vw)}}
 
-/* plates */
-.plate img{width:100%}
-.w710{max-width:710px}.w956{max-width:956px}.w1056{max-width:1056px}.w1168{max-width:1168px}.w1210{max-width:1210px}.w1320{max-width:1320px}
-.num{font:400 clamp(30px,3vw,46px)/1 var(--fm)}
-
-/* 05 field */
-.field{width:100%;aspect-ratio:1;cursor:crosshair;touch-action:manipulation}
-.field path{fill:#000;stroke:var(--ink);stroke-width:.7px;vector-effect:non-scaling-stroke;stroke-linejoin:round;transition:fill .3s}
-@media (hover:hover){.field path:hover{fill:#30363b}}
-.field path.on{fill:var(--lime);stroke:var(--lime)}
-.read{display:flex;gap:14px;align-items:baseline;justify-content:center}
-@media (max-width:560px){.read [data-r=s]{display:none}}
-.nop .field,.nop .specs{opacity:.25}
-
-/* interludes: campaign geometry series */
-.int{min-height:100svh;display:flex;flex-direction:column;padding:calc(var(--hh) + 8px) var(--gr) clamp(28px,5vh,64px) var(--gl);background:var(--bg);color:var(--ink);overflow:hidden}
-.int-hd{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding-bottom:14px;border-bottom:2px solid var(--rule)}
-.int-hd b{font:700 clamp(16px,1.6vw,26px)/1 var(--fs);letter-spacing:-.01em}
-.int-hd span{font:400 clamp(11px,.8vw + 6px,16px)/1.2 var(--fs);letter-spacing:.02em;text-align:right}
-.int h2{font:900 clamp(40px,12vw,200px)/.86 var(--fs);letter-spacing:-.042em;word-spacing:.06em;text-transform:uppercase;font-feature-settings:"case";margin:clamp(36px,6vh,72px) 0 clamp(24px,4vh,48px);text-wrap:balance}
-.int .sil{flex:1 1 auto;display:flex;align-items:center;justify-content:center;min-height:0;padding-block:clamp(8px,3vh,40px)}
-.int .sil svg{width:auto;height:auto;max-width:min(100%,1020px);max-height:46svh;fill:currentColor}
-.int-ft{display:flex;justify-content:space-between;gap:16px;padding-top:14px;border-top:2px solid var(--rule);font:500 clamp(13px,1vw + 6px,24px)/1.25 var(--fs);letter-spacing:.005em}
-.int .sub{font:500 clamp(20px,2.4vw,44px)/1.1 var(--fs);letter-spacing:-.02em;margin-top:-8px}
-.t-night .sil svg{fill:var(--sky)}
-
-/* 06 seed */
-.seed{display:grid;gap:clamp(24px,3vw,48px);grid-template-columns:minmax(0,1fr)}
-@media (min-width:960px){.seed{grid-template-columns:minmax(0,7fr) minmax(0,4fr);align-items:end}}
-.stage{position:relative;aspect-ratio:1;background:#000}
-.stage img{position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity .9s var(--ease)}
+/* seed 22: the three stages change as you scroll */
+.seq{height:300svh;padding:0}
+.pin{position:sticky;top:0;height:100svh;display:grid;grid-template-rows:auto 1fr auto;padding:calc(clamp(26px,3vw,44px) + env(safe-area-inset-top)) var(--gr) calc(clamp(26px,3vw,44px) + env(safe-area-inset-bottom)) var(--gl)}
+.stage{position:relative;place-self:center;width:min(100%,calc(100svh - 150px),1100px);aspect-ratio:1}
+.stage img{position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity .7s cubic-bezier(.2,.7,0,1)}
 .stage img.on{opacity:1}
-.ctl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--rule)}
-.ctl button{text-align:left;padding:14px 10px 16px 0;margin-top:-1px;border-top:2px solid transparent;color:var(--dim);min-height:44px}
-.ctl button b{display:block;font-weight:500}
-.ctl button[aria-pressed=true]{border-top-color:var(--lime);color:var(--ink)}
-.ctl button[aria-pressed=true] b{color:var(--lime)}
-.seed-cap{font:400 clamp(20px,1.6vw + 12px,34px)/1.2 var(--fs);letter-spacing:-.02em;margin:clamp(20px,3vw,40px) 0;min-height:3.6em;text-wrap:pretty}
-.kv{display:grid;grid-template-columns:auto 1fr;gap:10px 18px;border-top:1px solid var(--rule);padding-top:18px}
-.kv dd{text-align:right}
-.pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(12px,2vw,32px);margin-top:clamp(64px,9vw,140px)}
-@media (max-width:700px){.pair{grid-template-columns:minmax(0,1fr)}}
 
-/* 07 atlas */
-.atlas{display:block}
-@media (min-width:900px){.atlas{display:grid;grid-template-columns:minmax(0,1fr) clamp(240px,22vw,320px);gap:clamp(32px,4vw,64px);align-items:start}}
-.specs{display:grid;grid-template-columns:repeat(auto-fill,minmax(50px,1fr));gap:6px 0}
-@media (min-width:900px){.specs{grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:10px 2px}}
-.sp{display:grid;justify-items:center;gap:3px;padding:3px 0}
-.sp svg{width:84%;aspect-ratio:1;fill:var(--ink);transition:fill .25s,transform .45s var(--ease)}
-.sp span{font:400 10px/1 var(--fm);color:var(--dim);font-variant-numeric:tabular-nums}
-.sp[aria-pressed=true] svg{fill:var(--lime)}.sp[aria-pressed=true] span{color:var(--lime)}
-@media (hover:hover){.sp:hover svg{fill:#fff;transform:scale(1.14)}}
-.loc{position:sticky;z-index:5;bottom:max(12px,env(safe-area-inset-bottom));width:max-content;margin:20px 0 0 auto;display:flex;align-items:center;gap:14px;padding:8px 16px 8px 8px;background:rgba(12,13,14,.88);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid #2b3034}
-.loc svg{width:60px;height:60px;flex:none}
-.loc .ln{font:700 30px/1 var(--fs);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
-.loc-t{display:grid;gap:4px}
-@media (min-width:900px){.loc{grid-column:2;grid-row:1;align-self:start;top:calc(var(--hh) + 20px);bottom:auto;width:auto;margin:0;flex-direction:column;align-items:stretch;gap:18px;padding:0;background:none;border:0;-webkit-backdrop-filter:none;backdrop-filter:none}.loc svg{width:100%;height:auto}.loc .ln{font-size:clamp(44px,4vw,64px)}.loc-t{gap:8px;border-top:1px solid var(--rule);padding-top:14px}}
-.mini{aspect-ratio:1;background:#000;outline:1px solid #2b3034}
-.outl{fill:none;stroke:#3b4146;stroke-width:.5px;vector-effect:non-scaling-stroke}
-.mini use{fill:var(--lime)}
+/* cut field + atlas, live from the cut file */
+.field{aspect-ratio:1;cursor:crosshair}
+.field path{fill:#000;stroke:var(--ink);stroke-width:.7px;vector-effect:non-scaling-stroke;stroke-linejoin:round;transition:fill .35s}
+.specs{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:clamp(6px,1vw,14px) 0;cursor:crosshair}
+@media (min-width:760px){.specs{grid-template-columns:repeat(13,minmax(0,1fr))}}
+.sp{display:grid;justify-items:center;gap:3px}
+.sp svg{width:78%;aspect-ratio:1;fill:var(--ink);transition:fill .3s}
+.sp span{font-size:clamp(8px,.35vw + 5.5px,10px);color:var(--dim)}
+@media (hover:hover){.field path:hover{fill:#2b3035}.sp:hover svg{fill:#fff}}
+.field path.on{fill:var(--lime);stroke:var(--lime)}.sp.on svg{fill:var(--lime)}.sp.on span{color:var(--lime)}
 
-/* 08 editions */
-.tabs{display:flex;overflow-x:auto;scrollbar-width:none;border-top:1px solid var(--rule);margin-top:clamp(28px,4vw,48px)}
-.tabs::-webkit-scrollbar,.rail::-webkit-scrollbar{display:none}
-.tab{flex:1 0 auto;text-align:left;padding:14px 20px 18px 0;margin-top:-1px;border-top:2px solid transparent;color:var(--dim);min-height:44px}
-.tab span{display:block;font:400 15px/1.3 var(--fs);margin-top:6px}
-.tab[aria-selected=true]{border-top-color:var(--lime);color:var(--ink)}
-.tab[aria-selected=true] b{color:var(--lime)}
-.tab b{font-weight:500}
-.railw{position:relative;margin-top:clamp(16px,2vw,28px)}
-.rail{display:grid;grid-auto-flow:column;grid-auto-columns:min(82vw,720px);gap:clamp(12px,1.6vw,24px);overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:var(--gl);padding-inline:var(--gl) var(--gr);margin-inline:calc(-1*var(--gl)) calc(-1*var(--gr));overscroll-behavior-x:contain;scrollbar-width:none}
-.rail>*{scroll-snap-align:start}
-.rail figcaption{margin-top:12px;display:grid;gap:4px}
-.rail figcaption span{font:400 15px/1.35 var(--fs);color:var(--dim)}
-.nav{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
-.nav button{width:44px;height:44px;display:grid;place-items:center;border:1px solid var(--rule);transition:border-color .2s,opacity .2s}
-.nav button:disabled{opacity:.3;cursor:default}
-@media (hover:hover){.nav button:not(:disabled):hover{border-color:var(--ink)}}
-.nav svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.5}
-.posters .rail{grid-auto-columns:min(66vw,400px)}
-
-/* 09 to 11 studies */
-.studies{display:grid;gap:clamp(40px,6vw,96px)}
-.form{display:grid;gap:clamp(40px,6vw,96px);grid-template-columns:minmax(0,1fr)}
-@media (min-width:900px){.form .a{width:56%}.form .b{width:61%;margin-left:auto}}
-
-/* paper plates */
-.cons{display:grid;gap:clamp(36px,5vw,72px);grid-template-columns:minmax(0,1fr)}
-@media (min-width:960px){.cons{grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start}}
-.plan{max-width:560px;width:100%;margin-inline:auto}
-.dim{position:relative;height:26px;border-inline:1.5px solid var(--ink);display:grid;place-items:center;margin-bottom:10px}
-.dim::before{content:"";position:absolute;inset:50% 0 auto;border-top:1.5px solid var(--ink)}
-.dim span{position:relative;background:var(--bg);padding:0 10px}
-.pbox{position:relative}
-.pbox svg{width:100%;aspect-ratio:1}
-.pbox .frame{fill:#101010}.pbox .board{fill:#d9d4c7}.pbox .outl{stroke:#9d978a;stroke-width:.45px}
-.plab{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;text-align:center;pointer-events:none}
-.plab b{display:block;font:700 clamp(22px,2.6vw,40px)/1 var(--fs);letter-spacing:-.03em;background:#d9d4c7;padding:6px 10px 2px}
-.plab span{background:#d9d4c7;padding:2px 10px 6px}
-.legend{display:flex;flex-wrap:wrap;gap:8px 24px;margin-top:14px}
-.legend span::before{content:"";display:inline-block;width:10px;height:10px;margin-right:8px;vertical-align:-1px;background:var(--sw)}
-.blue{color:var(--plan)}
-.stack h3{font:700 clamp(26px,2.6vw,44px)/1 var(--fs);letter-spacing:-.03em;margin-bottom:22px}
-.layer{display:flex;align-items:center;gap:18px;height:calc(var(--h) * clamp(15px,1.5vw,22px));min-height:44px;padding-inline:18px;background:var(--c);font:500 clamp(15px,1.1vw + 8px,24px)/1 var(--fs)}
-.layer b{font:500 var(--mono)/1 var(--fm);min-width:4.6em}
-.layer+.layer{margin-top:3px}
-.kerf{margin-top:clamp(32px,4vw,56px);padding-top:clamp(20px,2vw,28px);border-top:1px solid var(--rule)}
-.kerf strong{display:block;font:700 clamp(48px,5.6vw,88px)/.95 var(--fs);letter-spacing:-.045em}
-.kerf p{margin-top:10px}
-.tbl{width:100%;border-collapse:collapse;margin-top:clamp(48px,6vw,96px)}
-.tbl caption{text-align:left;padding-bottom:14px}
-.tbl th,.tbl td{text-align:left;font:400 var(--mono)/1.4 var(--fm);padding:12px 16px 12px 0;border-top:1px solid var(--rule);vertical-align:top}
-.tbl th{color:var(--dim);font-weight:400}
-.tbl td:first-child{font:500 clamp(15px,.4vw + 13px,18px)/1.35 var(--fs);letter-spacing:-.005em}
-.tbl .n{text-align:right;padding-right:24px}
-@media (max-width:700px){.tbl thead{display:none}.tbl tr{display:grid;grid-template-columns:1fr auto;border-top:1px solid var(--rule);padding:12px 0}.tbl td{border:0;padding:2px 0}.tbl td:first-child{grid-column:1}.tbl .n{grid-column:2;grid-row:1;padding-right:0}.tbl td:nth-child(n+3){grid-column:1/-1;color:var(--dim)}}
-.duo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(12px,2vw,32px)}
-.trio{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(12px,2vw,32px)}
-@media (max-width:700px){.duo,.trio{grid-template-columns:minmax(0,1fr)}}
-.spec{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px 32px;margin-block:clamp(40px,5vw,72px)}
-.spec dd{font:700 clamp(24px,2vw,34px)/1 var(--fs);letter-spacing:-.035em;font-variant-numeric:tabular-nums}
-.spec dt{margin-top:8px}
-.sub-h{display:flex;justify-content:space-between;gap:16px;border-top:1px solid var(--rule);padding-top:14px;margin:clamp(56px,8vw,120px) 0 clamp(16px,2vw,28px)}
-
-/* 15 before production */
-.gate{display:grid;grid-template-columns:minmax(0,1fr);gap:clamp(32px,4vw,64px)}
-@media (min-width:900px){.gate{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.gate>div+div{border-left:1px solid var(--rule);padding-left:clamp(32px,4vw,64px)}}
-.gate h3{margin-bottom:18px}
-.list li{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:11px 0;border-top:1px solid var(--rule);font:400 clamp(17px,.9vw + 12px,28px)/1.25 var(--fs);letter-spacing:-.015em}
-.list li .m{flex:none}
-.kit{margin-top:24px}
-.print{display:grid;gap:clamp(20px,3vw,40px);grid-template-columns:minmax(0,1fr);margin-top:clamp(56px,8vw,120px);padding:clamp(20px,3vw,36px);background:#17191b}
-@media (min-width:900px){.print{grid-template-columns:minmax(0,5fr) minmax(0,6fr);align-items:center}}
-.print p.big2{font:500 clamp(20px,1.6vw + 10px,32px)/1.25 var(--fs);letter-spacing:-.015em}
-
-/* 16 campaign */
-.arch td.n,.arch th.n{text-align:right}
-
-/* colophon */
-.colo{padding-block:clamp(96px,14vw,200px) calc(clamp(40px,6vw,80px) + env(safe-area-inset-bottom))}
-.colo-name{font:400 clamp(20px,1.8vw,26px)/1.2 var(--fm)}
-@media (max-width:560px){.colo .row{display:grid;gap:16px}.colo .row>:last-child{text-align:left}}
-.colo .small{max-width:60ch;margin-top:clamp(40px,6vw,80px);display:grid;gap:10px}
-.install{margin-top:28px;padding:14px 16px;border:1px solid var(--rule);max-width:44ch}
-
-/* index */
-dialog.ix{position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:env(safe-area-inset-top) var(--gr) calc(32px + env(safe-area-inset-bottom)) var(--gl);border:0;background:#000;color:#edf0f2;overflow-y:auto;overscroll-behavior:contain}
-dialog.ix::backdrop{background:#000}
-dialog.ix[open]{animation:ixin .35s var(--ease)}
-@keyframes ixin{from{opacity:0}}
-@media (prefers-reduced-motion:reduce){dialog.ix[open]{animation:none}}
-.ix-top{position:sticky;top:0;height:52px;display:flex;justify-content:space-between;align-items:center;background:#000;z-index:1}
-.ix-top button{min-height:44px;font:400 var(--mono)/1 var(--fm)}
-.ix ol{margin-top:clamp(16px,4vh,48px);counter-reset:none}
-.ix a{display:grid;grid-template-columns:2.6em minmax(0,1fr) auto;align-items:baseline;gap:12px;padding:clamp(9px,1.3vh,14px) 0;border-top:1px solid #1d2023}
-.ix a b{font:600 clamp(24px,3.4vw,46px)/1.04 var(--fs);letter-spacing:-.03em;transition:color .2s}
-.ix a .d{text-align:right}
-.ix a[aria-current] b,.ix a:hover b{color:var(--lime)}
-@media (max-width:560px){.ix a{grid-template-columns:2.4em minmax(0,1fr)}.ix a .d{display:none}}
-.ix-ft{margin-top:32px}
+/* widths from the 1440 Figma frame */
+.w710{max-width:710px;width:49.3vw}.w956{max-width:956px;width:66.4vw}.w1056{max-width:1056px;width:73.3vw}
+.w1168{max-width:1168px;width:81.1vw}.w1210{max-width:1210px;width:84vw}.w1320{max-width:1320px;width:91.7vw}
+@media (max-width:700px){.w710{width:84vw}.w956,.w1056,.w1168,.w1210,.w1320{width:100%}}
+.ed{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(10px,1.4vw,20px)}
+.duo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(10px,1.4vw,20px)}
+@media (max-width:700px){.ed,.duo{grid-template-columns:minmax(0,1fr)}}
+.fa{width:55.6%}.fb{width:60.8%;margin-left:auto}.ang{width:82.4%;margin-left:auto}
+@media (max-width:700px){.fa,.fb,.ang{width:100%}}
+.colo{padding-block:clamp(80px,7.8vw,112px) calc(clamp(64px,6vw,96px) + env(safe-area-inset-bottom))}
+.colo .t{font-size:clamp(18px,1.8vw,26px)}
+.colo .r{align-items:end}
+@media (max-width:560px){.colo .r{display:grid;gap:10px}}
 </style>
 <script>document.documentElement.classList.add('js')</script>
 </head>
 <body>
 <svg id="pd" width="0" height="0" aria-hidden="true" style="position:absolute"><defs></defs></svg>
-
-<header class="top" data-tone="dark">
-  <a href="#object">SOUND IN PIECES</a>
-  <button class="idx" type="button" aria-haspopup="dialog" aria-controls="ix"><span class="cur">APHEX TWIN</span><i aria-hidden="true"></i><span class="vh">Open index</span></button>
-</header>
-
 <main>
-<!-- 01 OBJECT -->
-<section class="mv hero" id="object" data-tone="dark" data-label="APHEX TWIN">
-  <figure><img src="img/hero-1400.webp" srcset="img/hero-800.webp 800w, img/hero-1400.webp 1400w, img/hero-2000.webp 2000w, img/hero-2480.webp 2480w" sizes="(max-width: 700px) 116vw, min(1240px, 100vw)" width="2480" height="1320" alt="The assembled 183-piece board, angled on black, the cut pattern running through the cover photograph." class="f" loading="eager" fetchpriority="high" decoding="async"></figure>
-  <div class="row m"><span>WINDOWLICKER</span><span class="d">398&nbsp;×&nbsp;398&nbsp;MM</span><span>183</span></div>
+
+<section class="hero" id="object">
+  <div class="r"><span class="t">SOUND IN PIECES</span><span>APHEX TWIN</span></div>
+  <figure><img src="img/hero-1400.webp" srcset="img/hero-800.webp 800w, img/hero-1400.webp 1400w, img/hero-2000.webp 2000w, img/hero-2480.webp 2480w" sizes="(max-width: 700px) 116vw, min(86vw, 1240px)" width="2480" height="1320" alt="The assembled 183-piece board, angled on black." class="f" loading="eager" fetchpriority="high" decoding="async"></figure>
+  <div class="r"><span>WINDOWLICKER</span><span class="d">398&nbsp;×&nbsp;398&nbsp;MM</span><span>183</span></div>
 </section>
 
-<section class="mv state" data-tone="dark" data-label="APHEX TWIN">
-  <h1>A familiar cover. An unfamiliar cut.</h1>
-  <p class="lead">A framed jigsaw concept. A field of irregular logo-derived pieces.</p>
-  <dl class="figs">
-    <div><dt class="m d">PIECES</dt><dd class="l">183</dd></div>
-    <div><dt class="m d">MM / OUTER FRAME</dt><dd>398</dd></div>
-    <div><dt class="m d">MM / PUZZLE FIELD</dt><dd>368</dd></div>
-    <div><dt class="m d">MM / NOMINAL KERF</dt><dd>0.15</dd></div>
-  </dl>
-  <p class="m d foot">DIGITAL PRODUCT MODEL / NOT AN OFFICIAL RELEASE</p>
+<section id="surface">
+  <div class="r d"><span>01 / SURFACE</span><span>0.15&nbsp;MM</span></div>
+  <figure class="pl bleed"><img src="img/surface-1400.webp" srcset="img/surface-800.webp 800w, img/surface-1400.webp 1400w, img/surface-2000.webp 2000w, img/surface-2560.webp 2560w" sizes="100vw" width="2880" height="2304" alt="The printed face crossed by hairline cuts." class="f" loading="lazy" decoding="async"></figure>
+  <p class="d s">CUT GEOMETRY / ORIGINAL POSITION</p>
 </section>
 
-<!-- 02 SURFACE -->
-<section class="mv" id="surface" data-tone="dark" data-label="02 / SURFACE">
-  <div class="row m"><span class="d">02 / SURFACE</span><span class="d">0.15&nbsp;MM</span></div>
-  <figure class="plate bleed"><img src="img/surface-1400.webp" srcset="img/surface-800.webp 800w, img/surface-1400.webp 1400w, img/surface-2000.webp 2000w, img/surface-2560.webp 2560w" sizes="100vw" width="2880" height="2304" alt="Close crop of the printed face: the photograph read through a field of hairline cuts." class="f" loading="lazy" decoding="async"></figure>
-  <p class="m d foot">CUT GEOMETRY / ORIGINAL POSITION</p>
+<section id="specimen">
+  <div class="r"><span>093&nbsp;/&nbsp;183</span></div>
+  <figure class="pl w710"><img src="img/specimen-1100.webp" srcset="img/specimen-700.webp 700w, img/specimen-1100.webp 1100w, img/specimen-1420.webp 1420w" sizes="(max-width: 700px) 84vw, min(49vw, 710px)" width="1420" height="1420" alt="Piece 093 alone on black." class="f" loading="lazy" decoding="async"></figure>
+  <div class="r"><span class="d s">4&nbsp;MM</span><span class="n">093</span></div>
 </section>
 
-<!-- 03 SPECIMEN -->
-<section class="mv" id="specimen" data-tone="dark" data-label="03 / SPECIMEN">
-  <div class="row m"><span>093&nbsp;/&nbsp;183</span><span class="d">03</span></div>
-  <figure class="plate c w710"><img src="img/specimen-1100.webp" srcset="img/specimen-700.webp 700w, img/specimen-1100.webp 1100w, img/specimen-1420.webp 1420w" sizes="(max-width: 760px) 90vw, 710px" width="1420" height="1420" alt="Piece 093 alone on black, a 4 mm thick fragment of the printed skin tone." class="f" loading="lazy" decoding="async"></figure>
-  <div class="row foot"><span class="m d">4&nbsp;MM</span><span class="num">093</span></div>
+<section id="absence">
+  <div class="r d"><span>093&nbsp;/&nbsp;OPENING</span></div>
+  <figure class="pl w1056"><img src="img/opening-1400.webp" srcset="img/opening-800.webp 800w, img/opening-1400.webp 1400w, img/opening-2112.webp 2112w" sizes="(max-width: 700px) 100vw, min(73vw, 1056px)" width="2112" height="2112" alt="The board with piece 093 lifted out." class="f" loading="lazy" decoding="async"></figure>
+  <div class="r"><span>182&nbsp;+&nbsp;1</span><span class="d s">04</span></div>
 </section>
 
-<!-- 04 ABSENCE -->
-<section class="mv" id="absence" data-tone="dark" data-label="04 / ABSENCE">
-  <div class="row m"><span class="d">093&nbsp;/&nbsp;OPENING</span><span class="d">04</span></div>
-  <figure class="plate c w1056"><img src="img/opening-1400.webp" srcset="img/opening-800.webp 800w, img/opening-1400.webp 1400w, img/opening-2112.webp 2112w" sizes="(max-width: 1100px) 100vw, 1056px" width="2112" height="2112" alt="The board with piece 093 lifted out, the backing visible through its opening." class="f" loading="lazy" decoding="async"></figure>
-  <div class="row m foot"><span>182&nbsp;+&nbsp;1</span><span class="d">ONE PIECE OUT</span></div>
-</section>
-
-<!-- 05 CUT FIELD -->
-<section class="mv needs-p" id="cut-field" data-tone="dark" data-label="05 / CUT FIELD">
-  <div class="row m"><span class="d">05 / CUT FIELD</span><span class="d">368&nbsp;×&nbsp;368&nbsp;MM</span></div>
-  <figure class="c w1210">
-    <svg class="field" id="field" viewBox="-0.5 -0.5 369 369" role="img" aria-label="The assembled cut field: 183 piece outlines in their original positions. Select a piece to identify it."></svg>
-  </figure>
-  <div class="row foot"><span class="num">183</span><span class="read m"><span class="l" data-r="n">093</span><span data-r="a">636&nbsp;MM²</span><span class="d" data-r="s"></span></span><span class="m d">0.15&nbsp;MM</span></div>
-</section>
-
-<section class="int t-lime" data-tone="lime">
-  <div class="int-hd"><b>APHEX / 398</b><span>UNOFFICIAL DESIGN CONCEPT</span></div>
-  <h2>The cut is the art.</h2>
-  <div class="sil"><svg viewBox="0 0 950 665" width="950" height="665" aria-hidden="true"><path d="M0 95L38 9.5L456 19L513 0L627 19L722 57L731.5 171L779 209L788.5 275.5L950 532L722 665H693.5L684 627L741 570L674.5 418L712.5 313.5L703 285L674.5 275.5L636.5 313.5L522.5 465.5L551 503.5L532 541.5L437 570L370.5 617.5L361 551L427.5 399L418 323L437 304L522.5 275.5L541.5 256.5L532 228L484.5 199.5L9.5 104.5L0 95Z"/></svg></div>
-  <div class="int-ft"><span>GEOMETRY STUDY&nbsp; / &nbsp;APHEX 398</span></div>
-</section>
-
-<!-- 06 SEED 22 -->
-<section class="mv" id="seed-22" data-tone="dark" data-label="06 / SEED 22">
-  <div class="row m"><span class="d">06 / SEED 22</span><span class="d">183 LOGOS / 368&nbsp;×&nbsp;368&nbsp;MM</span></div>
-  <h2 class="h">The pattern is the product.</h2>
-  <div class="seed">
-    <div class="stage" aria-live="polite">
-      <img src="img/seed-1-1200.webp" srcset="img/seed-1-700.webp 700w, img/seed-1-1200.webp 1200w, img/seed-1-1800.webp 1800w" sizes="(max-width: 960px) 100vw, 60vw" width="2400" height="2400" alt="Stage one: 183 logo silhouettes placed across the square, white on black, with gaps between them." class="f f on" loading="lazy" decoding="async">
-      <img src="img/seed-2-1200.webp" srcset="img/seed-2-700.webp 700w, img/seed-2-1200.webp 1200w, img/seed-2-1800.webp 1800w" sizes="(max-width: 960px) 100vw, 60vw" width="2400" height="2400" alt="Stage two: the same logos after poses, sizes and shapes were optimised together." class="f f" loading="lazy" decoding="async">
-      <img src="img/seed-3-1200.webp" srcset="img/seed-3-700.webp 700w, img/seed-3-1200.webp 1200w, img/seed-3-1800.webp 1800w" sizes="(max-width: 960px) 100vw, 60vw" width="2400" height="2400" alt="Stage three: the field divided into 183 pieces along shared seams." class="f f" loading="lazy" decoding="async">
+<section class="seq" id="seed">
+  <div class="pin">
+    <div class="r"><span>SEED 22</span><span class="d" data-s="n">LAYOUT</span></div>
+    <div class="stage">
+      <img src="img/seed-1-1200.webp" srcset="img/seed-1-700.webp 700w, img/seed-1-1200.webp 1200w, img/seed-1-1800.webp 1800w" sizes="(max-width: 700px) 100vw, min(80vh, 1100px)" width="2400" height="2400" alt="Seed 22, layout: 183 logo silhouettes placed across the board." class="on" loading="lazy" decoding="async">
+      <img src="img/seed-2-1200.webp" srcset="img/seed-2-700.webp 700w, img/seed-2-1200.webp 1200w, img/seed-2-1800.webp 1800w" sizes="(max-width: 700px) 100vw, min(80vh, 1100px)" width="2400" height="2400" alt="Seed 22, refined: poses, sizes and shapes optimised together." class="" loading="lazy" decoding="async">
+      <img src="img/seed-3-1200.webp" srcset="img/seed-3-700.webp 700w, img/seed-3-1200.webp 1200w, img/seed-3-1800.webp 1800w" sizes="(max-width: 700px) 100vw, min(80vh, 1100px)" width="2400" height="2400" alt="Seed 22, cut: 183 pieces with shared seams." class="" loading="lazy" decoding="async">
     </div>
-    <div>
-      <div class="ctl m" role="group" aria-label="Process stage">
-        <button type="button" aria-pressed="true" data-cap="Layout search: 183 logos placed, 68% of the board covered."><b>01 LAYOUT</b>109&nbsp;S</button>
-        <button type="button" aria-pressed="false" data-cap="Logo poses, sizes and shapes optimised together, 69% covered."><b>02 REFINED</b>508&nbsp;S</button>
-        <button type="button" aria-pressed="false" data-cap="183 pieces with shared seams, 0 fragile."><b>03 CUT</b>577&nbsp;S</button>
-      </div>
-      <p class="seed-cap">Layout search: 183 logos placed, 68% of the board covered.</p>
-      <dl class="kv m">
-        <dt class="d">SEED</dt><dd>22</dd>
-        <dt class="d">PIECES</dt><dd>183 / 0 FILLERS / 0 HOLES</dd>
-        <dt class="d">LOCK MARGIN</dt><dd>0.84&nbsp;MM</dd>
-        <dt class="d">STRICT AUDIT</dt><dd>0 FAILS</dd>
-        <dt class="d">CUT LENGTH</dt><dd>18,758&nbsp;MM</dd>
-        <dt class="d">RUN</dt><dd>580&nbsp;S</dd>
-      </dl>
-    </div>
-  </div>
-  <div class="pair">
-    <figure><img src="img/r-original-close-1200.webp" srcset="img/r-original-close-700.webp 700w, img/r-original-close-1200.webp 1200w, img/r-original-close-2000.webp 2000w" sizes="(max-width: 700px) 100vw, 50vw" width="2000" height="1600" alt="Close view of the printed board: blue sky and catalogue number crossed by the cut lines." class="f" loading="lazy" decoding="async"><figcaption class="m cap">01 / PRINTED SURFACE</figcaption></figure>
-    <figure><img src="img/r-wood-close-1200.webp" srcset="img/r-wood-close-700.webp 700w, img/r-wood-close-1200.webp 1200w, img/r-wood-close-2000.webp 2000w" sizes="(max-width: 700px) 100vw, 50vw" width="2000" height="1600" alt="Close view of the unprinted wood-look board: the same cut lines on bare birch." class="f" loading="lazy" decoding="async"><figcaption class="m cap">02 / UNPRINTED MATERIAL STUDY</figcaption></figure>
-  </div>
-  <p class="note foot">Actual digital piece outlines; material appearance is a visualization proposal.</p>
-</section>
-
-<!-- 07 ATLAS -->
-<section class="mv needs-p" id="atlas" data-tone="dark" data-label="07 / ATLAS">
-  <div class="row m"><span>07 / 183 INDIVIDUAL PIECES</span><span class="d">COMMON SCALE</span></div>
-  <div class="atlas">
-    <div class="specs" id="specs" aria-label="183 pieces at common scale, original orientation"></div>
-    <aside class="loc" aria-live="polite">
-      <svg class="mini all" viewBox="-0.5 -0.5 369 369" aria-hidden="true"><use class="selp" href="#p093"/></svg>
-      <div class="loc-t"><span class="ln" data-r="n">093</span><span class="m"><span data-r="a">636&nbsp;MM²</span><br><span class="d" data-r="s"></span></span></div>
-    </aside>
-  </div>
-  <div class="row m foot"><span class="d">001–183</span><span class="d">ORIGINAL ORIENTATION</span></div>
-</section>
-
-<section class="int t-moss" data-tone="moss">
-  <div class="int-hd"><b>APHEX / 398</b><span>UNOFFICIAL DESIGN CONCEPT</span></div>
-  <h2>Repeat. Reassemble.</h2>
-  <div class="sil"><svg viewBox="0 0 950 703" width="950" height="703" aria-hidden="true"><path d="M0 199.5L142.5 28.5L180.5 19V47.5L161.5 95L237.5 247L247 313.5L228 389.5L237.5 408.5L266 418L285 399L361 285L503.5 9.5L674.5 0L693.5 19L684 38L579.5 104.5L560.5 237.5L503.5 256.5L513 332.5L418 399L408.5 446.5L437 465.5L864.5 503.5L921.5 532L950 589L893 617.5L684 646L598.5 703L503.5 674.5L285 684L237.5 646L228 579.5L66.5 266L0 199.5Z"/></svg></div>
-  <div class="int-ft"><span>ONE IMAGE. AN UNFAMILIAR CUT.</span></div>
-</section>
-
-<!-- 08 EDITIONS -->
-<section class="mv" id="editions" data-tone="dark" data-label="08 / EDITIONS">
-  <div class="row m"><span class="d">08 / ALTERNATE ARTWORK</span><span class="d">398&nbsp;×&nbsp;398&nbsp;MM</span></div>
-  <figure class="plate c w956"><img src="img/terrain-1400.webp" srcset="img/terrain-800.webp 800w, img/terrain-1400.webp 1400w, img/terrain-1912.webp 1912w" sizes="(max-width: 1000px) 100vw, 956px" width="1912" height="1912" alt="The same 183-piece cut carried by an alternate, landscape artwork, seen from above in its birch frame." class="f" loading="lazy" decoding="async"></figure>
-  <div class="row m foot"><span class="d">SAME GEOMETRY / NEW IMAGE</span><span>183</span></div>
-  <h2 class="h" style="margin-top:clamp(96px,13vw,200px)">One geometry. Four expressions.</h2>
-  <div class="tabs m" role="tablist" aria-label="Editions">
-    <button class="tab" role="tab" id="t-or" aria-controls="e-or" aria-selected="true" type="button"><b>01 / ORIGINAL</b><span>Printed artwork</span></button>
-    <button class="tab" role="tab" id="t-po" aria-controls="e-po" aria-selected="false" tabindex="-1" type="button"><b>02 / PORTRAIT</b><span>Artwork study</span></button>
-    <button class="tab" role="tab" id="t-la" aria-controls="e-la" aria-selected="false" tabindex="-1" type="button"><b>03 / LANDSCAPE</b><span>Artwork study</span></button>
-    <button class="tab" role="tab" id="t-fo" aria-controls="e-fo" aria-selected="false" tabindex="-1" type="button"><b>04 / FORM ONLY</b><span>Unprinted wood-look study</span></button>
-  </div>
-  <div class="railw" role="tabpanel" id="e-or" aria-labelledby="t-or">
-    <div class="rail" tabindex="0" aria-label="Original edition views">
-      <figure><img src="img/r-original-top-1200.webp" srcset="img/r-original-top-700.webp 700w, img/r-original-top-1200.webp 1200w, img/r-original-top-2000.webp 2000w" sizes="(max-width: 700px) 82vw, 720px" width="2000" height="1600" alt="The original edition from above on a pale ground." class="f" loading="lazy" decoding="async"><figcaption><b class="m">THE COMPLETE IMAGE</b><span>Original artwork model.</span></figcaption></figure>
-      <figure><img src="img/r-original-hero-1200.webp" srcset="img/r-original-hero-700.webp 700w, img/r-original-hero-1200.webp 1200w, img/r-original-hero-2000.webp 2000w" sizes="(max-width: 700px) 82vw, 720px" width="2000" height="1600" alt="The original edition angled, showing the birch frame edge." class="f" loading="lazy" decoding="async"><figcaption><b class="m">THE ASSEMBLED PUZZLE</b><span>398&nbsp;×&nbsp;398&nbsp;mm outer dimensions.</span></figcaption></figure>
-      <figure><img src="img/r-original-profile-1200.webp" srcset="img/r-original-profile-700.webp 700w, img/r-original-profile-1200.webp 1200w, img/r-original-profile-2000.webp 2000w" sizes="(max-width: 700px) 82vw, 720px" width="2000" height="1600" alt="The original edition at a low angle, almost edge-on." class="f" loading="lazy" decoding="async"><figcaption><b class="m">THE PROFILE</b><span>4&nbsp;mm pieces. 3&nbsp;mm backing.</span></figcaption></figure>
-    </div>
-    <div class="nav" aria-hidden="false"><button type="button" data-dir="-1" aria-label="Previous"><svg viewBox="0 0 16 16"><path d="M10 3 5 8l5 5"/></svg></button><button type="button" data-dir="1" aria-label="Next"><svg viewBox="0 0 16 16"><path d="m6 3 5 5-5 5"/></svg></button></div>
-  </div>
-  <div class="railw" role="tabpanel" id="e-po" aria-labelledby="t-po" hidden>
-    <div class="rail" tabindex="0" aria-label="Portrait edition views">
-      <figure><img src="img/r-portrait-hero-1200.webp" srcset="img/r-portrait-hero-700.webp 700w, img/r-portrait-hero-1200.webp 1200w, img/r-portrait-hero-2000.webp 2000w" sizes="(max-width: 700px) 82vw, 720px" width="2000" height="1600" alt="The portrait artwork study angled on a dark ground." class="f" loading="lazy" decoding="async"><figcaption><b class="m">ARTWORK CONCEPT</b><span>Portrait cover concept.</span></figcaption></figure>
-      <figure><img src="img/r-portrait-top-1200.webp" srcset="img/r-portrait-top-700.webp 700w, img/r-portrait-top-1200.webp 1200w, img/r-portrait-top-2000.webp 2000w" sizes="(max-width: 700px) 82vw, 720px" width="2000" height="1600" alt="The portrait artwork study from above on a blue ground." class="f" loading="lazy" decoding="async"><figcaption><b class="m">FROM ABOVE</b><span>Same 183 pieces, a different photograph.</span></figcaption></figure>
-    </div>
-    <div class="nav"><button type="button" data-dir="-1" aria-label="Previous"><svg viewBox="0 0 16 16"><path d="M10 3 5 8l5 5"/></svg></button><button type="button" data-dir="1" aria-label="Next"><svg viewBox="0 0 16 16"><path d="m6 3 5 5-5 5"/></svg></button></div>
-  </div>
-  <div class="railw" role="tabpanel" id="e-la" aria-labelledby="t-la" hidden>
-    <div class="rail" tabindex="0" aria-label="Landscape edition views">
-      <figure><img src="img/r-landscape-hero-1200.webp" srcset="img/r-landscape-hero-700.webp 700w, img/r-landscape-hero-1200.webp 1200w, img/r-landscape-hero-2000.webp 2000w" sizes="(max-width: 700px) 82vw, 720px" width="2000" height="1600" alt="The landscape artwork study angled on a dark green ground." class="f" loading="lazy" decoding="async"><figcaption><b class="m">ARTWORK CONCEPT</b><span>Landscape cover concept.</span></figcaption></figure>
-      <figure><img src="img/r-landscape-top-1200.webp" srcset="img/r-landscape-top-700.webp 700w, img/r-landscape-top-1200.webp 1200w, img/r-landscape-top-2000.webp 2000w" sizes="(max-width: 700px) 82vw, 720px" width="2000" height="1600" alt="The landscape artwork study from above on a pale green ground." class="f" loading="lazy" decoding="async"><figcaption><b class="m">FROM ABOVE</b><span>Terraced rings, cut into 183.</span></figcaption></figure>
-      <figure><img src="img/r-landscape-close-1200.webp" srcset="img/r-landscape-close-700.webp 700w, img/r-landscape-close-1200.webp 1200w, img/r-landscape-close-2000.webp 2000w" sizes="(max-width: 700px) 82vw, 720px" width="2000" height="1600" alt="Close view of the landscape artwork and its cut lines." class="f" loading="lazy" decoding="async"><figcaption><b class="m">CLOSE</b><span>Cut lines through the terraces.</span></figcaption></figure>
-    </div>
-    <div class="nav"><button type="button" data-dir="-1" aria-label="Previous"><svg viewBox="0 0 16 16"><path d="M10 3 5 8l5 5"/></svg></button><button type="button" data-dir="1" aria-label="Next"><svg viewBox="0 0 16 16"><path d="m6 3 5 5-5 5"/></svg></button></div>
-  </div>
-  <div class="railw" role="tabpanel" id="e-fo" aria-labelledby="t-fo" hidden>
-    <div class="rail" tabindex="0" aria-label="Form only edition views">
-      <figure><img src="img/r-wood-hero-1200.webp" srcset="img/r-wood-hero-700.webp 700w, img/r-wood-hero-1200.webp 1200w, img/r-wood-hero-2000.webp 2000w" sizes="(max-width: 700px) 82vw, 720px" width="2000" height="1600" alt="The unprinted wood-look board angled on a pale ground." class="f" loading="lazy" decoding="async"><figcaption><b class="m">THE GEOMETRY</b><span>Unprinted wood-look visualization.</span></figcaption></figure>
-      <figure><img src="img/r-wood-top-1200.webp" srcset="img/r-wood-top-700.webp 700w, img/r-wood-top-1200.webp 1200w, img/r-wood-top-2000.webp 2000w" sizes="(max-width: 700px) 82vw, 720px" width="2000" height="1600" alt="The unprinted board from above, its cuts too fine to read at this distance." class="f" loading="lazy" decoding="async"><figcaption><b class="m">FROM ABOVE</b><span>Form without image.</span></figcaption></figure>
-    </div>
-    <div class="nav"><button type="button" data-dir="-1" aria-label="Previous"><svg viewBox="0 0 16 16"><path d="M10 3 5 8l5 5"/></svg></button><button type="button" data-dir="1" aria-label="Next"><svg viewBox="0 0 16 16"><path d="m6 3 5 5-5 5"/></svg></button></div>
-  </div>
-  <p class="note foot">Concept variants only. Artwork rights and final material specifications remain to be confirmed.</p>
-  <p class="m d foot">FORM / IMAGE / SURFACE</p>
-</section>
-
-<!-- 09 BOX TAPE -->
-<section class="mv" id="box-tape" data-tone="dark" data-label="09 / BOX TAPE">
-  <div class="row m"><span>09 / BOX TAPE</span><span class="d">00:06.5 / MOTION</span></div>
-  <figure class="plate c w1320"><video muted loop playsinline preload="none" poster="img/tape-1320.webp" data-src="media/box-tape.mp4" width="1080" height="810" aria-label="Loop: loose pieces tumbling inside the box, seen from above."></video></figure>
-  <p class="m d foot">BLENDER / 195 SOURCE FRAMES</p>
-</section>
-
-<!-- 10 MATERIAL -->
-<section class="mv" id="material" data-tone="dark" data-label="10 / MATERIAL">
-  <div class="row m"><span>10 / MATERIAL STUDIES</span><span class="d">CONCEPT IMAGERY</span></div>
-  <figure class="plate c w1168"><img src="img/macro-1200.webp" srcset="img/macro-700.webp 700w, img/macro-1200.webp 1200w" sizes="(max-width: 1200px) 100vw, 1168px" width="1200" height="896" alt="Macro of a few pieces on slate: printed blue faces over raw plywood edges." class="f" loading="lazy" decoding="async"></figure>
-  <p class="m d foot" style="margin-top:clamp(56px,7vw,96px)">FRONT / BACK</p>
-  <figure class="plate bleed cap"><img src="img/frontback-1376.webp" srcset="img/frontback-800.webp 800w, img/frontback-1376.webp 1376w" sizes="100vw" width="1376" height="768" alt="Board and loose pieces on grey, some printed side up, some showing the birch back." class="f" loading="lazy" decoding="async"></figure>
-</section>
-
-<!-- 11 FORM -->
-<section class="mv" id="form" data-tone="dark" data-label="11 / FORM">
-  <div class="row m"><span>11 / FORM STUDIES</span><span class="d">CONCEPT IMAGERY</span></div>
-  <div class="form">
-    <figure class="a"><img src="img/terrainform-1200.webp" srcset="img/terrainform-700.webp 700w, img/terrainform-1200.webp 1200w" sizes="(max-width: 900px) 100vw, 56vw" width="1200" height="896" alt="The landscape edition with a few pieces set aside in green." class="f" loading="lazy" decoding="async"><figcaption class="m d cap">TERRAIN</figcaption></figure>
-    <figure class="b"><img src="img/freeform-1200.webp" srcset="img/freeform-700.webp 700w, img/freeform-1200.webp 1200w" sizes="(max-width: 900px) 100vw, 61vw" width="1200" height="896" alt="An unframed, unprinted freeform field of pieces on white card." class="f" loading="lazy" decoding="async"><figcaption class="m d cap">FREEFORM</figcaption></figure>
+    <div class="r"><span class="d" data-s="t">109&nbsp;S</span><span>183</span></div>
   </div>
 </section>
 
-<section class="int t-form" data-tone="form">
-  <div class="int-hd"><b>APHEX / 398</b><span>UNOFFICIAL DESIGN CONCEPT</span></div>
-  <h2>Form only.</h2>
-  <p class="sub">The cut is the art.</p>
-  <div class="sil"><svg viewBox="0 0 472.75 775" width="472.75" height="775" aria-hidden="true"><path d="M0 116.25L15.5 69.75L54.25 7.75L69.75 0L85.25 7.75V46.5L124 108.5L170.5 131.75L255.75 100.75L294.5 62L364.25 54.25L372 77.5L348.75 93L325.5 155V201.5L379.75 217L472.75 193.75V472.75L426.25 519.25L379.75 682L348.75 775L317.75 767.25L294.5 705.25L248 697.5L178.25 635.5V620L255.75 565.75H286.75L302.25 519.25L356.5 465L364.25 441.75L356.5 434L302.25 449.5L46.5 565.75L23.25 573.5L0 565.75L7.75 534.75L69.75 472.75L85.25 480.5L131.75 449.5L162.75 387.5L255.75 379.75L271.25 372L279 348.75L263.5 325.5L0 116.25Z"/></svg></div>
-  <div class="int-ft"><span>183 PIECES&nbsp; / &nbsp;DESIGN CONCEPT</span></div>
+<section id="cut-field">
+  <div class="r d"><span>05 / CUT FIELD</span><span>368&nbsp;×&nbsp;368&nbsp;MM</span></div>
+  <figure class="pl w1210"><svg class="field" id="field" viewBox="-0.5 -0.5 369 369" role="img" aria-label="The assembled cut field: 183 piece outlines in their original positions."></svg></figure>
+  <div class="r"><span class="n">183</span><span class="d">0.15&nbsp;MM</span></div>
 </section>
 
-<!-- 12 CONSTRUCTION -->
-<section class="mv t-paper needs-p" id="construction" data-tone="paper" data-label="12 / CONSTRUCTION">
-  <div class="row m"><span class="d">12 / CONSTRUCTION</span><span class="d">DIMENSIONAL STUDY</span></div>
-  <h2 class="h">398&nbsp;×&nbsp;398&nbsp;mm</h2>
-  <div class="cons">
-    <figure><img src="img/exploded-1100.webp" srcset="img/exploded-700.webp 700w, img/exploded-1100.webp 1100w, img/exploded-1500.webp 1500w" sizes="(max-width: 960px) 100vw, 50vw" width="1500" height="1500" alt="Exploded view: the printed puzzle layer floating above the frame ring and the backing board." class="f" loading="lazy" decoding="async"><figcaption class="m d cap">STUDIO PASS 07 / EXPLODED</figcaption></figure>
-    <div>
-      <figure class="plan">
-        <div class="dim m"><span>398.5&nbsp;MM</span></div>
-        <div class="pbox">
-          <svg class="all" viewBox="-15.25 -15.25 398.5 398.5" aria-hidden="true"><path class="frame" fill-rule="evenodd" d="M-15.25-15.25h398.5v398.5h-398.5z M-0.25-0.25v368.5h368.5v-368.5z"/><rect class="board" x="0" y="0" width="368" height="368"/></svg>
-          <div class="plab"><b>368&nbsp;×&nbsp;368&nbsp;mm</b><span class="m d">PUZZLE FIELD</span></div>
-        </div>
-        <figcaption class="legend m"><span style="--sw:#101010">15&nbsp;MM FRAME</span><span class="blue" style="--sw:var(--plan)">368.5&nbsp;MM OPENING / 0.25&nbsp;MM PLAY</span></figcaption>
-        <p class="m d cap">PLAN SCHEMATIC · PROPORTIONAL</p>
-      </figure>
-      <div class="stack" style="margin-top:clamp(48px,6vw,88px)">
-        <h3>Layer stack</h3>
-        <div class="layer" style="--h:4;--c:#bea77d"><b>4&nbsp;MM</b>Puzzle pieces and frame strips</div>
-        <div class="layer" style="--h:3;--c:#d4c1a0"><b>3&nbsp;MM</b>Backing</div>
-        <p class="m d cap">7&nbsp;MM NOMINAL FINISHED THICKNESS</p>
-      </div>
-      <div class="kerf">
-        <strong>0.15&nbsp;mm</strong>
-        <p class="note">Nominal kerf in source model. Confirm on a physical test cut.</p>
-      </div>
-    </div>
-  </div>
-  <table class="tbl">
-    <caption class="m d">BILL OF MATERIALS / PASS 10</caption>
-    <thead><tr><th>PART</th><th class="n">QTY</th><th>NOMINAL MM</th><th>MATERIAL</th></tr></thead>
-    <tbody>
-      <tr><td>Puzzle</td><td class="n">183</td><td>368&nbsp;×&nbsp;368 assembled</td><td>4&nbsp;mm birch plywood</td></tr>
-      <tr><td>Short frame strips</td><td class="n">2</td><td>368.5&nbsp;×&nbsp;15</td><td>4&nbsp;mm birch plywood</td></tr>
-      <tr><td>Long frame strips</td><td class="n">2</td><td>398.5&nbsp;×&nbsp;15</td><td>4&nbsp;mm birch plywood</td></tr>
-      <tr><td>Square backing</td><td class="n">1</td><td>398.5&nbsp;×&nbsp;398.5</td><td>3&nbsp;mm backing board</td></tr>
-      <tr><td>Rounded frame ring, optional</td><td class="n">1</td><td>398.5 outside, 368.5 opening</td><td>4&nbsp;mm birch plywood</td></tr>
-      <tr><td>Rounded backing, optional</td><td class="n">1</td><td>398.5&nbsp;×&nbsp;398.5, R4 corners</td><td>3&nbsp;mm backing board</td></tr>
-    </tbody>
-  </table>
-  <p class="m d foot">SOURCE: PRODUCT.JSON / SEED 22 · NOMINAL DIMENSIONS; NOT A MANUFACTURING DRAWING.</p>
+<section id="atlas">
+  <div class="r"><span>06 / 183 INDIVIDUAL PIECES</span><span class="d s">COMMON SCALE</span></div>
+  <div class="pl specs" id="specs" role="img" aria-label="All 183 pieces at common scale, in original orientation."></div>
+  <p class="d s">001–183</p>
 </section>
 
-<!-- 13 PACKAGING -->
-<section class="mv t-paper" id="packaging" data-tone="paper" data-label="13 / PACKAGING">
-  <div class="row m"><span class="d">13 / PACKAGING</span><span class="d">413&nbsp;×&nbsp;413&nbsp;×&nbsp;16&nbsp;MM</span></div>
-  <h2 class="h">A collectible object.</h2>
-  <div class="duo">
-    <figure><img src="img/pack-closed-1100.webp" srcset="img/pack-closed-700.webp 700w, img/pack-closed-1100.webp 1100w, img/pack-closed-1500.webp 1500w" sizes="(max-width: 700px) 100vw, 50vw" width="1500" height="1200" alt="The closed box: charcoal lid printed with a single piece outline and APHEX / 398." class="f" loading="lazy" decoding="async"><figcaption class="m d cap">CLOSED</figcaption></figure>
-    <figure><img src="img/pack-open-1200.webp" srcset="img/pack-open-700.webp 700w, img/pack-open-1200.webp 1200w, img/pack-open-1800.webp 1800w" sizes="(max-width: 700px) 100vw, 50vw" width="1800" height="1200" alt="Lid set aside, the framed puzzle resting in the open tray." class="f" loading="lazy" decoding="async"><figcaption class="m d cap">OPEN</figcaption></figure>
-  </div>
-  <dl class="spec">
-    <div><dt class="m d">MM / CLOSED</dt><dd>413&nbsp;×&nbsp;413&nbsp;×&nbsp;16</dd></div>
-    <div><dt class="m d">MM / BASE</dt><dd>408&nbsp;×&nbsp;408&nbsp;×&nbsp;14</dd></div>
-    <div><dt class="m d">MM / BOARD TO TRAY</dt><dd>2.75</dd></div>
-    <div><dt class="m d">MM / GREYBOARD WALLS</dt><dd>2</dd></div>
-  </dl>
-  <div class="sub-h m"><span>BOX CONCEPTS</span><span class="d">3 EDITIONS</span></div>
-  <div class="trio">
-    <figure><img src="img/box-original-1200.webp" srcset="img/box-original-700.webp 700w, img/box-original-1200.webp 1200w, img/box-original-1900.webp 1900w" sizes="(max-width: 700px) 100vw, 33vw" width="1900" height="1500" alt="Black box concept with the original artwork on the lid." class="f" loading="lazy" decoding="async"><figcaption class="m cap">01 / ORIGINAL</figcaption></figure>
-    <figure><img src="img/box-landscape-1200.webp" srcset="img/box-landscape-700.webp 700w, img/box-landscape-1200.webp 1200w, img/box-landscape-1900.webp 1900w" sizes="(max-width: 700px) 100vw, 33vw" width="1900" height="1500" alt="Dark green box concept with the landscape artwork." class="f" loading="lazy" decoding="async"><figcaption class="m cap">02 / LANDSCAPE</figcaption></figure>
-    <figure><img src="img/box-wood-1200.webp" srcset="img/box-wood-700.webp 700w, img/box-wood-1200.webp 1200w, img/box-wood-1900.webp 1900w" sizes="(max-width: 700px) 100vw, 33vw" width="1900" height="1500" alt="Birch-coloured box concept for the unprinted edition." class="f" loading="lazy" decoding="async"><figcaption class="m cap">03 / FORM ONLY</figcaption></figure>
-  </div>
-  <div class="sub-h m"><span>PACKAGING STUDY</span><span class="d">CONCEPT IMAGERY</span></div>
-  <div class="duo">
-    <figure><img src="img/angled-1376.webp" srcset="img/angled-800.webp 800w, img/angled-1376.webp 1376w" sizes="(max-width: 700px) 100vw, 50vw" width="1376" height="768" alt="The board angled on grey felt with loose blue pieces beside it." class="f" loading="lazy" decoding="async"><figcaption class="m d cap">BOARD</figcaption></figure>
-    <figure><img src="img/boxpouch-1376.webp" srcset="img/boxpouch-800.webp 800w, img/boxpouch-1376.webp 1376w" sizes="(max-width: 700px) 100vw, 50vw" width="1376" height="768" alt="A birch box with a drawstring pouch for loose pieces." class="f" loading="lazy" decoding="async"><figcaption class="m d cap">BOX / POUCH</figcaption></figure>
-  </div>
-  <p class="note foot">Concept. Supplier tolerances, retention, fit, rights and print resolution not physically verified.</p>
+<section id="terrain">
+  <div class="r d"><span>07 / ALTERNATE ARTWORK</span></div>
+  <figure class="pl w956"><img src="img/terrain-1400.webp" srcset="img/terrain-800.webp 800w, img/terrain-1400.webp 1400w, img/terrain-1912.webp 1912w" sizes="(max-width: 700px) 100vw, min(66vw, 956px)" width="1912" height="1912" alt="The same cut carrying an alternate landscape artwork, from above." class="f" loading="lazy" decoding="async"></figure>
+  <div class="r"><span class="d">398&nbsp;×&nbsp;398&nbsp;MM</span><span>183</span></div>
 </section>
 
-<!-- 14 PUNCTURED KRAFT -->
-<section class="mv" id="kraft" data-tone="dark" data-label="14 / KRAFT">
-  <div class="row m"><span>14 / PUNCTURED KRAFT</span><span class="d">400&nbsp;×&nbsp;400&nbsp;×&nbsp;150&nbsp;MM</span></div>
-  <figure class="plate c w1320"><img src="img/kraft-hero-1400.webp" srcset="img/kraft-hero-800.webp 800w, img/kraft-hero-1400.webp 1400w, img/kraft-hero-1920.webp 1920w" sizes="(max-width: 1360px) 100vw, 1320px" width="1920" height="1440" alt="A kraft box on black, lid raised, pieces spilling from a steel-pierced side." class="f" loading="lazy" decoding="async"></figure>
-  <p class="m d foot">08 PUNCTURES / STEEL</p>
-  <figure class="plate bleed" style="margin-top:clamp(24px,3vw,40px)"><img src="img/kraft-macro-1400.webp" srcset="img/kraft-macro-800.webp 800w, img/kraft-macro-1400.webp 1400w, img/kraft-macro-1920.webp 1920w" sizes="100vw" width="1920" height="1440" alt="Macro of one steel pin through the kraft board." class="f" loading="lazy" decoding="async"></figure>
-  <p class="m d foot">183 PIECES</p>
-  <figure class="plate c w1320" style="margin-top:clamp(24px,3vw,40px)"><img src="img/kraft-open-1400.webp" srcset="img/kraft-open-800.webp 800w, img/kraft-open-1400.webp 1400w, img/kraft-open-1920.webp 1920w" sizes="(max-width: 1360px) 100vw, 1320px" width="1920" height="1440" alt="The kraft box open, pieces loose inside." class="f" loading="lazy" decoding="async"></figure>
-  <p class="m d foot">BLENDER / CYCLES</p>
+<section id="editions">
+  <div class="r"><span>EDITIONS</span><span class="d s">STUDIO RENDERS</span></div>
+  <div class="pl ed">
+    <figure><img src="img/r-original-hero-1200.webp" srcset="img/r-original-hero-700.webp 700w, img/r-original-hero-1200.webp 1200w, img/r-original-hero-2000.webp 2000w" sizes="(max-width: 700px) 100vw, 45vw" width="2000" height="1600" alt="Original edition, angled." class="f" loading="lazy" decoding="async"></figure>
+    <figure><img src="img/r-portrait-hero-1200.webp" srcset="img/r-portrait-hero-700.webp 700w, img/r-portrait-hero-1200.webp 1200w, img/r-portrait-hero-2000.webp 2000w" sizes="(max-width: 700px) 100vw, 45vw" width="2000" height="1600" alt="Portrait artwork study, angled." class="f" loading="lazy" decoding="async"></figure>
+    <figure><img src="img/r-landscape-hero-1200.webp" srcset="img/r-landscape-hero-700.webp 700w, img/r-landscape-hero-1200.webp 1200w, img/r-landscape-hero-2000.webp 2000w" sizes="(max-width: 700px) 100vw, 45vw" width="2000" height="1600" alt="Landscape artwork study, angled." class="f" loading="lazy" decoding="async"></figure>
+    <figure><img src="img/r-wood-hero-1200.webp" srcset="img/r-wood-hero-700.webp 700w, img/r-wood-hero-1200.webp 1200w, img/r-wood-hero-2000.webp 2000w" sizes="(max-width: 700px) 100vw, 45vw" width="2000" height="1600" alt="Unprinted wood-look study, angled." class="f" loading="lazy" decoding="async"></figure>
+  </div>
+  <p class="d s">ORIGINAL / PORTRAIT / LANDSCAPE / FORM ONLY</p>
 </section>
 
-<!-- 15 BEFORE PRODUCTION -->
-<section class="mv" id="production" data-tone="dark" data-label="15 / PRODUCTION">
-  <div class="row m"><span class="d">15 / BEFORE PRODUCTION</span><span class="d">PASS 10</span></div>
-  <h2 class="h">From model to object.</h2>
-  <div class="gate">
-    <div>
-      <h3 class="m l">DIGITAL BASELINE</h3>
-      <ul class="list">
-        <li>183 pieces<span class="m d">CONFIRMED</span></li>
-        <li>368&nbsp;×&nbsp;368&nbsp;mm board<span class="m d">CONFIRMED</span></li>
-        <li>15&nbsp;mm frame width<span class="m d">CONFIRMED</span></li>
-        <li>4&nbsp;mm piece thickness<span class="m d">CONFIRMED</span></li>
-        <li>3&nbsp;mm backing<span class="m d">CONFIRMED</span></li>
-      </ul>
-      <dl class="kv m kit">
-        <dt class="d">CUT FILE</dt><dd>183 CLOSED FACES</dd>
-        <dt class="d">SEGMENTS</dt><dd>19,592 / 0 DUPLICATES</dd>
-        <dt class="d">OPENING</dt><dd>368.5&nbsp;×&nbsp;368.5&nbsp;MM</dd>
-        <dt class="d">STOCK</dt><dd>600&nbsp;×&nbsp;400&nbsp;MM SHEET</dd>
-      </dl>
-    </div>
-    <div>
-      <h3 class="m l">PHYSICAL VALIDATION</h3>
-      <ul class="list">
-        <li>01&nbsp; Test cut and kerf compensation<span class="m d">PENDING</span></li>
-        <li>02&nbsp; Check piece fit and edge strength<span class="m d">PENDING</span></li>
-        <li>03&nbsp; Verify frame and backing fit<span class="m d">PENDING</span></li>
-        <li>04&nbsp; Check print registration and finish<span class="m d">PENDING</span></li>
-        <li>05&nbsp; Test packaging protection<span class="m d">PENDING</span></li>
-      </ul>
-      <dl class="kv m kit">
-        <dt class="d">K1–K3</dt><dd>KERF COUPONS, 40&nbsp;MM PLUGS</dd>
-        <dt class="d">S1–S6</dt><dd>SLOTS 3.5–4.5&nbsp;MM</dd>
-        <dt class="d">A / B</dt><dd>THREE-PIECE FIXTURES</dd>
-        <dt class="d">L1–L4</dt><dd>LID PLAY 0.25–1.00&nbsp;MM</dd>
-      </dl>
-    </div>
-  </div>
-  <div class="print">
-    <div>
-      <p class="m l">ARTWORK MASTER</p>
-      <p class="big2" style="margin-top:14px">447&nbsp;px source. 4346&nbsp;px target at 300&nbsp;dpi across 368&nbsp;mm.</p>
-      <p class="note" style="margin-top:14px">Confirm artwork rights and replace low-resolution source before commercial printing.</p>
-    </div>
-    <figure><img src="img/cut-detail-1400.webp" srcset="img/cut-detail-700.webp 700w, img/cut-detail-1400.webp 1400w" sizes="(max-width: 900px) 100vw, 50vw" width="1400" height="1050" alt="Macro render of the printed face: the low-resolution sky goes soft while the cut lines stay sharp." class="f" loading="lazy" decoding="async"><figcaption class="m d cap">447&nbsp;PX ACROSS 368&nbsp;MM / 30.9&nbsp;PPI</figcaption></figure>
-  </div>
-  <p class="m d foot">DIGITAL DIMENSIONS CONFIRMED / PHYSICAL VALIDATION PENDING</p>
+<section id="box-tape">
+  <div class="r"><span>08 / BOX TAPE</span><span class="d">00:06.5 / MOTION</span></div>
+  <figure class="pl w1320"><video muted loop playsinline preload="none" poster="img/tape-1320.webp" data-src="media/box-tape.mp4" width="1080" height="810" aria-label="Loose pieces tumbling inside the box, from above."></video></figure>
+  <p class="d">BLENDER / 195 SOURCE FRAMES</p>
 </section>
 
-<!-- 16 CAMPAIGN -->
-<section class="mv t-night posters" id="campaign" data-tone="night" data-label="16 / CAMPAIGN">
-  <div class="row m"><span class="d">16 / CAMPAIGN</span><span class="d">51 SOURCE ASSETS</span></div>
-  <h2 class="h">Posters / A4</h2>
-  <div class="railw">
-    <div class="rail" tabindex="0" aria-label="Eight A4 posters">
-      <figure><img src="img/poster-1-1400.webp" srcset="img/poster-1-500.webp 500w, img/poster-1-900.webp 900w, img/poster-1-1400.webp 1400w" sizes="(max-width: 700px) 66vw, 400px" width="2480" height="3508" alt="Poster: SOUND IN PIECES. A familiar cover. An unfamiliar cut." class="f" loading="lazy" decoding="async"><figcaption class="m d">01 / PORTRAIT HERO</figcaption></figure>
-      <figure><img src="img/poster-2-1400.webp" srcset="img/poster-2-500.webp 500w, img/poster-2-900.webp 900w, img/poster-2-1400.webp 1400w" sizes="(max-width: 700px) 66vw, 400px" width="2480" height="3508" alt="Poster: THE ART OF THE CUT. A puzzle shaped by a visual identity." class="f" loading="lazy" decoding="async"><figcaption class="m d">02 / ORIGINAL HERO</figcaption></figure>
-      <figure><img src="img/poster-3-1400.webp" srcset="img/poster-3-500.webp 500w, img/poster-3-900.webp 900w, img/poster-3-1400.webp 1400w" sizes="(max-width: 700px) 66vw, 400px" width="2480" height="3508" alt="Poster: REPEAT. REASSEMBLE. Landscape artwork concept." class="f" loading="lazy" decoding="async"><figcaption class="m d">03 / LANDSCAPE HERO</figcaption></figure>
-      <figure><img src="img/poster-4-1400.webp" srcset="img/poster-4-500.webp 500w, img/poster-4-900.webp 900w, img/poster-4-1400.webp 1400w" sizes="(max-width: 700px) 66vw, 400px" width="2480" height="3508" alt="Poster: FORM WITHOUT IMAGE. Unprinted wood-look concept." class="f" loading="lazy" decoding="async"><figcaption class="m d">04 / WOOD HERO</figcaption></figure>
-      <figure><img src="img/poster-5-1400.webp" srcset="img/poster-5-500.webp 500w, img/poster-5-900.webp 900w, img/poster-5-1400.webp 1400w" sizes="(max-width: 700px) 66vw, 400px" width="2480" height="3508" alt="Poster: 183 PIECES. One image. An entirely different geometry." class="f" loading="lazy" decoding="async"><figcaption class="m d">05 / ORIGINAL TOP</figcaption></figure>
-      <figure><img src="img/poster-6-1400.webp" srcset="img/poster-6-500.webp 500w, img/poster-6-900.webp 900w, img/poster-6-1400.webp 1400w" sizes="(max-width: 700px) 66vw, 400px" width="2480" height="3508" alt="Poster: FIND THE FORM. Landscape artwork concept." class="f" loading="lazy" decoding="async"><figcaption class="m d">06 / LANDSCAPE TOP</figcaption></figure>
-      <figure><img src="img/poster-7-1400.webp" srcset="img/poster-7-500.webp 500w, img/poster-7-900.webp 900w, img/poster-7-1400.webp 1400w" sizes="(max-width: 700px) 66vw, 400px" width="2480" height="3508" alt="Poster: NOT A NORMAL JIGSAW." class="f" loading="lazy" decoding="async"><figcaption class="m d">07 / NOT A NORMAL JIGSAW</figcaption></figure>
-      <figure><img src="img/poster-8-1400.webp" srcset="img/poster-8-500.webp 500w, img/poster-8-900.webp 900w, img/poster-8-1400.webp 1400w" sizes="(max-width: 700px) 66vw, 400px" width="2480" height="3508" alt="Poster: THE PATTERN. 183 pieces. One continuous field." class="f" loading="lazy" decoding="async"><figcaption class="m d">08 / THE PATTERN</figcaption></figure>
-    </div>
-    <div class="nav"><button type="button" data-dir="-1" aria-label="Previous"><svg viewBox="0 0 16 16"><path d="M10 3 5 8l5 5"/></svg></button><button type="button" data-dir="1" aria-label="Next"><svg viewBox="0 0 16 16"><path d="m6 3 5 5-5 5"/></svg></button></div>
-  </div>
-  <table class="tbl arch">
-    <caption class="m d">CAMPAIGN ARCHIVE / NATIVE PIXEL SIZE</caption>
-    <thead><tr><th>FORMAT</th><th class="n">ASSETS</th><th>PIXELS</th></tr></thead>
-    <tbody>
-      <tr><td>Studio renders</td><td class="n">12</td><td>2000&nbsp;×&nbsp;1600</td></tr>
-      <tr><td>Posters, A4</td><td class="n">8</td><td>2480&nbsp;×&nbsp;3508</td></tr>
-      <tr><td>Social feed</td><td class="n">10</td><td>1080&nbsp;×&nbsp;1350 / 1080&nbsp;×&nbsp;1080</td></tr>
-      <tr><td>Stories, 9:16</td><td class="n">5</td><td>1080&nbsp;×&nbsp;1920</td></tr>
-      <tr><td>Web banners</td><td class="n">4</td><td>1920&nbsp;×&nbsp;1080</td></tr>
-      <tr><td>Packaging concepts</td><td class="n">6</td><td>1500&nbsp;×&nbsp;1500 / 1900&nbsp;×&nbsp;1500</td></tr>
-      <tr><td>E-commerce</td><td class="n">6</td><td>1600&nbsp;×&nbsp;1600</td></tr>
-    </tbody>
-  </table>
+<section id="material">
+  <div class="r"><span>09 / MATERIAL STUDIES</span><span class="d">CONCEPT IMAGERY</span></div>
+  <figure class="pl w1168"><img src="img/macro-1200.webp" srcset="img/macro-700.webp 700w, img/macro-1200.webp 1200w" sizes="(max-width: 700px) 100vw, min(81vw, 1168px)" width="1200" height="896" alt="A few pieces on slate, printed faces over plywood edges." class="f" loading="lazy" decoding="async"></figure>
+  <p class="d">FRONT / BACK</p>
+  <figure class="pl bleed"><img src="img/frontback-1376.webp" srcset="img/frontback-800.webp 800w, img/frontback-1376.webp 1376w" sizes="100vw" width="1376" height="768" alt="Board and loose pieces, printed side and birch back." class="f" loading="lazy" decoding="async"></figure>
 </section>
 
-<section class="int t-night" data-tone="night">
-  <div class="int-hd"><b>APHEX / 398</b><span>UNOFFICIAL DESIGN CONCEPT</span></div>
-  <h2>Sound in pieces.</h2>
-  <div class="sil"><svg viewBox="0 0 2182 1374.66" width="2182" height="1374.66" aria-hidden="true"><path d="M0 174.56L65.46 65.46L43.64 0H1352.84L1374.66 109.1L1396.48 152.74L2138.36 436.4L2182 501.86L2138.36 545.5L1963.8 610.96L1920.16 763.7L1723.78 1025.54H1571.04L1592.86 938.26L1505.58 872.8L1418.3 654.6L1461.94 458.22L1418.3 436.4L1352.84 458.22L1265.56 610.96L1178.28 960.08L1265.56 1069.18L1287.38 1331.02L1243.74 1374.66L1112.82 1221.92L894.62 1134.64V1025.54L981.9 741.88L938.26 589.14L1112.82 458.22V370.94L1025.54 349.12L174.56 305.48L0 174.56Z"/></svg></div>
-  <div class="int-ft"><span>183 PIECES&nbsp; / &nbsp;398&nbsp;×&nbsp;398&nbsp;MM</span></div>
+<section id="form">
+  <div class="r"><span>10 / FORM STUDIES</span><span class="d">CONCEPT IMAGERY</span></div>
+  <figure class="pl fa" style="margin-left:0"><img src="img/terrainform-1200.webp" srcset="img/terrainform-700.webp 700w, img/terrainform-1200.webp 1200w" sizes="(max-width: 700px) 100vw, 56vw" width="1200" height="896" alt="The landscape edition with pieces set aside." class="f" loading="lazy" decoding="async"></figure>
+  <p class="d">TERRAIN</p>
+  <figure class="pl fb"><img src="img/freeform-1200.webp" srcset="img/freeform-700.webp 700w, img/freeform-1200.webp 1200w" sizes="(max-width: 700px) 100vw, 61vw" width="1200" height="896" alt="An unframed, unprinted freeform field of pieces." class="f" loading="lazy" decoding="async"><p class="d gap">FREEFORM</p></figure>
 </section>
 
-<!-- 17 COLOPHON -->
-<footer class="mv colo" id="colophon" data-tone="dark" data-label="17 / COLOPHON">
-  <div class="row"><span class="colo-name">SOUND IN PIECES<br><span class="m d">APHEX TWIN</span></span><span class="m d">398&nbsp;×&nbsp;398&nbsp;MM / 183 PIECES</span></div>
-  <div class="small m d">
-    <p>UNOFFICIAL DESIGN CONCEPT. NOT AN OFFICIAL RELEASE.</p>
-    <p>PERSONAL, NON-COMMERCIAL RESEARCH. ARTWORK AND LOGO RIGHTS MUST BE CONFIRMED BEFORE COMMERCIAL PUBLICATION.</p>
-    <p>SEED 22 · STUDIO PASS 07 · PRODUCTION PASS 10 · BLENDER / CYCLES</p>
+<section id="layers">
+  <div class="r"><span>EXPLODED</span><span class="d">STUDIO PASS 07</span></div>
+  <figure class="pl w956"><img src="img/exploded-1100.webp" srcset="img/exploded-700.webp 700w, img/exploded-1100.webp 1100w, img/exploded-1500.webp 1500w" sizes="(max-width: 700px) 100vw, min(66vw, 956px)" width="1500" height="1500" alt="Exploded view: puzzle layer above frame and backing." class="f" loading="lazy" decoding="async"></figure>
+  <div class="r d"><span>4&nbsp;MM / 4&nbsp;MM / 3&nbsp;MM</span></div>
+</section>
+
+<section id="packaging">
+  <div class="r"><span>11 / PACKAGING STUDY</span><span class="d">CONCEPT IMAGERY</span></div>
+  <figure class="pl ang"><img src="img/angled-1376.webp" srcset="img/angled-800.webp 800w, img/angled-1376.webp 1376w" sizes="(max-width: 700px) 100vw, 82vw" width="1376" height="768" alt="The board angled on felt with loose pieces." class="f" loading="lazy" decoding="async"></figure>
+  <p class="d">BOX / POUCH</p>
+  <figure class="pl bleed"><img src="img/boxpouch-1376.webp" srcset="img/boxpouch-800.webp 800w, img/boxpouch-1376.webp 1376w" sizes="100vw" width="1376" height="768" alt="A birch box with a drawstring pouch." class="f" loading="lazy" decoding="async"></figure>
+  <div class="pl duo">
+    <figure><img src="img/pack-closed-1100.webp" srcset="img/pack-closed-700.webp 700w, img/pack-closed-1100.webp 1100w, img/pack-closed-1500.webp 1500w" sizes="(max-width: 700px) 100vw, 50vw" width="1500" height="1200" alt="The closed charcoal box." class="f" loading="lazy" decoding="async"></figure>
+    <figure><img src="img/pack-open-1200.webp" srcset="img/pack-open-700.webp 700w, img/pack-open-1200.webp 1200w, img/pack-open-1800.webp 1800w" sizes="(max-width: 700px) 100vw, 50vw" width="1800" height="1200" alt="Lid set aside, the framed puzzle in the tray." class="f" loading="lazy" decoding="async"></figure>
   </div>
-  <p class="install m" hidden>ADD TO HOME SCREEN: TAP SHARE, THEN ADD TO HOME SCREEN. IT OPENS FULL SCREEN AND WORKS OFFLINE.</p>
-</footer>
+  <p class="d">413&nbsp;×&nbsp;413&nbsp;×&nbsp;16&nbsp;MM</p>
+</section>
+
+<section id="kraft">
+  <div class="r"><span>12 / PUNCTURED KRAFT</span><span class="d">400&nbsp;×&nbsp;400&nbsp;×&nbsp;150&nbsp;MM</span></div>
+  <figure class="pl w1320"><img src="img/kraft-hero-1400.webp" srcset="img/kraft-hero-800.webp 800w, img/kraft-hero-1400.webp 1400w, img/kraft-hero-1920.webp 1920w" sizes="(max-width: 700px) 100vw, min(92vw, 1320px)" width="1920" height="1440" alt="A kraft box on black, lid raised." class="f" loading="lazy" decoding="async"></figure>
+  <p class="d">08 PUNCTURES / STEEL</p>
+  <figure class="pl bleed"><img src="img/kraft-macro-1400.webp" srcset="img/kraft-macro-800.webp 800w, img/kraft-macro-1400.webp 1400w, img/kraft-macro-1920.webp 1920w" sizes="100vw" width="1920" height="1440" alt="One steel pin through the kraft board." class="f" loading="lazy" decoding="async"></figure>
+  <p class="d">183 PIECES</p>
+  <figure class="pl w1320"><img src="img/kraft-open-1400.webp" srcset="img/kraft-open-800.webp 800w, img/kraft-open-1400.webp 1400w, img/kraft-open-1920.webp 1920w" sizes="(max-width: 700px) 100vw, min(92vw, 1320px)" width="1920" height="1440" alt="The kraft box open, pieces loose inside." class="f" loading="lazy" decoding="async"></figure>
+  <p class="d">BLENDER / CYCLES</p>
+</section>
+
+<section class="colo" id="colophon">
+  <div class="r"><span><span class="t">SOUND IN PIECES</span><br><span class="d">APHEX TWIN</span></span><span class="d">398&nbsp;×&nbsp;398&nbsp;MM / 183 PIECES</span></div>
+</section>
+
 </main>
-
-<dialog class="ix" id="ix" aria-label="Index">
-  <div class="ix-top"><span class="m">SOUND IN PIECES</span><button type="button" class="ix-x">CLOSE</button></div>
-  <ol>
-    <li><a href="#object"><span class="m d">01</span><b>Object</b><span class="m d">398&nbsp;×&nbsp;398&nbsp;MM</span></a></li>
-    <li><a href="#surface"><span class="m d">02</span><b>Surface</b><span class="m d">0.15&nbsp;MM</span></a></li>
-    <li><a href="#specimen"><span class="m d">03</span><b>Specimen</b><span class="m d">093&nbsp;/&nbsp;183</span></a></li>
-    <li><a href="#absence"><span class="m d">04</span><b>Absence</b><span class="m d">182&nbsp;+&nbsp;1</span></a></li>
-    <li><a href="#cut-field"><span class="m d">05</span><b>Cut field</b><span class="m d">368&nbsp;×&nbsp;368&nbsp;MM</span></a></li>
-    <li><a href="#seed-22"><span class="m d">06</span><b>Seed 22</b><span class="m d">580&nbsp;S</span></a></li>
-    <li><a href="#atlas"><span class="m d">07</span><b>Atlas</b><span class="m d">001–183</span></a></li>
-    <li><a href="#editions"><span class="m d">08</span><b>Editions</b><span class="m d">4 EXPRESSIONS</span></a></li>
-    <li><a href="#box-tape"><span class="m d">09</span><b>Box tape</b><span class="m d">00:06.5</span></a></li>
-    <li><a href="#material"><span class="m d">10</span><b>Material studies</b><span class="m d">FRONT / BACK</span></a></li>
-    <li><a href="#form"><span class="m d">11</span><b>Form studies</b><span class="m d">TERRAIN / FREEFORM</span></a></li>
-    <li><a href="#construction"><span class="m d">12</span><b>Construction</b><span class="m d">7&nbsp;MM</span></a></li>
-    <li><a href="#packaging"><span class="m d">13</span><b>Packaging</b><span class="m d">413&nbsp;MM</span></a></li>
-    <li><a href="#kraft"><span class="m d">14</span><b>Punctured kraft</b><span class="m d">08 PUNCTURES</span></a></li>
-    <li><a href="#production"><span class="m d">15</span><b>Before production</b><span class="m d">PASS 10</span></a></li>
-    <li><a href="#campaign"><span class="m d">16</span><b>Campaign</b><span class="m d">51 ASSETS</span></a></li>
-    <li><a href="#colophon"><span class="m d">17</span><b>Colophon</b><span class="m d">UNOFFICIAL</span></a></li>
-  </ol>
-  <p class="ix-ft m d">UNOFFICIAL DESIGN CONCEPT / NOT AN OFFICIAL RELEASE</p>
-</dialog>
-
 <script>
 {
 const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
-const NS='http://www.w3.org/2000/svg',reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-const svgEl=(n,a)=>{const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);return e};
+const NS='http://www.w3.org/2000/svg',el=(n,a)=>{const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);return e};
 
-/* images fade in once decoded */
 for(const im of $$('img.f')){const done=()=>im.classList.add('ld');if(im.complete)done();else{im.addEventListener('load',done,{once:true});im.addEventListener('error',done,{once:true})}}
 
-/* header: colour and current movement follow the section under it */
-const hdr=$('.top'),cur=$('.cur'),theme=$('meta[name=theme-color]'),secs=$$('main [data-tone]'),links=$$('.ix a');
-const TONE={dark:'#000000',paper:'#f1efe8',lime:'#ccf44b',moss:'#142016',form:'#eeece4',night:'#111316'};
-let shown=null,ticking=false;
-const place=()=>{ticking=false;const y=hdr.offsetHeight+1;let s=secs[0],lab=s;for(const e of secs){if(e.getBoundingClientRect().top<=y){s=e;if(e.dataset.label)lab=e}else break}
-  if(s===shown)return;shown=s;const t=s.dataset.tone;hdr.className='top t-'+t;theme.content=TONE[t];
-  cur.textContent=lab.dataset.label;links.forEach(a=>a.toggleAttribute('aria-current',a.hash==='#'+lab.id))};
-addEventListener('scroll',()=>{if(!ticking){ticking=true;requestAnimationFrame(place)}},{passive:true});
-addEventListener('resize',place);place();
+/* seed 22: layout, refined, cut follow the scroll */
+const seq=$('.seq'),st=$$('.stage img'),sn=$('[data-s=n]'),stt=$('[data-s=t]');
+const STAGE=[['LAYOUT','109 S'],['REFINED','508 S'],['CUT','577 S']];
+let cur=0;
+const stage=()=>{const r=seq.getBoundingClientRect(),p=Math.min(1,Math.max(0,-r.top/(r.height-innerHeight))),i=p<.34?0:p<.67?1:2;
+  if(i===cur)return;cur=i;st.forEach((im,j)=>im.classList.toggle('on',i===j));sn.textContent=STAGE[i][0];stt.textContent=STAGE[i][1]};
+let tick=false;addEventListener('scroll',()=>{if(!tick){tick=true;requestAnimationFrame(()=>{tick=false;stage()})}},{passive:true});
 
-/* index */
-const ix=$('#ix');
-$('.idx').addEventListener('click',()=>{if(ix.showModal)ix.showModal();else ix.setAttribute('open','');document.documentElement.classList.add('lock')});
-ix.addEventListener('close',()=>document.documentElement.classList.remove('lock'));
-$('.ix-x').addEventListener('click',()=>ix.close());
-ix.addEventListener('click',e=>{if(e.target.closest('a'))ix.close()});
-
-/* pieces: one dataset drives the field, the atlas, the locator and the plan */
-let P=[],sel=92;
-const field=$('#field'),specs=$('#specs');
-const show=i=>{const p=P[i];if(!p)return;const w=Math.round(p.b[2]-p.b[0]),h=Math.round(p.b[3]-p.b[1]);
-  $$('[data-r=n]').forEach(e=>e.textContent=p.n);
-  $$('[data-r=a]').forEach(e=>e.textContent=p.a+' MM²');
-  $$('[data-r=s]').forEach(e=>e.textContent=w+' × '+h+' MM');
-  $$('use.selp').forEach(u=>u.setAttribute('href','#p'+p.n))};
-const pick=(i,focus)=>{if(!P[i])return;
-  field.querySelector('.on')?.classList.remove('on');field.querySelector(`[data-i="${i}"]`)?.classList.add('on');
-  const old=specs.querySelector('[aria-pressed=true]');if(old){old.setAttribute('aria-pressed','false');old.tabIndex=-1}
-  const b=specs.children[i];if(b){b.setAttribute('aria-pressed','true');b.tabIndex=0;if(focus)b.focus()}
-  sel=i;show(i)};
-const build=()=>{
-  const defs=$('#pd defs'),all=P.map(p=>p.d).join('');
-  P.forEach(p=>defs.append(svgEl('path',{id:'p'+p.n,d:p.d})));
-  P.forEach((p,i)=>{const e=svgEl('path',{d:p.d,'data-i':i});field.append(e)});
-  $$('svg.all').forEach(s=>s.insertBefore(svgEl('path',{d:all,class:'outl'}),s.querySelector('use')));
-  const frag=document.createDocumentFragment();
-  P.forEach((p,i)=>{const cx=(p.b[0]+p.b[2])/2,cy=(p.b[1]+p.b[3])/2,b=document.createElement('button');
-    b.type='button';b.className='sp';b.tabIndex=-1;b.setAttribute('aria-pressed','false');b.setAttribute('aria-label','Piece '+p.n+', '+p.a+' square millimetres');
-    const s=svgEl('svg',{viewBox:'-38 -38 76 76','aria-hidden':'true'});s.append(svgEl('use',{href:'#p'+p.n,transform:`translate(${-cx} ${-cy})`}));
-    const t=document.createElement('span');t.textContent=p.n;b.append(s,t);b.dataset.i=i;frag.append(b)});
-  specs.append(frag);pick(sel)};
-fetch('data/pieces.json').then(r=>r.json()).then(d=>{P=d;build()}).catch(()=>$$('.needs-p').forEach(e=>e.classList.add('nop')));
+/* the 183 pieces, drawn from the cut file; touching one lights it in both views */
+const field=$('#field'),specs=$('#specs');let on=-1;
+const pick=i=>{field.querySelector('.on')?.classList.remove('on');specs.querySelector('.on')?.classList.remove('on');
+  if(i===on){on=-1;return}on=i;field.children[i].classList.add('on');specs.children[i].classList.add('on')};
+fetch('data/pieces.json').then(r=>r.json()).then(P=>{const defs=$('#pd defs'),frag=document.createDocumentFragment();
+  P.forEach((p,i)=>{defs.append(el('path',{id:'p'+p.n,d:p.d}));field.append(el('path',{d:p.d,'data-i':i}));
+    const cx=(p.b[0]+p.b[2])/2,cy=(p.b[1]+p.b[3])/2,c=document.createElement('div'),s=el('svg',{viewBox:'-38 -38 76 76','aria-hidden':'true'}),t=document.createElement('span');
+    c.className='sp';c.dataset.i=i;s.append(el('use',{href:'#p'+p.n,transform:`translate(${-cx} ${-cy})`}));t.textContent=p.n;c.append(s,t);frag.append(c)});
+  specs.append(frag)}).catch(()=>{});
 field.addEventListener('click',e=>{const i=e.target.dataset?.i;if(i!==undefined)pick(+i)});
-specs.addEventListener('click',e=>{const b=e.target.closest('.sp');if(b)pick(+b.dataset.i)});
-if(matchMedia('(hover: hover)').matches){
-  const hov=e=>{const t=e.target.closest('[data-i]');if(t)show(+t.dataset.i)};
-  field.addEventListener('pointerover',hov);specs.addEventListener('pointerover',hov);
-  field.addEventListener('pointerleave',()=>show(sel));specs.addEventListener('pointerleave',()=>show(sel))}
-specs.addEventListener('keydown',e=>{const k={ArrowRight:1,ArrowLeft:-1,ArrowDown:'+',ArrowUp:'-',Home:'h',End:'e'}[e.key];if(!k||!P.length)return;e.preventDefault();
-  const cols=getComputedStyle(specs).gridTemplateColumns.split(' ').length;
-  let j=k==='h'?0:k==='e'?P.length-1:sel+(k==='+'?cols:k==='-'?-cols:k);pick(Math.max(0,Math.min(P.length-1,j)),true)});
+specs.addEventListener('click',e=>{const c=e.target.closest('.sp');if(c)pick(+c.dataset.i)});
 
-/* seed 22 stages */
-const stage=$$('.stage img'),cap=$('.seed-cap');
-$$('.ctl button').forEach((b,i,all)=>b.addEventListener('click',()=>{stage.forEach((im,j)=>im.classList.toggle('on',i===j));all.forEach((x,j)=>x.setAttribute('aria-pressed',i===j));cap.textContent=b.dataset.cap}));
+/* motion loop: loads near the viewport, plays only while visible */
+const v=$('video[data-src]'),still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+if(still)v.controls=true;
+new IntersectionObserver(([e])=>{if(e.isIntersecting){if(!v.src)v.src=v.dataset.src;if(!still)v.play().catch(()=>{})}else v.pause()},{rootMargin:'400px 0px'}).observe(v);
 
-/* rails */
-const step=(r,d)=>r.scrollBy({left:d*r.clientWidth*.8,behavior:reduce?'auto':'smooth'});
-const sync=w=>{const r=$('.rail',w),[p,n]=$$('.nav button',w);if(!p)return;p.disabled=r.scrollLeft<4;n.disabled=r.scrollLeft+r.clientWidth>=r.scrollWidth-4};
-for(const w of $$('.railw')){const r=$('.rail',w);
-  $$('.nav button',w).forEach(b=>b.addEventListener('click',()=>step(r,+b.dataset.dir)));
-  r.addEventListener('keydown',e=>{const d={ArrowRight:1,ArrowLeft:-1}[e.key];if(d){e.preventDefault();step(r,d)}});
-  r.addEventListener('scroll',()=>sync(w),{passive:true});sync(w)}
-
-/* edition tabs */
-for(const tl of $$('[role=tablist]')){const tabs=$$('[role=tab]',tl);
-  const go=t=>tabs.forEach(x=>{const on=x===t,pn=$('#'+x.getAttribute('aria-controls'));x.setAttribute('aria-selected',on);x.tabIndex=on?0:-1;pn.hidden=!on;if(on)sync(pn)});
-  tl.addEventListener('click',e=>{const t=e.target.closest('[role=tab]');if(t)go(t)});
-  tl.addEventListener('keydown',e=>{const d={ArrowRight:1,ArrowLeft:-1}[e.key];if(!d)return;const t=tabs[(tabs.indexOf(document.activeElement)+d+tabs.length)%tabs.length];t.focus();go(t)})}
-
-/* motion loop: load near the viewport, play only while visible */
-const v=$('video[data-src]');
-if(v){if(reduce)v.controls=true;
-  new IntersectionObserver(([e])=>{if(e.isIntersecting){if(!v.src)v.src=v.dataset.src;if(!reduce)v.play().catch(()=>{})}else v.pause()},{rootMargin:'400px 0px'}).observe(v)}
-
-/* offline + home screen */
-const framed=window.top!==window.self;
-if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')&&!framed)navigator.serviceWorker.register('sw.js').catch(()=>{});
-const ios=/iP(hone|od|ad)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
-if(ios&&!navigator.standalone&&!framed)$('.install').hidden=false;
+if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')&&window.top===window.self)navigator.serviceWorker.register('sw.js').catch(()=>{});
 }
 </script>
 </body>
