@@ -1,0 +1,39 @@
+{
+ "name": "Sound in Pieces",
+ "short_name": "In Pieces",
+ "description": "SOUND IN PIECES / APHEX 398. A framed jigsaw concept: 183 logo-derived pieces. Unofficial design concept.",
+ "id": "./",
+ "start_url": "./",
+ "scope": "./",
+ "display": "standalone",
+ "orientation": "any",
+ "background_color": "#000000",
+ "theme_color": "#000000",
+ "categories": [
+  "design",
+  "art"
+ ],
+ "icons": [
+  {
+   "src": "icons/icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png"
+  },
+  {
+   "src": "icons/icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png"
+  },
+  {
+   "src": "icons/icon-maskable-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  },
+  {
+   "src": "icons/favicon.svg",
+   "sizes": "any",
+   "type": "image/svg+xml"
+  }
+ ]
+}
