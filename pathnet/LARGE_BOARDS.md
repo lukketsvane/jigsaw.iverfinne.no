@@ -44,4 +44,6 @@ Same settings, three seeds. Every board has 300 pieces and no erosion flags, and
 
 Inside a frame every board holds between 9 and 11 mm. Without one the margin ranges from 0.1 to 1.7 mm, set each time by a block of pieces that slides out through the board edge, so more seeds alone will not reach the reference's 3.5 mm.
 
+`frame_export.py <run-dir> --cut aphex-field-puzzle.svg` writes the framed production files for these boards (see `FOSSILNET.md`, Frames).
+
 These are geometric checks of the cutting file. Nothing here has been cut, assembled or tested in a material, and the logo is not cleared for commercial use.

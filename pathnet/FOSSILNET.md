@@ -31,6 +31,16 @@
 
 Screens are `audit_field.py`'s, run on the re-read cut file: kerf 0.10–0.25 mm, 2.5 and 3 mm necks, thin tips over 3 mm, holes, size. Every board has zero coverage error, overlap and duplicate cut segments. Corals and antlers keep 73% of their outline within 2 mm of the cut, trilobites about 51-58%: their notches are narrower, so more of their drawing is engraved rather than cut. In a frame or tray the boards lock firmly. Without one, edge pieces can slide outward at under 1 mm, the same limitation as the large Aphex boards (`LARGE_BOARDS.md`).
 
+## Frames
+
+The owner chose to ship the puzzles in a frame. `frame_export.py <run-dir> --cut fossil-field-puzzle.svg --engrave fossil-field-engrave.svg` writes, in `<run-dir>/frame`:
+
+- one sheet with frame and puzzle, where the board edge is cut once and is also the frame's inner edge (600 x 420 mm for a 570 x 390 mm board with a 15 mm frame);
+- the frame alone, as one ring or as four straight strips (the strips fit a 600 x 400 mm bed), with 0.25 mm of play around the puzzle;
+- a backing plate the frame is glued to (a tray), and a preview.
+
+Every cut layer is re-read and polygonised: the one-sheet file gives exactly the pieces plus the frame, with no duplicate segments. In the frame the boards hold 9-12 mm (`frame_lock.py`) instead of 0.4-1.3 mm.
+
 The first trilobite board (v1, before notch sizing and engraving) kept only 60% of its outlines within 2 mm and read as generic blobs. That board and the v2 boards are kept under `runs/fossil-boards` for comparison.
 
 The drawings, network weights and boards are private and stored on Drive (`jigsaw-shadow-transfer/fossilnet`), not in Git. Nothing has been cut or assembled in wood yet.
