@@ -13,8 +13,8 @@ python pathnet_export.py   # pathnet/decoder.json (APHEX LOGO) -> public/js/path
 The renders, `scrollzip/05-cut-field.svg` and `puzzle.glb` come from the Figma files and the Drive working folder. They stay private in `runs/sound-in-pieces/` (or `SIP_SRC`); rebuild from them only when they change:
 
 ```
-python images.py   # renders -> public/img, images.json
+python images.py   # renders -> public/img, images.json; film grain tile
 python pieces.py   # cut field -> public/data/pieces.json
 python icons.py    # piece 093 -> public/icons, public/splash, splash-links.html
-npm run model      # puzzle.glb -> public/models/puzzle.js
+npm run model      # puzzle.glb -> public/models/puzzle.js, its print -> public/img/print-1600.webp
 ```

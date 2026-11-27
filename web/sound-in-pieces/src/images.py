@@ -67,3 +67,9 @@ path = os.path.join(B, 'images.json')
 old = json.load(open(path)) if os.path.exists(path) else {}
 old.update(meta)
 json.dump(old, open(path, 'w'), indent=1)
+
+# film grain tile for the page overlay: white or black specks, alpha up to about 22/255
+import numpy as np
+n = np.random.default_rng(22).normal(size=(160, 160))
+rgba = np.dstack([np.where(n[..., None] > 0, 255, 0).repeat(3, 2), np.clip(np.abs(n) * .55, 0, 1) * 22]).astype(np.uint8)
+Image.fromarray(rgba, 'RGBA').save(f'{OUT}/grain.png', optimize=True)
