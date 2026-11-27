@@ -43,6 +43,7 @@ async function main() {
   { const raw = atob(b64); for (let i = 0; i < bin.length; i++) bin[i] = raw.charCodeAt(i); }
   const gltf = await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).parseAsync(bin.buffer, '');
   const board = gltf.scene;
+  for (const name of ['frame', 'backing']) { const o = board.getObjectByName(name); o?.parent.remove(o); } // the pieces alone, on black
   board.position.sub(new Box3().setFromObject(board).getCenter(new Vector3()));
   const rig = new Group();
   rig.add(board);
