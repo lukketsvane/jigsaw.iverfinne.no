@@ -112,8 +112,10 @@ def assign_by_silhouette(faces, polys):
     return owner if all(o is not None for o in owner) else None
 
 
-def partition(polys, W, H, px=.25, bay=0., margin=48., sigma=.35, reach=16.):
-    """field.partition (untrained slowness only) with the arrival fields computed on windows"""
+def partition(polys, W, H, px=.25, bay=0., margin=48., sigma=.35, reach=16., repair=0.):
+    """field.partition (untrained slowness only) with the arrival fields computed on windows. repair > 0 (mm, e.g. 1.25 =
+    the audit's 2.5 mm neck test) hands every bit of gap material a disc of that radius cannot reach to the neighbour it
+    lies against; tightly packed silhouettes leave thin gap wedges that would otherwise become fragile slivers"""
     n = len(polys); h = round(H / px); w = round(W / px); moved = 0
     with torch.no_grad(): v1, l1, v2, l2 = arrival_fields(polys, W, H, px, bay, margin, reach)
     v1, v2 = v1.cpu().numpy(), v2.cpu().numpy(); l1 = l1.cpu().numpy().astype(np.int32); l2 = l2.cpu().numpy().astype(np.int32)
@@ -122,6 +124,9 @@ def partition(polys, W, H, px=.25, bay=0., margin=48., sigma=.35, reach=16.):
     if bay:
         for _ in range(3):
             lab, m = fl.despike(lab, v1 <= 0, n, px); moved += m
+            if not m: break
+        for _ in range(3 if repair else 0):
+            lab, m = fl.despike(lab, v1 <= 0, n, px, r=repair, reach=0.); moved += m
             if not m: break
         lab, more = fl.connect(lab, n); stray += more
     arcs = fl.trace(lab, v1, l1, v2, l2, W, H, np.ones((h, w), np.float32) if bay else None)
@@ -531,7 +536,7 @@ def lock_fault_lines(faces, polys, W, H, target_margin=3.5, ndir=360, min_area=3
 
 # ---------------------------------------------------------------- composition
 
-def compose(seed=22, W=570., H=390., n=300, restarts=4, min_size=34., px=.25, bay=32., layouts=3, margin=48., resume=None, out=None, target_lock=0., log=print):
+def compose(seed=22, W=570., H=390., n=300, restarts=4, min_size=34., px=.25, bay=32., layouts=3, margin=48., resume=None, out=None, target_lock=0., repair=0., log=print):
     """field.compose for large boards: logos only, untrained seams (the bay rule), windowed partition"""
     from refine import flag
     t0 = time.time(); tried = []; reverted = 0
@@ -558,7 +563,7 @@ def compose(seed=22, W=570., H=390., n=300, restarts=4, min_size=34., px=.25, ba
             m = None
             if layouts > 1:
                 try:
-                    faces = partition(fl.outlines(k, z, c, th, size), W, H, 2 * px, bay=bay, margin=margin)['faces']
+                    faces = partition(fl.outlines(k, z, c, th, size), W, H, 2 * px, bay=bay, margin=margin, repair=repair)['faces']
                     flags = sum(flag(f) for f in faces); m = -1. if flags else fl.lock_margin(faces)
                 except ValueError as e: m = -1.; log(f'  layout {li}: {e}')
                 tried.append({'packing_score': score, 'lock_margin_mm': m}); log(f'  layout {li} (packing score {score:.3f}): lock margin {m:.2f} mm ({time.time() - t0:.0f}s)')
@@ -570,7 +575,7 @@ def compose(seed=22, W=570., H=390., n=300, restarts=4, min_size=34., px=.25, ba
     polys = fl.outlines(k, z, c, th, size); lay = fl.measure(fl.distance_stack(polys, W, H, 1., 60.), W, H)
     log(f'  silhouettes cover {lay["covered"]:.3f} of the board, rms gap {lay["rms_gap_mm"]:.2f} mm, deepest overlap {lay["max_overlap_depth_mm"]:.2f} mm ({time.time() - t0:.0f}s)')
     if out is not None: snapshot(out, '2-refined', polys, W, H, f'Refined: logo poses, sizes and shapes optimised together, {lay["covered"]:.0%} covered ({time.time() - t0:.0f} s)')
-    res = partition(polys, W, H, px, bay=bay, margin=margin); bis = partition(polys, W, H, px, bay=0., margin=margin)
+    res = partition(polys, W, H, px, bay=bay, margin=margin, repair=repair); bis = partition(polys, W, H, px, bay=0., margin=margin)
     flags = sum(flag(f) for f in res['faces']); log(f'  cut {len(res["faces"])} pieces, {flags} erosion flags ({time.time() - t0:.0f}s)')
     slides = lambda faces: {'assembly_lock_margin_mm': fl.lock_margin(faces), **{f'blocking_{need:g}mm': fl.lock_stats(faces, need)[0] for need in (1., 2., 3.)}}
     base = slides(res['faces'])
@@ -611,10 +616,11 @@ if __name__ == '__main__':
     a.add_argument('--min-size', type=float, default=34., help='smallest logo extent in mm; 34 keeps every 3 mm feature of the logo')
     a.add_argument('--bay', type=float, default=32.); a.add_argument('--margin', type=float, default=48., help='window margin in mm around every silhouette')
     a.add_argument('--target-lock', type=float, default=0., help='if > 0, apply strict-3mm-safe cross-fault seam locking up to this margin (mm)')
+    a.add_argument('--neck-repair', type=float, default=0., help='if > 0 (mm, 1.25 matches the audit), hand gap material a disc of this radius cannot reach to the neighbour')
     a.add_argument('--resume', type=Path, help='a saved *-state.pt: keep its layout and cut it again')
     a.add_argument('--output', type=Path, required=True); a = a.parse_args()
     log = lambda s: print(s, flush=True)
-    res, polys, meta, report, state = compose(a.seed, a.width, a.height, a.pieces, a.restarts, a.min_size, bay=a.bay, layouts=a.layouts, margin=a.margin, resume=a.resume, out=a.output, target_lock=a.target_lock, log=log)
+    res, polys, meta, report, state = compose(a.seed, a.width, a.height, a.pieces, a.restarts, a.min_size, bay=a.bay, layouts=a.layouts, margin=a.margin, resume=a.resume, out=a.output, target_lock=a.target_lock, repair=a.neck_repair, log=log)
     faces = fl.export(a.output, res, polys, meta, report, state)
     previews(a.output, faces, polys, meta, report['width_mm'], report['height_mm'])
     audit_summary = af.audit(a.output)
