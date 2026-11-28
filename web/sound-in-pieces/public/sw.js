@@ -1,4 +1,4 @@
-const V='sip-b22ec19ff9',CORE=["./", "index.html", "manifest.webmanifest", "data/pieces.json", "fonts/plex-mono-400.woff2", "icons/favicon.svg", "icons/apple-touch-icon.png", "icons/icon-192.png", "img/hero-800.webp", "img/hero-1400.webp", "js/hero.js", "models/puzzle.js", "img/grain.png", "design.html", "js/designer.js", "js/pathnet-logo.js", "img/print-1600.webp"];
+const V='sip-0ba1b4f231',CORE=["./", "index.html", "manifest.webmanifest", "data/pieces.json", "fonts/plex-mono-400.woff2", "icons/favicon.svg", "icons/apple-touch-icon.png", "icons/icon-192.png", "img/hero-800.webp", "img/hero-1400.webp", "js/hero.js", "models/puzzle.js", "img/grain.png", "design.html", "js/designer.js", "js/pathnet-logo.js", "img/print-1600.webp"];
 self.addEventListener('install',e=>e.waitUntil(caches.open(V).then(c=>c.addAll(CORE.map(u=>new Request(u,{cache:'reload'})))).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==V).map(x=>caches.delete(x)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',e=>{

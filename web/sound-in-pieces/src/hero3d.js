@@ -14,6 +14,38 @@ const fig = document.querySelector('.hero figure');
 const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
+// a standard MIDI file -> the chords of its highest track, and how many of them make the refrain:
+// the opening, as far as it matches its first return (at least 16 chords long)
+function tune(d) {
+  let p = 0;
+  const u32 = () => d[p++] * 16777216 + (d[p++] << 16 | d[p++] << 8 | d[p++]), u16 = () => d[p++] << 8 | d[p++];
+  const vlq = () => { let v = 0, b; do { b = d[p++]; v = v * 128 + (b & 127); } while (b & 128); return v; };
+  if (u32() !== 0x4d546864) return null;
+  const hl = u32(); p += 2; const nt = u16(); p = 8 + hl;
+  const tracks = [];
+  for (let t = 0; t < nt && p + 8 <= d.length; t++) {
+    const id = u32(), len = u32(), end = p + len, notes = [];
+    let tick = 0, run = 0;
+    while (id === 0x4d54726b && p < end) {
+      tick += vlq();
+      let s = d[p]; if (s & 128) p++; else s = run;
+      if (s === 0xff) { p++; const n = vlq(); p += n; continue; }          // meta: type, length, data
+      if (s === 0xf0 || s === 0xf7) { const n = vlq(); p += n; continue; } // sysex
+      run = s; const hi = s & 0xf0, a = d[p++], b = hi === 0xc0 || hi === 0xd0 ? 0 : d[p++];
+      if (hi === 0x90 && b) notes.push([tick, a]);
+    }
+    p = end; if (notes.length) tracks.push(notes);
+  }
+  if (!tracks.length) return null;
+  const mean = n => n.reduce((s, x) => s + x[1], 0) / n.length, top = tracks.reduce((a, b) => (mean(b) > mean(a) ? b : a)), at = new Map();
+  for (const [k, n] of top) (at.get(k) || at.set(k, []).get(k)).push(n);
+  const chords = [...at.keys()].sort((a, b) => a - b).map(k => at.get(k)), seq = chords.map(c => Math.max(...c));
+  const same = k => { let n = 0; while (k + n < seq.length && seq[n] === seq[k + n]) n++; return n; };
+  let refrain = seq.length;
+  for (let k = 16; k < seq.length; k++) if (same(k) >= 16) { refrain = same(k); break; }
+  return { chords, refrain };
+}
+
 async function main() {
   const renderer = new WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
@@ -117,10 +149,15 @@ async function main() {
     while (o && !/^piece-\d+$/.test(o.name)) o = o.parent;
     return o;
   };
+  // media/melody.mid, when the site has one: each tap plays its next chord; once the refrain is played, that piece comes forward
+  let song = null, step = 0;
+  fetch(new URL('../media/melody.mid', import.meta.url)).then(r => (r.ok ? r.arrayBuffer() : null)).then(b => { song = b && tune(new Uint8Array(b)); }).catch(() => {});
   const lift = (x, y) => {
     const o = pick(x, y); if (!o) return;
     const u = o.userData; u.to = u.to >= 1 ? 0 : 1; u.tw = 0;
-    window.blip?.(u.f, u.to);
+    if (!song) { window.blip?.(u.f, u.to); return; }
+    for (const n of song.chords[step]) window.blip?.(440 * 2 ** ((n - 69) / 12), 1);
+    if (++step >= song.refrain) { step = 0; gather(o); }
   };
   // a chosen piece glides to the middle, grows, floats and turns; the rest make room, nearest first
   let chosen = null;

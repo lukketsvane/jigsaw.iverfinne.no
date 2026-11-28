@@ -18,3 +18,5 @@ python pieces.py   # cut field -> public/data/pieces.json
 python icons.py    # piece 093 -> public/icons, public/splash, splash-links.html
 npm run model      # puzzle.glb -> public/models/puzzle.js, its print -> public/img/print-1600.webp
 ```
+
+Optional: `public/media/melody.mid`. When present, each tap on the 3D board plays the next chord of its highest track, and once the refrain (the opening, as far as it matches its first return) has been played, the last piece tapped comes to the middle.
