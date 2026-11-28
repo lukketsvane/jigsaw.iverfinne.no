@@ -1,0 +1,194 @@
+{
+  "total_manifest_records": 1454,
+  "unique_sha256_files": 1454,
+  "sha256_verified_ok": 1454,
+  "sha256_failures": 0,
+  "missing_files": 0,
+  "orphan_files": 0,
+  "missing_rights_or_url": 0,
+  "quarantined_painted_photo": 104,
+  "traceable_non_painted": 1168,
+  "by_source_folder": {
+    "alta_expansion": {
+      "total": 81,
+      "traceable": 81,
+      "quarantined": 0
+    },
+    "ksamsok_dimu_expansion": {
+      "total": 27,
+      "traceable": 27,
+      "quarantined": 0
+    },
+    "nordic_archives": {
+      "total": 301,
+      "traceable": 290,
+      "quarantined": 4
+    },
+    "norway_archives": {
+      "total": 344,
+      "traceable": 281,
+      "quarantined": 29
+    },
+    "shfa_expansion": {
+      "total": 276,
+      "traceable": 276,
+      "quarantined": 0
+    },
+    "unimus_expansion": {
+      "total": 139,
+      "traceable": 139,
+      "quarantined": 0
+    },
+    "wikimedia": {
+      "total": 286,
+      "traceable": 74,
+      "quarantined": 71
+    }
+  },
+  "by_media_type": {
+    "bw_tracing": 918,
+    "rti_3d": 66,
+    "painted_photo": 104,
+    "photo_other": 182,
+    "rubbing_frottage": 174,
+    "svg_vector": 10
+  },
+  "by_archive": {
+    "altarockart": 231,
+    "digitaltmuseum": 14,
+    "zenodo_shfa": 23,
+    "europeana": 4,
+    "ksamsok": 6,
+    "nationalmuseet": 5,
+    "shfa": 562,
+    "unimus": 286,
+    "kulturminnesok": 12,
+    "other": 25,
+    "wikimedia": 286
+  },
+  "by_commercial_ok": {
+    "False": 231,
+    "True": 1223
+  },
+  "core_region_breakdown": {
+    "Alta (Finnmark, NO)": {
+      "total": 284,
+      "traceable": 271,
+      "painted_quarantined": 5,
+      "by_media_type": {
+        "bw_tracing": 231,
+        "rubbing_frottage": 40,
+        "painted_photo": 5,
+        "photo_other": 8
+      }
+    },
+    "Bohuslän / Tanum (SE)": {
+      "total": 182,
+      "traceable": 166,
+      "painted_quarantined": 9,
+      "by_media_type": {
+        "painted_photo": 9,
+        "bw_tracing": 135,
+        "rti_3d": 19,
+        "svg_vector": 10,
+        "rubbing_frottage": 2,
+        "photo_other": 7
+      }
+    },
+    "Nämforsen (Ångermanland, SE)": {
+      "total": 88,
+      "traceable": 86,
+      "painted_quarantined": 2,
+      "by_media_type": {
+        "rti_3d": 34,
+        "bw_tracing": 1,
+        "rubbing_frottage": 51,
+        "painted_photo": 2
+      }
+    },
+    "Other (DK)": {
+      "total": 26,
+      "traceable": 20,
+      "painted_quarantined": 2,
+      "by_media_type": {
+        "painted_photo": 2,
+        "photo_other": 4,
+        "bw_tracing": 6,
+        "rubbing_frottage": 14
+      }
+    },
+    "Other (FI)": {
+      "total": 4,
+      "traceable": 0,
+      "painted_quarantined": 2,
+      "by_media_type": {
+        "photo_other": 2,
+        "painted_photo": 2
+      }
+    },
+    "Other (NO)": {
+      "total": 148,
+      "traceable": 58,
+      "painted_quarantined": 30,
+      "by_media_type": {
+        "rubbing_frottage": 15,
+        "bw_tracing": 43,
+        "painted_photo": 30,
+        "photo_other": 60
+      }
+    },
+    "Other (SE)": {
+      "total": 111,
+      "traceable": 77,
+      "painted_quarantined": 12,
+      "by_media_type": {
+        "bw_tracing": 50,
+        "photo_other": 22,
+        "painted_photo": 12,
+        "rubbing_frottage": 14,
+        "rti_3d": 13
+      }
+    },
+    "Trøndelag (NO)": {
+      "total": 153,
+      "traceable": 68,
+      "painted_quarantined": 15,
+      "by_media_type": {
+        "photo_other": 70,
+        "rubbing_frottage": 15,
+        "bw_tracing": 53,
+        "painted_photo": 15
+      }
+    },
+    "Vingen / Vestland (NO)": {
+      "total": 238,
+      "traceable": 237,
+      "painted_quarantined": 0,
+      "by_media_type": {
+        "bw_tracing": 228,
+        "rubbing_frottage": 9,
+        "photo_other": 1
+      }
+    },
+    "Østfold (NO)": {
+      "total": 220,
+      "traceable": 185,
+      "painted_quarantined": 27,
+      "by_media_type": {
+        "rubbing_frottage": 14,
+        "bw_tracing": 171,
+        "painted_photo": 27,
+        "photo_other": 8
+      }
+    }
+  },
+  "gazetteer_stats": {
+    "total_unique_sites": 767,
+    "sites_with_verified_coordinates": 638,
+    "sites_with_verified_heritage_id": 638,
+    "total_source_records_covered": 1454,
+    "records_at_verified_coordinate_sites": 1188
+  },
+  "literature_citations": 20,
+  "taxonomy_schema_version": "2.0.0"
+}

@@ -1,0 +1,192 @@
+{
+  "audit_scope": "hellerisninger/sources/*/manifest.jsonl (baseline pre-expansion)",
+  "total_records": 931,
+  "sha256_verified_ok": 931,
+  "sha256_failures": [],
+  "missing_files": [],
+  "readability_errors": [],
+  "license_or_creator_missing": [],
+  "quarantined_painted_photo_count": 104,
+  "traceable_baseline_count": 645,
+  "photo_other_count": 182,
+  "by_media_type": {
+    "bw_tracing": 584,
+    "painted_photo": 104,
+    "photo_other": 182,
+    "rubbing_frottage": 51,
+    "svg_vector": 10
+  },
+  "by_archive": {
+    "europeana": 4,
+    "ksamsok": 6,
+    "nationalmuseet": 5,
+    "shfa": 286,
+    "altarockart": 150,
+    "unimus": 147,
+    "kulturminnesok": 12,
+    "other": 25,
+    "digitaltmuseum": 10,
+    "wikimedia": 286
+  },
+  "by_country": {
+    "SE": 257,
+    "NO": 644,
+    "DK": 26,
+    "FI": 4
+  },
+  "by_license": {
+    "CC BY-SA 4.0": 239,
+    "Public Domain Mark 1.0": 11,
+    "CC BY 3.0": 16,
+    "CC BY 4.0": 299,
+    "Alta Museum Open Non-Commercial ShareAlike (CC BY-NC-SA-equivalent)": 150,
+    "CC0 1.0": 9,
+    "Public Domain": 25,
+    "Public domain": 102,
+    "CC BY-SA 3.0": 33,
+    "CC BY-SA 2.0": 2,
+    "CC BY 2.0": 9,
+    "CC BY-SA 3.0 no": 11,
+    "CC BY-SA 2.5": 3,
+    "CC BY 2.5": 22
+  },
+  "commercial_ok_counts": {
+    "true": 781,
+    "false": 150
+  },
+  "core_region_coverage_and_gaps": {
+    "Alta (Finnmark, NO)": {
+      "total": 170,
+      "traceable_non_painted": 157,
+      "painted_quarantined": 5,
+      "photo_other_excluded": 8,
+      "by_media_type": {
+        "rubbing_frottage": 7,
+        "bw_tracing": 150,
+        "painted_photo": 5,
+        "photo_other": 8
+      },
+      "gap_severity": "MODERATE_OR_GOOD"
+    },
+    "Bohuslän / Tanum (SE)": {
+      "total": 163,
+      "traceable_non_painted": 147,
+      "painted_quarantined": 9,
+      "photo_other_excluded": 7,
+      "by_media_type": {
+        "painted_photo": 9,
+        "bw_tracing": 135,
+        "svg_vector": 10,
+        "rubbing_frottage": 2,
+        "photo_other": 7
+      },
+      "gap_severity": "MODERATE_OR_GOOD"
+    },
+    "Nämforsen (Ångermanland, SE)": {
+      "total": 7,
+      "traceable_non_painted": 5,
+      "painted_quarantined": 2,
+      "photo_other_excluded": 0,
+      "by_media_type": {
+        "bw_tracing": 1,
+        "rubbing_frottage": 4,
+        "painted_photo": 2
+      },
+      "gap_severity": "CRITICAL"
+    },
+    "Other (DK)": {
+      "total": 26,
+      "traceable_non_painted": 20,
+      "painted_quarantined": 2,
+      "photo_other_excluded": 4,
+      "by_media_type": {
+        "painted_photo": 2,
+        "photo_other": 4,
+        "bw_tracing": 6,
+        "rubbing_frottage": 14
+      },
+      "gap_severity": "HIGH"
+    },
+    "Other (FI)": {
+      "total": 4,
+      "traceable_non_painted": 0,
+      "painted_quarantined": 2,
+      "photo_other_excluded": 2,
+      "by_media_type": {
+        "photo_other": 2,
+        "painted_photo": 2
+      },
+      "gap_severity": "CRITICAL"
+    },
+    "Other (NO)": {
+      "total": 139,
+      "traceable_non_painted": 48,
+      "painted_quarantined": 31,
+      "photo_other_excluded": 60,
+      "by_media_type": {
+        "rubbing_frottage": 5,
+        "bw_tracing": 43,
+        "painted_photo": 31,
+        "photo_other": 60
+      },
+      "gap_severity": "HIGH"
+    },
+    "Other (SE)": {
+      "total": 87,
+      "traceable_non_painted": 52,
+      "painted_quarantined": 13,
+      "photo_other_excluded": 22,
+      "by_media_type": {
+        "bw_tracing": 46,
+        "photo_other": 22,
+        "painted_photo": 13,
+        "rubbing_frottage": 6
+      },
+      "gap_severity": "MODERATE_OR_GOOD"
+    },
+    "Trøndelag (NO)": {
+      "total": 141,
+      "traceable_non_painted": 56,
+      "painted_quarantined": 15,
+      "photo_other_excluded": 70,
+      "by_media_type": {
+        "photo_other": 70,
+        "rubbing_frottage": 5,
+        "bw_tracing": 51,
+        "painted_photo": 15
+      },
+      "gap_severity": "MODERATE_OR_GOOD"
+    },
+    "Vingen / Vestland (NO)": {
+      "total": 122,
+      "traceable_non_painted": 121,
+      "painted_quarantined": 0,
+      "photo_other_excluded": 1,
+      "by_media_type": {
+        "bw_tracing": 118,
+        "rubbing_frottage": 3,
+        "photo_other": 1
+      },
+      "gap_severity": "MODERATE_OR_GOOD"
+    },
+    "Østfold (NO)": {
+      "total": 72,
+      "traceable_non_painted": 39,
+      "painted_quarantined": 25,
+      "photo_other_excluded": 8,
+      "by_media_type": {
+        "rubbing_frottage": 5,
+        "bw_tracing": 34,
+        "painted_photo": 25,
+        "photo_other": 8
+      },
+      "gap_severity": "HIGH"
+    }
+  },
+  "identified_gaps": [
+    "Nämforsen (Ångermanland, SE) has only 7 baseline raw files (5 traceable: 1 bw_tracing, 4 rubbing_frottage; 2 painted_photo quarantined) — CRITICAL gap.",
+    "Østfold (NO) has 72 baseline files, but 25 are painted_photo (quarantined) and 8 photo_other, leaving only 39 traceable records (34 bw_tracing, 5 rubbing_frottage) despite 200+ KHM CC BY-SA 4.0 tracings existing in Unimus — HIGH gap.",
+    "Zero rti_3d records in baseline despite 884 CC BY 4.0 SHFA 3d-visualisering relief maps available (including 19 in Nämforsen and hundreds in Bohuslän/Tanum).",
+    "Alta (Finnmark, NO) has 150 commercial_ok=false tracings + 7 SHFA rubbings, while SHFA holds 41 CC BY 4.0 Alta rubbings and Alta Museum holds ~115 additional 5009-Kalkeringer tracings."
+  ]
+}

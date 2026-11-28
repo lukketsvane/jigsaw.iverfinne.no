@@ -1,0 +1,1318 @@
+{
+  "release": "v2026.W48",
+  "reproducibility": {
+    "generated_utc": "2026-11-28T11:08:42Z",
+    "random_seed": 42,
+    "n_bootstrap": 2000,
+    "python_version": "3.11.9",
+    "scipy_version": "1.17.0",
+    "numpy_version": "1.26.4"
+  },
+  "corpus_overview": {
+    "total_figures": 7934,
+    "calibrated_count": 0,
+    "uncalibrated_count": 7934,
+    "coords_count": 7312,
+    "site_id_count": 7209,
+    "commercial_ok_count": 6261,
+    "region_period_counts": {
+      "Alta": {
+        "stone_age_hunter": 1977,
+        "mixed": 41
+      },
+      "Østfold": {
+        "bronze_age_agrarian": 1105
+      },
+      "Bohuslän/Tanum": {
+        "bronze_age_agrarian": 1340,
+        "stone_age_hunter": 23
+      },
+      "Nämforsen": {
+        "stone_age_hunter": 313
+      },
+      "Vingen": {
+        "stone_age_hunter": 1380
+      },
+      "Trøndelag": {
+        "stone_age_hunter": 72,
+        "bronze_age_agrarian": 250,
+        "mixed": 163
+      },
+      "Other Nordic": {
+        "stone_age_hunter": 613,
+        "bronze_age_agrarian": 628,
+        "unknown": 16,
+        "mixed": 13
+      }
+    },
+    "licence_counts": {
+      "Alta Museum Open Non-Commercial ShareAlike (CC BY-NC-SA-equivalent)": 1673,
+      "CC BY-SA 4.0": 1812,
+      "CC BY 4.0": 4018,
+      "Public domain": 396,
+      "CC BY 3.0": 19,
+      "CC BY-SA 3.0": 16
+    },
+    "archive_counts": {
+      "altarockart": 1673,
+      "unimus": 1782,
+      "shfa": 3984,
+      "wikimedia": 434,
+      "zenodo_shfa": 25,
+      "digitaltmuseum": 13,
+      "europeana": 13,
+      "ksamsok": 10
+    }
+  },
+  "morphometrics_veide_vs_jordbruk": [
+    {
+      "metric": "area_mm2",
+      "label": "Calibrated Area (mm²)",
+      "calibrated_only": true,
+      "stone_age_hunter": {
+        "n": 0,
+        "mean": null,
+        "std": null,
+        "median": null,
+        "q25": null,
+        "q75": null,
+        "iqr": null
+      },
+      "bronze_age_agrarian": {
+        "n": 0,
+        "mean": null,
+        "std": null,
+        "median": null,
+        "q25": null,
+        "q75": null,
+        "iqr": null
+      },
+      "tested": false,
+      "u_stat": null,
+      "p_value": null,
+      "q_value": null,
+      "rank_biserial_r": null,
+      "cliffs_delta": null,
+      "effect_magnitude": null,
+      "median_diff_stone_minus_bronze": null,
+      "ci95_median_diff": null,
+      "ci95_cliffs_delta": null,
+      "significant_fdr_0_05": false
+    },
+    {
+      "metric": "width_mm",
+      "label": "Calibrated Width (mm)",
+      "calibrated_only": true,
+      "stone_age_hunter": {
+        "n": 0,
+        "mean": null,
+        "std": null,
+        "median": null,
+        "q25": null,
+        "q75": null,
+        "iqr": null
+      },
+      "bronze_age_agrarian": {
+        "n": 0,
+        "mean": null,
+        "std": null,
+        "median": null,
+        "q25": null,
+        "q75": null,
+        "iqr": null
+      },
+      "tested": false,
+      "u_stat": null,
+      "p_value": null,
+      "q_value": null,
+      "rank_biserial_r": null,
+      "cliffs_delta": null,
+      "effect_magnitude": null,
+      "median_diff_stone_minus_bronze": null,
+      "ci95_median_diff": null,
+      "ci95_cliffs_delta": null,
+      "significant_fdr_0_05": false
+    },
+    {
+      "metric": "height_mm",
+      "label": "Calibrated Height (mm)",
+      "calibrated_only": true,
+      "stone_age_hunter": {
+        "n": 0,
+        "mean": null,
+        "std": null,
+        "median": null,
+        "q25": null,
+        "q75": null,
+        "iqr": null
+      },
+      "bronze_age_agrarian": {
+        "n": 0,
+        "mean": null,
+        "std": null,
+        "median": null,
+        "q25": null,
+        "q75": null,
+        "iqr": null
+      },
+      "tested": false,
+      "u_stat": null,
+      "p_value": null,
+      "q_value": null,
+      "rank_biserial_r": null,
+      "cliffs_delta": null,
+      "effect_magnitude": null,
+      "median_diff_stone_minus_bronze": null,
+      "ci95_median_diff": null,
+      "ci95_cliffs_delta": null,
+      "significant_fdr_0_05": false
+    },
+    {
+      "metric": "perimeter_mm",
+      "label": "Calibrated Perimeter (mm)",
+      "calibrated_only": true,
+      "stone_age_hunter": {
+        "n": 0,
+        "mean": null,
+        "std": null,
+        "median": null,
+        "q25": null,
+        "q75": null,
+        "iqr": null
+      },
+      "bronze_age_agrarian": {
+        "n": 0,
+        "mean": null,
+        "std": null,
+        "median": null,
+        "q25": null,
+        "q75": null,
+        "iqr": null
+      },
+      "tested": false,
+      "u_stat": null,
+      "p_value": null,
+      "q_value": null,
+      "rank_biserial_r": null,
+      "cliffs_delta": null,
+      "effect_magnitude": null,
+      "median_diff_stone_minus_bronze": null,
+      "ci95_median_diff": null,
+      "ci95_cliffs_delta": null,
+      "significant_fdr_0_05": false
+    },
+    {
+      "metric": "aspect_ratio",
+      "label": "Aspect Ratio (L/W)",
+      "calibrated_only": false,
+      "stone_age_hunter": {
+        "n": 4378,
+        "mean": 2.2057735495660116,
+        "std": 3.2483997883598716,
+        "median": 1.232,
+        "q25": 0.792725,
+        "q75": 1.9622249999999999,
+        "iqr": 1.1694999999999998
+      },
+      "bronze_age_agrarian": {
+        "n": 3323,
+        "mean": 1.8890292205838097,
+        "std": 2.574874281051164,
+        "median": 1.3529,
+        "q25": 0.8546499999999999,
+        "q75": 2.14565,
+        "iqr": 1.291
+      },
+      "tested": true,
+      "u_stat": 6906013.5,
+      "p_value": 0.0001397196673656961,
+      "q_value": 0.0003260125571866243,
+      "rank_biserial_r": -0.05059542507767689,
+      "cliffs_delta": -0.050595425077676844,
+      "effect_magnitude": "negligible",
+      "median_diff_stone_minus_bronze": -0.12090000000000001,
+      "ci95_median_diff": [
+        -0.16570249999999995,
+        -0.06469749999999999
+      ],
+      "ci95_cliffs_delta": [
+        -0.07615863631345797,
+        -0.023300052226772804
+      ],
+      "significant_fdr_0_05": true
+    },
+    {
+      "metric": "compactness",
+      "label": "Compactness (4πA/P²)",
+      "calibrated_only": false,
+      "stone_age_hunter": {
+        "n": 4378,
+        "mean": 0.07758727729556875,
+        "std": 0.09290916699009848,
+        "median": 0.0488,
+        "q25": 0.0225,
+        "q75": 0.0958,
+        "iqr": 0.0733
+      },
+      "bronze_age_agrarian": {
+        "n": 3323,
+        "mean": 0.08160192597050857,
+        "std": 0.09390682437373547,
+        "median": 0.053,
+        "q25": 0.0242,
+        "q75": 0.1016,
+        "iqr": 0.0774
+      },
+      "tested": true,
+      "u_stat": 7000640.5,
+      "p_value": 0.004663564698589121,
+      "q_value": 0.0065354601182751534,
+      "rank_biserial_r": -0.037586573196461304,
+      "cliffs_delta": -0.03758657319646134,
+      "effect_magnitude": "negligible",
+      "median_diff_stone_minus_bronze": -0.004199999999999995,
+      "ci95_median_diff": [
+        -0.007200000000000005,
+        -0.0011000000000000035
+      ],
+      "ci95_cliffs_delta": [
+        -0.06397701650814189,
+        -0.01183517923378829
+      ],
+      "significant_fdr_0_05": true
+    },
+    {
+      "metric": "solidity",
+      "label": "Convex Solidity (A/A_hull)",
+      "calibrated_only": false,
+      "stone_age_hunter": {
+        "n": 4378,
+        "mean": 0.3245029922338967,
+        "std": 0.1833267438183552,
+        "median": 0.2923,
+        "q25": 0.195625,
+        "q75": 0.419475,
+        "iqr": 0.22385
+      },
+      "bronze_age_agrarian": {
+        "n": 3323,
+        "mean": 0.3507558230514595,
+        "std": 0.16879120390648997,
+        "median": 0.3279,
+        "q25": 0.23215,
+        "q75": 0.44195,
+        "iqr": 0.20980000000000001
+      },
+      "tested": true,
+      "u_stat": 6454071.5,
+      "p_value": 2.1446801794212214e-17,
+      "q_value": 1.501276125594855e-16,
+      "rank_biserial_r": -0.11272617567634635,
+      "cliffs_delta": -0.11272617567634632,
+      "effect_magnitude": "negligible",
+      "median_diff_stone_minus_bronze": -0.03560000000000002,
+      "ci95_median_diff": [
+        -0.04380250000000001,
+        -0.026698750000000007
+      ],
+      "ci95_cliffs_delta": [
+        -0.13882805541399443,
+        -0.08711793448681318
+      ],
+      "significant_fdr_0_05": true
+    },
+    {
+      "metric": "shape_complexity_index",
+      "label": "Shape Complexity (P/√A)",
+      "calibrated_only": false,
+      "stone_age_hunter": {
+        "n": 4378,
+        "mean": 20.511806275675347,
+        "std": 15.42409392245317,
+        "median": 16.04301977665706,
+        "q25": 11.453520064419557,
+        "q75": 23.62739627376795,
+        "iqr": 12.173876209348393
+      },
+      "bronze_age_agrarian": {
+        "n": 3323,
+        "mean": 19.65721367175399,
+        "std": 15.150923497511707,
+        "median": 15.396142700224043,
+        "q25": 11.120140766897423,
+        "q75": 22.78407777264798,
+        "iqr": 11.663937005750556
+      },
+      "tested": true,
+      "u_stat": 7547423.0,
+      "p_value": 0.004668185798767967,
+      "q_value": 0.0065354601182751534,
+      "rank_biserial_r": 0.03758238020733162,
+      "cliffs_delta": 0.03758238020733163,
+      "effect_magnitude": "negligible",
+      "median_diff_stone_minus_bronze": 0.6468770764330181,
+      "ci95_median_diff": [
+        0.18735194583359333,
+        1.1256010725873848
+      ],
+      "ci95_cliffs_delta": [
+        0.01156572125530671,
+        0.06327194132784676
+      ],
+      "significant_fdr_0_05": true
+    },
+    {
+      "metric": "vertex_count",
+      "label": "Contour Vertex Count",
+      "calibrated_only": false,
+      "stone_age_hunter": {
+        "n": 4378,
+        "mean": 250.15577889447235,
+        "std": 683.1467648637412,
+        "median": 98.0,
+        "q25": 58.0,
+        "q75": 207.0,
+        "iqr": 149.0
+      },
+      "bronze_age_agrarian": {
+        "n": 3323,
+        "mean": 233.28137225398737,
+        "std": 632.6848407709825,
+        "median": 98.0,
+        "q25": 52.0,
+        "q75": 192.0,
+        "iqr": 140.0
+      },
+      "tested": true,
+      "u_stat": 7419205.0,
+      "p_value": 0.13304357727013127,
+      "q_value": 0.13304357727013127,
+      "rank_biserial_r": 0.019955603806244282,
+      "cliffs_delta": 0.01995560380624431,
+      "effect_magnitude": "negligible",
+      "median_diff_stone_minus_bronze": 0.0,
+      "ci95_median_diff": [
+        -4.0,
+        5.0
+      ],
+      "ci95_cliffs_delta": [
+        -0.005871996015423051,
+        0.04663268775964741
+      ],
+      "significant_fdr_0_05": false
+    },
+    {
+      "metric": "hole_count",
+      "label": "Internal Hole Count",
+      "calibrated_only": false,
+      "stone_age_hunter": {
+        "n": 4378,
+        "mean": 5.509136592051165,
+        "std": 33.580378117320876,
+        "median": 1.0,
+        "q25": 0.0,
+        "q75": 4.0,
+        "iqr": 4.0
+      },
+      "bronze_age_agrarian": {
+        "n": 3323,
+        "mean": 6.283478784231116,
+        "std": 32.40942067920013,
+        "median": 1.0,
+        "q25": 0.0,
+        "q75": 4.0,
+        "iqr": 4.0
+      },
+      "tested": true,
+      "u_stat": 7067298.5,
+      "p_value": 0.02582070135471569,
+      "q_value": 0.030124151580501638,
+      "rank_biserial_r": -0.02842276108471664,
+      "cliffs_delta": -0.028422761084716665,
+      "effect_magnitude": "negligible",
+      "median_diff_stone_minus_bronze": 0.0,
+      "ci95_median_diff": [
+        0.0,
+        0.0
+      ],
+      "ci95_cliffs_delta": [
+        -0.052908030426528724,
+        -0.0033578213063511983
+      ],
+      "significant_fdr_0_05": true
+    },
+    {
+      "metric": "cup_marks_count",
+      "label": "Associated Cup Marks",
+      "calibrated_only": false,
+      "stone_age_hunter": {
+        "n": 4378,
+        "mean": 4.427820922795797,
+        "std": 20.042436651851443,
+        "median": 0.0,
+        "q25": 0.0,
+        "q75": 2.0,
+        "iqr": 2.0
+      },
+      "bronze_age_agrarian": {
+        "n": 3323,
+        "mean": 5.1465543183869995,
+        "std": 21.329837296025925,
+        "median": 1.0,
+        "q25": 0.0,
+        "q75": 3.0,
+        "iqr": 3.0
+      },
+      "tested": true,
+      "u_stat": 6900680.5,
+      "p_value": 3.718383462742878e-05,
+      "q_value": 0.00013014342119600073,
+      "rank_biserial_r": -0.0513285795376357,
+      "cliffs_delta": -0.05132857953763565,
+      "effect_magnitude": "negligible",
+      "median_diff_stone_minus_bronze": -1.0,
+      "ci95_median_diff": [
+        -1.0,
+        0.0
+      ],
+      "ci95_cliffs_delta": [
+        -0.07649030690893255,
+        -0.026181350629161475
+      ],
+      "significant_fdr_0_05": true
+    }
+  ],
+  "regional_iconography": {
+    "regions_compared": [
+      "Alta",
+      "Østfold",
+      "Bohuslän/Tanum",
+      "Nämforsen",
+      "Vingen",
+      "Trøndelag"
+    ],
+    "all_regions_present": [
+      "Alta",
+      "Bohuslän/Tanum",
+      "Nämforsen",
+      "Other Nordic",
+      "Trøndelag",
+      "Vingen",
+      "Østfold"
+    ],
+    "families": [
+      "animal",
+      "human",
+      "scene_or_unclassified",
+      "symbol",
+      "vessel"
+    ],
+    "classes": [
+      "acrobat_dancer",
+      "anthropomorph",
+      "bronze_age_ship",
+      "elk_moose",
+      "fish",
+      "footprint",
+      "geometric_spiral",
+      "quadruped_other",
+      "reindeer",
+      "rider",
+      "stone_age_boat",
+      "sun_wheel",
+      "unclassified_motif",
+      "whale_cetacean"
+    ],
+    "family_counts": {
+      "Alta": {
+        "animal": 2,
+        "human": 152,
+        "scene_or_unclassified": 1764,
+        "symbol": 24,
+        "vessel": 76
+      },
+      "Østfold": {
+        "animal": 0,
+        "human": 44,
+        "scene_or_unclassified": 962,
+        "symbol": 24,
+        "vessel": 75
+      },
+      "Bohuslän/Tanum": {
+        "animal": 4,
+        "human": 173,
+        "scene_or_unclassified": 748,
+        "symbol": 28,
+        "vessel": 410
+      },
+      "Nämforsen": {
+        "animal": 22,
+        "human": 20,
+        "scene_or_unclassified": 200,
+        "symbol": 0,
+        "vessel": 71
+      },
+      "Vingen": {
+        "animal": 1007,
+        "human": 58,
+        "scene_or_unclassified": 308,
+        "symbol": 7,
+        "vessel": 0
+      },
+      "Trøndelag": {
+        "animal": 93,
+        "human": 2,
+        "scene_or_unclassified": 336,
+        "symbol": 22,
+        "vessel": 32
+      }
+    },
+    "family_proportions": {
+      "Alta": {
+        "animal": 0.0009910802775024777,
+        "human": 0.0753221010901883,
+        "scene_or_unclassified": 0.8741328047571854,
+        "symbol": 0.011892963330029732,
+        "vessel": 0.03766105054509415
+      },
+      "Østfold": {
+        "animal": 0.0,
+        "human": 0.039819004524886875,
+        "scene_or_unclassified": 0.8705882352941177,
+        "symbol": 0.02171945701357466,
+        "vessel": 0.06787330316742081
+      },
+      "Bohuslän/Tanum": {
+        "animal": 0.00293470286133529,
+        "human": 0.1269258987527513,
+        "scene_or_unclassified": 0.5487894350696992,
+        "symbol": 0.020542920029347028,
+        "vessel": 0.3008070432868672
+      },
+      "Nämforsen": {
+        "animal": 0.07028753993610223,
+        "human": 0.06389776357827476,
+        "scene_or_unclassified": 0.6389776357827476,
+        "symbol": 0.0,
+        "vessel": 0.2268370607028754
+      },
+      "Vingen": {
+        "animal": 0.7297101449275363,
+        "human": 0.042028985507246375,
+        "scene_or_unclassified": 0.22318840579710145,
+        "symbol": 0.005072463768115942,
+        "vessel": 0.0
+      },
+      "Trøndelag": {
+        "animal": 0.19175257731958764,
+        "human": 0.004123711340206186,
+        "scene_or_unclassified": 0.6927835051546392,
+        "symbol": 0.04536082474226804,
+        "vessel": 0.06597938144329897
+      }
+    },
+    "diversity": {
+      "Alta": {
+        "n": 2018,
+        "richness_S": 6,
+        "shannon_h": 0.5214174657060051,
+        "effective_classes_exp_h": 1.6844135567801375,
+        "pielou_j": 0.291008628479942,
+        "simpson_1_minus_d": 0.22936239847320605,
+        "top_classes": [
+          {
+            "motif_class": "unclassified_motif",
+            "count": 1764,
+            "share": 0.8741328047571854
+          },
+          {
+            "motif_class": "anthropomorph",
+            "count": 152,
+            "share": 0.0753221010901883
+          },
+          {
+            "motif_class": "bronze_age_ship",
+            "count": 41,
+            "share": 0.020317145688800792
+          },
+          {
+            "motif_class": "stone_age_boat",
+            "count": 35,
+            "share": 0.01734390485629336
+          },
+          {
+            "motif_class": "geometric_spiral",
+            "count": 24,
+            "share": 0.011892963330029732
+          }
+        ]
+      },
+      "Østfold": {
+        "n": 1105,
+        "richness_S": 6,
+        "shannon_h": 0.5401251589134045,
+        "effective_classes_exp_h": 1.7162216491800972,
+        "pielou_j": 0.3014495908572522,
+        "simpson_1_minus_d": 0.23595749472779026,
+        "top_classes": [
+          {
+            "motif_class": "unclassified_motif",
+            "count": 962,
+            "share": 0.8705882352941177
+          },
+          {
+            "motif_class": "bronze_age_ship",
+            "count": 75,
+            "share": 0.06787330316742081
+          },
+          {
+            "motif_class": "anthropomorph",
+            "count": 35,
+            "share": 0.03167420814479638
+          },
+          {
+            "motif_class": "geometric_spiral",
+            "count": 24,
+            "share": 0.02171945701357466
+          },
+          {
+            "motif_class": "acrobat_dancer",
+            "count": 6,
+            "share": 0.005429864253393665
+          }
+        ]
+      },
+      "Bohuslän/Tanum": {
+        "n": 1363,
+        "richness_S": 6,
+        "shannon_h": 1.0638116697573863,
+        "effective_classes_exp_h": 2.8973938767339464,
+        "pielou_j": 0.5937245975408234,
+        "simpson_1_minus_d": 0.5920154766281491,
+        "top_classes": [
+          {
+            "motif_class": "unclassified_motif",
+            "count": 748,
+            "share": 0.5487894350696992
+          },
+          {
+            "motif_class": "bronze_age_ship",
+            "count": 410,
+            "share": 0.3008070432868672
+          },
+          {
+            "motif_class": "anthropomorph",
+            "count": 173,
+            "share": 0.1269258987527513
+          },
+          {
+            "motif_class": "footprint",
+            "count": 14,
+            "share": 0.010271460014673514
+          },
+          {
+            "motif_class": "sun_wheel",
+            "count": 14,
+            "share": 0.010271460014673514
+          }
+        ]
+      },
+      "Nämforsen": {
+        "n": 313,
+        "richness_S": 4,
+        "shannon_h": 0.9850807495672985,
+        "effective_classes_exp_h": 2.678028125302585,
+        "pielou_j": 0.7105855561379623,
+        "simpson_1_minus_d": 0.5312292664005962,
+        "top_classes": [
+          {
+            "motif_class": "unclassified_motif",
+            "count": 200,
+            "share": 0.6389776357827476
+          },
+          {
+            "motif_class": "stone_age_boat",
+            "count": 71,
+            "share": 0.2268370607028754
+          },
+          {
+            "motif_class": "elk_moose",
+            "count": 22,
+            "share": 0.07028753993610223
+          },
+          {
+            "motif_class": "anthropomorph",
+            "count": 20,
+            "share": 0.06389776357827476
+          }
+        ]
+      },
+      "Vingen": {
+        "n": 1380,
+        "richness_S": 6,
+        "shannon_h": 0.7372157248616247,
+        "effective_classes_exp_h": 2.0901079698582286,
+        "pielou_j": 0.41144793010595326,
+        "simpson_1_minus_d": 0.4180350766645662,
+        "top_classes": [
+          {
+            "motif_class": "quadruped_other",
+            "count": 1005,
+            "share": 0.7282608695652174
+          },
+          {
+            "motif_class": "unclassified_motif",
+            "count": 308,
+            "share": 0.22318840579710145
+          },
+          {
+            "motif_class": "anthropomorph",
+            "count": 58,
+            "share": 0.042028985507246375
+          },
+          {
+            "motif_class": "geometric_spiral",
+            "count": 6,
+            "share": 0.004347826086956522
+          },
+          {
+            "motif_class": "fish",
+            "count": 2,
+            "share": 0.0014492753623188406
+          }
+        ]
+      },
+      "Trøndelag": {
+        "n": 485,
+        "richness_S": 10,
+        "shannon_h": 1.0964219997059204,
+        "effective_classes_exp_h": 2.993436323911106,
+        "pielou_j": 0.47617002430961,
+        "simpson_1_minus_d": 0.49200552662344565,
+        "top_classes": [
+          {
+            "motif_class": "unclassified_motif",
+            "count": 336,
+            "share": 0.6927835051546392
+          },
+          {
+            "motif_class": "elk_moose",
+            "count": 72,
+            "share": 0.14845360824742268
+          },
+          {
+            "motif_class": "stone_age_boat",
+            "count": 29,
+            "share": 0.05979381443298969
+          },
+          {
+            "motif_class": "footprint",
+            "count": 20,
+            "share": 0.041237113402061855
+          },
+          {
+            "motif_class": "fish",
+            "count": 9,
+            "share": 0.018556701030927835
+          }
+        ]
+      }
+    },
+    "jaccard_similarity_matrix": [
+      [
+        1.0,
+        0.5,
+        0.3333333333333333,
+        0.42857142857142855,
+        0.3333333333333333,
+        0.6
+      ],
+      [
+        0.5,
+        1.0,
+        0.3333333333333333,
+        0.25,
+        0.3333333333333333,
+        0.3333333333333333
+      ],
+      [
+        0.3333333333333333,
+        0.3333333333333333,
+        1.0,
+        0.25,
+        0.5,
+        0.3333333333333333
+      ],
+      [
+        0.42857142857142855,
+        0.25,
+        0.25,
+        1.0,
+        0.25,
+        0.4
+      ],
+      [
+        0.3333333333333333,
+        0.3333333333333333,
+        0.5,
+        0.25,
+        1.0,
+        0.45454545454545453
+      ],
+      [
+        0.6,
+        0.3333333333333333,
+        0.3333333333333333,
+        0.4,
+        0.45454545454545453,
+        1.0
+      ]
+    ],
+    "jaccard_distance_matrix": [
+      [
+        0.0,
+        0.5,
+        0.6666666666666667,
+        0.5714285714285714,
+        0.6666666666666667,
+        0.4
+      ],
+      [
+        0.5,
+        0.0,
+        0.6666666666666667,
+        0.75,
+        0.6666666666666667,
+        0.6666666666666667
+      ],
+      [
+        0.6666666666666667,
+        0.6666666666666667,
+        0.0,
+        0.75,
+        0.5,
+        0.6666666666666667
+      ],
+      [
+        0.5714285714285714,
+        0.75,
+        0.75,
+        0.0,
+        0.75,
+        0.6
+      ],
+      [
+        0.6666666666666667,
+        0.6666666666666667,
+        0.5,
+        0.75,
+        0.0,
+        0.5454545454545454
+      ],
+      [
+        0.4,
+        0.6666666666666667,
+        0.6666666666666667,
+        0.6,
+        0.5454545454545454,
+        0.0
+      ]
+    ],
+    "bray_curtis_matrix": [
+      [
+        0.0,
+        0.06552744754225545,
+        0.3555713181513117,
+        0.2797806957826843,
+        0.7304347826086957,
+        0.27444852002084336
+      ],
+      [
+        0.06552744754225545,
+        0.0,
+        0.3516630536180836,
+        0.3293481560724561,
+        0.7407895599711456,
+        0.29278350515463913
+      ],
+      [
+        0.3555713181513117,
+        0.3516630536180836,
+        0.0,
+        0.387312801352026,
+        0.7311232681531576,
+        0.43062982656511173
+      ],
+      [
+        0.2797806957826843,
+        0.3293481560724561,
+        0.387312801352026,
+        0.0,
+        0.7347826086956522,
+        0.22681729850795426
+      ],
+      [
+        0.7304347826086957,
+        0.7407895599711456,
+        0.7311232681531576,
+        0.7347826086956522,
+        0.0,
+        0.766390258479008
+      ],
+      [
+        0.27444852002084336,
+        0.29278350515463913,
+        0.43062982656511173,
+        0.22681729850795426,
+        0.766390258479008,
+        0.0
+      ]
+    ],
+    "bray_curtis_raw_counts_matrix": [
+      [
+        0.0,
+        0.31988472622478387,
+        0.44335995267672285,
+        0.7812097812097812,
+        0.7810476751030018,
+        0.7011586096683979
+      ],
+      [
+        0.31988472622478387,
+        0.0,
+        0.3047001620745543,
+        0.689703808180536,
+        0.7191146881287727,
+        0.5685534591194968
+      ],
+      [
+        0.44335995267672285,
+        0.3047001620745543,
+        0.0,
+        0.7374701670644391,
+        0.7294932555596063,
+        0.6158008658008658
+      ],
+      [
+        0.7812097812097812,
+        0.689703808180536,
+        0.7374701670644391,
+        0.0,
+        0.7401063201417601,
+        0.3659147869674185
+      ],
+      [
+        0.7810476751030018,
+        0.7191146881287727,
+        0.7294932555596063,
+        0.7401063201417601,
+        0.0,
+        0.6621983914209115
+      ],
+      [
+        0.7011586096683979,
+        0.5685534591194968,
+        0.6158008658008658,
+        0.3659147869674185,
+        0.6621983914209115,
+        0.0
+      ]
+    ],
+    "contingency_chi2": {
+      "tested": true,
+      "chi2": 4990.871556778164,
+      "dof": 20,
+      "p_value": 0.0,
+      "min_expected_count": 4.93172268907563,
+      "cramers_v": 0.4327037975448621,
+      "sparse_cells_warning": true
+    }
+  },
+  "dual_trace_reliability": {
+    "overall": {
+      "n": 397,
+      "mean_iou": 0.603915919395466,
+      "std_iou": 0.25144430823024694,
+      "median_iou": 0.65609,
+      "q25_iou": 0.43379,
+      "q75_iou": 0.80477,
+      "min_iou": 0.0,
+      "max_iou": 0.97797,
+      "mean_boundary_dist": 14.020319899244333,
+      "median_boundary_dist": 6.884,
+      "coverage_pct": 5.0037811948575746
+    },
+    "report_summary_raw": {},
+    "by_archive": {
+      "shfa": {
+        "n": 191,
+        "mean_iou": 0.5747349738219895,
+        "std_iou": 0.258005131882609,
+        "median_iou": 0.59094,
+        "q25_iou": 0.342335,
+        "q75_iou": 0.806485,
+        "min_iou": 0.00639,
+        "max_iou": 0.97365,
+        "mean_boundary_dist": 18.337214659685863,
+        "median_boundary_dist": 9.42
+      },
+      "altarockart": {
+        "n": 89,
+        "mean_iou": 0.6276342696629214,
+        "std_iou": 0.26045565617118555,
+        "median_iou": 0.73008,
+        "q25_iou": 0.50642,
+        "q75_iou": 0.82375,
+        "min_iou": 0.0,
+        "max_iou": 0.95027,
+        "mean_boundary_dist": 8.311775280898877,
+        "median_boundary_dist": 3.358
+      },
+      "unimus": {
+        "n": 88,
+        "mean_iou": 0.6411759090909092,
+        "std_iou": 0.23530326534479432,
+        "median_iou": 0.710655,
+        "q25_iou": 0.5507925,
+        "q75_iou": 0.8030299999999999,
+        "min_iou": 0.0,
+        "max_iou": 0.97797,
+        "mean_boundary_dist": 12.414875,
+        "median_boundary_dist": 5.041499999999999
+      },
+      "wikimedia": {
+        "n": 25,
+        "mean_iou": 0.6364012,
+        "std_iou": 0.17656163105556089,
+        "median_iou": 0.71579,
+        "q25_iou": 0.53156,
+        "q75_iou": 0.75743,
+        "min_iou": 0.16867,
+        "max_iou": 0.86047,
+        "mean_boundary_dist": 7.3606799999999994,
+        "median_boundary_dist": 4.114
+      },
+      "zenodo_shfa": {
+        "n": 2,
+        "mean_iou": 0.162785,
+        "std_iou": 0.04623771242178833,
+        "median_iou": 0.162785,
+        "q25_iou": 0.1464375,
+        "q75_iou": 0.1791325,
+        "min_iou": 0.13009,
+        "max_iou": 0.19548,
+        "mean_boundary_dist": 10.9105,
+        "median_boundary_dist": 10.9105
+      },
+      "digitaltmuseum": {
+        "n": 1,
+        "mean_iou": 0.54446,
+        "std_iou": 0.0,
+        "median_iou": 0.54446,
+        "q25_iou": 0.54446,
+        "q75_iou": 0.54446,
+        "min_iou": 0.54446,
+        "max_iou": 0.54446,
+        "mean_boundary_dist": 22.831,
+        "median_boundary_dist": 22.831
+      },
+      "europeana": {
+        "n": 1,
+        "mean_iou": 0.91725,
+        "std_iou": 0.0,
+        "median_iou": 0.91725,
+        "q25_iou": 0.91725,
+        "q75_iou": 0.91725,
+        "min_iou": 0.91725,
+        "max_iou": 0.91725,
+        "mean_boundary_dist": 2.733,
+        "median_boundary_dist": 2.733
+      }
+    },
+    "by_family": {
+      "scene_or_unclassified": {
+        "n": 259,
+        "mean_iou": 0.6203062162162163,
+        "std_iou": 0.23346938044753904,
+        "median_iou": 0.66144,
+        "q25_iou": 0.46441,
+        "q75_iou": 0.80321,
+        "min_iou": 0.0,
+        "max_iou": 0.97797,
+        "mean_boundary_dist": 10.867621621621621,
+        "median_boundary_dist": 5.581
+      },
+      "animal": {
+        "n": 67,
+        "mean_iou": 0.6084177611940299,
+        "std_iou": 0.2915641416713451,
+        "median_iou": 0.71914,
+        "q25_iou": 0.37326,
+        "q75_iou": 0.838195,
+        "min_iou": 0.0048,
+        "max_iou": 0.97365,
+        "mean_boundary_dist": 13.515343283582089,
+        "median_boundary_dist": 9.072
+      },
+      "vessel": {
+        "n": 38,
+        "mean_iou": 0.4976505263157893,
+        "std_iou": 0.2543386647328595,
+        "median_iou": 0.506625,
+        "q25_iou": 0.2987875,
+        "q75_iou": 0.7043725,
+        "min_iou": 5e-05,
+        "max_iou": 0.90279,
+        "mean_boundary_dist": 34.60963157894737,
+        "median_boundary_dist": 10.1645
+      },
+      "human": {
+        "n": 26,
+        "mean_iou": 0.5776592307692308,
+        "std_iou": 0.3099821916810458,
+        "median_iou": 0.73367,
+        "q25_iou": 0.31716500000000003,
+        "q75_iou": 0.83993,
+        "min_iou": 0.0,
+        "max_iou": 0.95638,
+        "mean_boundary_dist": 17.175615384615387,
+        "median_boundary_dist": 9.7055
+      },
+      "symbol": {
+        "n": 7,
+        "mean_iou": 0.62878,
+        "std_iou": 0.0867255346865424,
+        "median_iou": 0.64512,
+        "q25_iou": 0.6278349999999999,
+        "q75_iou": 0.65956,
+        "min_iou": 0.44983,
+        "max_iou": 0.73172,
+        "mean_boundary_dist": 12.013285714285713,
+        "median_boundary_dist": 4.998
+      }
+    },
+    "by_complexity": {
+      "medium (12.64 < P/√A ≤ 19.63)": {
+        "n": 133,
+        "mean_iou": 0.6150992481203007,
+        "std_iou": 0.24550237695456123,
+        "median_iou": 0.69588,
+        "q25_iou": 0.47549,
+        "q75_iou": 0.80285,
+        "min_iou": 0.0,
+        "max_iou": 0.94336,
+        "mean_boundary_dist": 11.091924812030074,
+        "median_boundary_dist": 6.902
+      },
+      "high (P/√A > 19.63)": {
+        "n": 132,
+        "mean_iou": 0.5215953030303031,
+        "std_iou": 0.2413116749608824,
+        "median_iou": 0.547285,
+        "q25_iou": 0.32120000000000004,
+        "q75_iou": 0.7209399999999999,
+        "min_iou": 0.0048,
+        "max_iou": 0.95027,
+        "mean_boundary_dist": 23.270909090909093,
+        "median_boundary_dist": 13.5185
+      },
+      "low (P/√A ≤ 12.64)": {
+        "n": 132,
+        "mean_iou": 0.6749684848484849,
+        "std_iou": 0.24518437867716025,
+        "median_iou": 0.7490950000000001,
+        "q25_iou": 0.5437175,
+        "q75_iou": 0.859825,
+        "min_iou": 0.0,
+        "max_iou": 0.97797,
+        "mean_boundary_dist": 7.7203106060606075,
+        "median_boundary_dist": 5.03
+      }
+    },
+    "by_period": {
+      "stone_age_hunter": {
+        "n": 224,
+        "mean_iou": 0.6025461160714285,
+        "std_iou": 0.2661756851441872,
+        "median_iou": 0.69181,
+        "q25_iou": 0.417775,
+        "q75_iou": 0.8083425,
+        "min_iou": 0.0,
+        "max_iou": 0.97365,
+        "mean_boundary_dist": 11.84109375,
+        "median_boundary_dist": 6.811
+      },
+      "bronze_age_agrarian": {
+        "n": 162,
+        "mean_iou": 0.6158835185185185,
+        "std_iou": 0.23246591875893882,
+        "median_iou": 0.65619,
+        "q25_iou": 0.45648500000000003,
+        "q75_iou": 0.8050725,
+        "min_iou": 0.0,
+        "max_iou": 0.97797,
+        "mean_boundary_dist": 17.286685185185185,
+        "median_boundary_dist": 6.809
+      },
+      "mixed": {
+        "n": 11,
+        "mean_iou": 0.45556,
+        "std_iou": 0.1646602313857235,
+        "median_iou": 0.40754,
+        "q25_iou": 0.29756499999999997,
+        "q75_iou": 0.59194,
+        "min_iou": 0.26597,
+        "max_iou": 0.72148,
+        "mean_boundary_dist": 10.292636363636364,
+        "median_boundary_dist": 7.414
+      }
+    },
+    "kruskal_wallis": {
+      "archive": {
+        "groups": [
+          "shfa",
+          "altarockart",
+          "unimus",
+          "wikimedia"
+        ],
+        "H": 5.155065182786487,
+        "p_value": 0.16078833789007016
+      },
+      "family": {
+        "groups": [
+          "scene_or_unclassified",
+          "animal",
+          "vessel",
+          "human",
+          "symbol"
+        ],
+        "H": 8.207976078305741,
+        "p_value": 0.08425007356800636
+      },
+      "complexity": {
+        "groups": [
+          "medium (12.64 < P/√A ≤ 19.63)",
+          "high (P/√A > 19.63)",
+          "low (P/√A ≤ 12.64)"
+        ],
+        "H": 31.097849484717887,
+        "p_value": 1.7668016040062609e-07
+      },
+      "period": {
+        "groups": [
+          "stone_age_hunter",
+          "bronze_age_agrarian",
+          "mixed"
+        ],
+        "H": 5.897071033087638,
+        "p_value": 0.052416412736096506
+      }
+    },
+    "disagreement_count": 385,
+    "disagreement_breakdown": {
+      "major": 195,
+      "moderate": 169,
+      "minor": 21
+    }
+  }
+}

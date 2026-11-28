@@ -10,6 +10,21 @@ pathnet/generated/
 # (Recreate from manifests via fetch_*.py and python -m hellerisninger.pipeline.run_pipeline)
 hellerisninger/sources/*/raw/
 /hellerisninger/processed/
+helleristninger/sources/*/raw/
+helleristninger/sources/*/quarantine_raw/
+helleristninger/sources/**/raw/
+helleristninger/sources/**/quarantine_raw/
+/helleristninger/jigsaw_corpus/processed/masks/
+/helleristninger/jigsaw_corpus/processed/sdf/
+/helleristninger/jigsaw_corpus/processed/contact_sheets/
+/helleristninger/jigsaw_corpus/processed/figma_sheets/
+/helleristninger/jigsaw_corpus/masks/
+/helleristninger/jigsaw_corpus/sdf/
+/helleristninger/jigsaw_corpus/contact_sheets/
+/helleristninger/jigsaw_corpus/figma_sheets/
+/helleristninger/puzzle_750/weakest_review_packet/
+/helleristninger/puzzle_750/*.png
+/helleristninger/puzzle_750/partition.json
 resources/*.zip
 
 /runs/

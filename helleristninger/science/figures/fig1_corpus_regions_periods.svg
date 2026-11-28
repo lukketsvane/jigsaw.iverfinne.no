@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="680" viewBox="0 0 1280 680">
+<rect width="1280" height="680" fill="#FAF8F4"/>
+<text x="48.0" y="46.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="22" font-weight="700" fill="#1C252C">Nordic Rock-Art Scientific Corpus — Geographic, Chronological &amp; Archival Coverage</text>
+<text x="48.0" y="72.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="13" fill="#5C666E">N = 7934 traced figures (painted_photo excluded) · Release v2026.W48</text>
+<rect x="48.0" y="102.0" width="650.0" height="510.0" rx="8.0" fill="#FFFFFF" stroke="#D8D2C5" stroke-width="1.0"/>
+<text x="68.0" y="134.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="15" font-weight="700" fill="#1C252C">A. Regional Distribution by Tradition / Period</text>
+<rect x="68.0" y="154.0" width="12.0" height="12.0" rx="2.0" fill="#2D5B75"/>
+<text x="85.0" y="164.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" fill="#1C252C">Stone Age (veideristninger)</text>
+<rect x="233.0" y="154.0" width="12.0" height="12.0" rx="2.0" fill="#B85D3B"/>
+<text x="250.0" y="164.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" fill="#1C252C">Bronze Age (jordbruksristninger)</text>
+<rect x="428.0" y="154.0" width="12.0" height="12.0" rx="2.0" fill="#C98A2C"/>
+<text x="445.0" y="164.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" fill="#1C252C">Mixed</text>
+<rect x="518.0" y="154.0" width="12.0" height="12.0" rx="2.0" fill="#7D8790"/>
+<text x="535.0" y="164.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" fill="#1C252C">Undated</text>
+<text x="211.0" y="215.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="12" font-weight="700" text-anchor="end" fill="#1C252C">Alta</text>
+<rect x="223.0" y="200.0" width="405.0" height="22.0" rx="3.0" fill="#EAE5DA"/>
+<rect x="223.0" y="200.0" width="396.8" height="22.0" fill="#2D5B75"/>
+<rect x="619.8" y="200.0" width="8.2" height="22.0" fill="#C98A2C"/>
+<text x="636.0" y="215.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" fill="#1C252C">2018</text>
+<text x="211.0" y="267.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="12" font-weight="700" text-anchor="end" fill="#1C252C">Østfold</text>
+<rect x="223.0" y="252.0" width="405.0" height="22.0" rx="3.0" fill="#EAE5DA"/>
+<rect x="223.0" y="252.0" width="221.8" height="22.0" fill="#B85D3B"/>
+<text x="452.8" y="267.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" fill="#1C252C">1105</text>
+<text x="211.0" y="319.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="12" font-weight="700" text-anchor="end" fill="#1C252C">Bohuslän/Tanum</text>
+<rect x="223.0" y="304.0" width="405.0" height="22.0" rx="3.0" fill="#EAE5DA"/>
+<rect x="223.0" y="304.0" width="4.6" height="22.0" fill="#2D5B75"/>
+<rect x="227.6" y="304.0" width="268.9" height="22.0" fill="#B85D3B"/>
+<text x="504.5" y="319.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" fill="#1C252C">1363</text>
+<text x="211.0" y="371.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="12" font-weight="700" text-anchor="end" fill="#1C252C">Nämforsen</text>
+<rect x="223.0" y="356.0" width="405.0" height="22.0" rx="3.0" fill="#EAE5DA"/>
+<rect x="223.0" y="356.0" width="62.8" height="22.0" fill="#2D5B75"/>
+<text x="293.8" y="371.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" fill="#1C252C">313</text>
+<text x="211.0" y="423.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="12" font-weight="700" text-anchor="end" fill="#1C252C">Vingen</text>
+<rect x="223.0" y="408.0" width="405.0" height="22.0" rx="3.0" fill="#EAE5DA"/>
+<rect x="223.0" y="408.0" width="277.0" height="22.0" fill="#2D5B75"/>
+<text x="508.0" y="423.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" fill="#1C252C">1380</text>
+<text x="211.0" y="475.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="12" font-weight="700" text-anchor="end" fill="#1C252C">Trøndelag</text>
+<rect x="223.0" y="460.0" width="405.0" height="22.0" rx="3.0" fill="#EAE5DA"/>
+<rect x="223.0" y="460.0" width="14.4" height="22.0" fill="#2D5B75"/>
+<rect x="237.4" y="460.0" width="50.2" height="22.0" fill="#B85D3B"/>
+<rect x="287.6" y="460.0" width="32.7" height="22.0" fill="#C98A2C"/>
+<text x="328.3" y="475.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" fill="#1C252C">485</text>
+<text x="211.0" y="527.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="12" font-weight="700" text-anchor="end" fill="#1C252C">Other Nordic</text>
+<rect x="223.0" y="512.0" width="405.0" height="22.0" rx="3.0" fill="#EAE5DA"/>
+<rect x="223.0" y="512.0" width="123.0" height="22.0" fill="#2D5B75"/>
+<rect x="346.0" y="512.0" width="126.0" height="22.0" fill="#B85D3B"/>
+<rect x="472.1" y="512.0" width="2.6" height="22.0" fill="#C98A2C"/>
+<rect x="474.7" y="512.0" width="3.2" height="22.0" fill="#7D8790"/>
+<text x="485.9" y="527.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" fill="#1C252C">1270</text>
+<rect x="720.0" y="102.0" width="512.0" height="235.0" rx="8.0" fill="#FFFFFF" stroke="#D8D2C5" stroke-width="1.0"/>
+<text x="740.0" y="134.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="15" font-weight="700" fill="#1C252C">B. Measurement &amp; Provenance Coverage</text>
+<text x="740.0" y="162.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="12" fill="#1C252C">Physical Scale Calibrated (mm)</text>
+<text x="1212.0" y="162.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="12" font-weight="700" text-anchor="end" fill="#1C252C">0/7934 (0.0%)</text>
+<rect x="740.0" y="169.0" width="472.0" height="12.0" rx="4.0" fill="#EAE5DA"/>
+<text x="740.0" y="204.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="12" fill="#1C252C">Verified Coordinates (EPSG:4326)</text>
+<text x="1212.0" y="204.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="12" font-weight="700" text-anchor="end" fill="#1C252C">7312/7934 (92.2%)</text>
+<rect x="740.0" y="211.0" width="472.0" height="12.0" rx="4.0" fill="#EAE5DA"/>
+<rect x="740.0" y="211.0" width="435.0" height="12.0" rx="4.0" fill="#2D5B75"/>
+<text x="740.0" y="246.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="12" fill="#1C252C">Askeladden / RAÄ FMIS ID</text>
+<text x="1212.0" y="246.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="12" font-weight="700" text-anchor="end" fill="#1C252C">7209/7934 (90.9%)</text>
+<rect x="740.0" y="253.0" width="472.0" height="12.0" rx="4.0" fill="#EAE5DA"/>
+<rect x="740.0" y="253.0" width="428.9" height="12.0" rx="4.0" fill="#B85D3B"/>
+<text x="740.0" y="288.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="12" fill="#1C252C">Commercial-Eligible Licence</text>
+<text x="1212.0" y="288.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="12" font-weight="700" text-anchor="end" fill="#1C252C">6261/7934 (78.9%)</text>
+<rect x="740.0" y="295.0" width="472.0" height="12.0" rx="4.0" fill="#EAE5DA"/>
+<rect x="740.0" y="295.0" width="372.5" height="12.0" rx="4.0" fill="#C98A2C"/>
+<rect x="720.0" y="355.0" width="512.0" height="257.0" rx="8.0" fill="#FFFFFF" stroke="#D8D2C5" stroke-width="1.0"/>
+<text x="740.0" y="387.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="15" font-weight="700" fill="#1C252C">C. Licence Distribution</text>
+<text x="740.0" y="427.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" fill="#1C252C">CC BY 4.0</text>
+<rect x="915.0" y="415.0" width="242.0" height="15.0" rx="3.0" fill="#EAE5DA"/>
+<rect x="915.0" y="415.0" width="242.0" height="15.0" rx="3.0" fill="#2D5B75"/>
+<text x="1165.0" y="427.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" fill="#1C252C">4018</text>
+<text x="740.0" y="458.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" fill="#1C252C">CC BY-SA 4.0</text>
+<rect x="915.0" y="446.0" width="242.0" height="15.0" rx="3.0" fill="#EAE5DA"/>
+<rect x="915.0" y="446.0" width="109.1" height="15.0" rx="3.0" fill="#2D5B75"/>
+<text x="1165.0" y="458.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" fill="#1C252C">1812</text>
+<text x="740.0" y="489.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" fill="#1C252C">Alta Museum Open Non-...</text>
+<rect x="915.0" y="477.0" width="242.0" height="15.0" rx="3.0" fill="#EAE5DA"/>
+<rect x="915.0" y="477.0" width="100.8" height="15.0" rx="3.0" fill="#6D4C6E"/>
+<text x="1165.0" y="489.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" fill="#1C252C">1673</text>
+<text x="740.0" y="520.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" fill="#1C252C">Public domain</text>
+<rect x="915.0" y="508.0" width="242.0" height="15.0" rx="3.0" fill="#EAE5DA"/>
+<rect x="915.0" y="508.0" width="23.9" height="15.0" rx="3.0" fill="#2D5B75"/>
+<text x="1165.0" y="520.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" fill="#1C252C">396</text>
+<text x="740.0" y="551.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" fill="#1C252C">CC BY 3.0</text>
+<rect x="915.0" y="539.0" width="242.0" height="15.0" rx="3.0" fill="#EAE5DA"/>
+<rect x="915.0" y="539.0" width="1.1" height="15.0" rx="3.0" fill="#2D5B75"/>
+<text x="1165.0" y="551.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" fill="#1C252C">19</text>
+<text x="740.0" y="582.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" fill="#1C252C">CC BY-SA 3.0</text>
+<rect x="915.0" y="570.0" width="242.0" height="15.0" rx="3.0" fill="#EAE5DA"/>
+<rect x="915.0" y="570.0" width="1.0" height="15.0" rx="3.0" fill="#2D5B75"/>
+<text x="1165.0" y="582.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" fill="#1C252C">16</text>
+<text x="48.0" y="662.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" fill="#5C666E">Source: helleristninger/scientific_record/figures.jsonl. Scale-calibrated metrics strictly reflect verified archival scale bars.</text>
+</svg>

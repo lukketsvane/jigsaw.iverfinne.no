@@ -1,0 +1,965 @@
+{
+  "schema_version": "2.0.0",
+  "domain": "nordic_helleristninger",
+  "description": "Hierarchical motif taxonomy and scientific period/layer specification for Norwegian and Swedish prehistoric rock carvings (helleristninger / hällristningar), preserving v1.0.0 families/classes and adding chronological, tradition, and multi-layer SVG documentation metadata.",
+  "quarantine_policy": {
+    "exclude_media_types": [
+      "painted_photo"
+    ],
+    "rule": "Trace what is carved, not the modern paint. All painted_photo records are quarantined at archive ingestion and strictly excluded from scientific tracing.",
+    "allowed_traceable_media_types": [
+      "bw_tracing",
+      "svg_vector",
+      "rubbing_frottage",
+      "rti_3d"
+    ]
+  },
+  "periods": {
+    "stone_age_hunter": {
+      "label": "Stone Age Hunter-Gatherer Tradition (Veideristninger)",
+      "norwegian_term": "Veideristninger / Fangstfolkets bergkunst",
+      "swedish_term": "Nordsvenska hällristningar / Jägare-samlartradition",
+      "chronological_span_bce": [
+        -7000,
+        -1800
+      ],
+      "dating_basis": [
+        "Post-glacial isostatic shore-displacement curves (e.g. Alta Phases I-V, Helskog 1988, 2012; Vingen, Lødøen & Mandt 2010, 2012)",
+        "Stratigraphic superposition & stylistic seriation (Gjessing 1932, 1936; Hallström 1938, 1960)"
+      ],
+      "core_regions": [
+        "Alta (Finnmark, NO)",
+        "Nämforsen (Ångermanland, SE)",
+        "Vingen (Vestland, NO)",
+        "Trøndelag northern sites (Bøla, Evenhus, Holtås, Bardal lower phases, NO)",
+        "Nordland (Leiknes, Rødøy, Skjomen, NO)"
+      ],
+      "characteristic_motifs": [
+        "reindeer",
+        "elk_moose",
+        "bear",
+        "whale_cetacean",
+        "fish",
+        "skier",
+        "stone_age_boat",
+        "quadruped_other"
+      ],
+      "key_literature_ids": [
+        "helskog_1988",
+        "helskog_2012",
+        "hallstrom_1938",
+        "hallstrom_1960",
+        "gjessing_1932",
+        "gjessing_1936",
+        "lodoen_mandt_2010",
+        "lodoen_mandt_2012"
+      ]
+    },
+    "bronze_age_agrarian": {
+      "label": "Bronze Age Agrarian Tradition (Jordbruksristninger)",
+      "norwegian_term": "Jordbruksristninger",
+      "swedish_term": "Sydskandinaviska hällristningar / Bronsålderstradition",
+      "chronological_span_bce": [
+        -1800,
+        -500
+      ],
+      "dating_basis": [
+        "Bronze artefact typology (curved bronze lurs, socketed/flanged axes, horned helmets, Hjortspring-precursor ship prows; Marstrander 1963; Kaul 1998; Ling 2008)",
+        "Shoreline elevation models in Bohuslän and Østfold (Ling 2008; Vogt 2011)"
+      ],
+      "core_regions": [
+        "Bohuslän / Tanum (Västra Götaland, SE)",
+        "Østfold (Sarpsborg, Fredrikstad, Skjeberg, Halden, NO)",
+        "Rogaland (Austre Åmøy, Revheim, NO)",
+        "Trøndelag agrarian sites (Leirfall, Hegra, Bardal upper phases, NO)",
+        "Östergötland (Himmelstalund), Skåne (Kivik, Simrishamn), Uppland (Boglösa), SE"
+      ],
+      "characteristic_motifs": [
+        "bronze_age_ship",
+        "sun_wheel",
+        "footprint",
+        "horse",
+        "lur_blower",
+        "acrobat_dancer",
+        "rider",
+        "chariot_plough",
+        "axe_weapon",
+        "tree"
+      ],
+      "key_literature_ids": [
+        "marstrander_1963",
+        "vogt_2011",
+        "ling_2008",
+        "milstreu_prohl_1996",
+        "bertilsson_1987",
+        "kaul_1998",
+        "sognnes_2001"
+      ]
+    },
+    "mixed": {
+      "label": "Multi-Period / Transitional Panel",
+      "norwegian_term": "Flerperiodefelt",
+      "swedish_term": "Flerperiodslokal",
+      "chronological_span_bce": [
+        -5000,
+        500
+      ],
+      "dating_basis": [
+        "Panels exhibiting superimposed or co-occurring hunter-gatherer and agrarian carvings (e.g. Bardal, Hell, Nämforsen Bronze Age ships alongside Stone Age elks, Alta Phase IV-V)"
+      ],
+      "core_regions": [
+        "Bardal (Steinkjer, Trøndelag, NO)",
+        "Nämforsen (Ångermanland, SE)",
+        "Alta late phases (Finnmark, NO)"
+      ],
+      "characteristic_motifs": [
+        "elk_moose",
+        "bronze_age_ship",
+        "stone_age_boat",
+        "anthropomorph",
+        "multi_motif_panel"
+      ],
+      "key_literature_ids": [
+        "gjessing_1936",
+        "hallstrom_1960",
+        "sognnes_2001",
+        "helskog_2012"
+      ]
+    },
+    "unknown": {
+      "label": "Undetermined / Unverified Chronology",
+      "norwegian_term": "Ubestemt datering",
+      "swedish_term": "Obestämd datering",
+      "chronological_span_bce": null,
+      "dating_basis": [
+        "Insufficient diagnostic typology, elevation metadata, or archival provenance to assign period."
+      ],
+      "core_regions": [],
+      "characteristic_motifs": [
+        "unclassified_motif",
+        "geometric_spiral"
+      ],
+      "key_literature_ids": []
+    }
+  },
+  "scientific_svg_layers": {
+    "figures": {
+      "svg_group_id": "figures",
+      "description": "Primary closed solid exterior silhouette <path> of the carved figure, preserved at true physical scale (mm) when calibrated or documented pixel-space when uncalibrated.",
+      "required": true,
+      "styling": "solid fill, closed CCW simple polygon"
+    },
+    "cup_marks": {
+      "svg_group_id": "cup_marks",
+      "description": "Isolated circular pecked depressions (skålgroper / älvkvarnar) adjacent to or associated with the figure.",
+      "required": false,
+      "styling": "separate circular/elliptical <path> or <circle> elements"
+    },
+    "cracks": {
+      "svg_group_id": "cracks",
+      "description": "Linear geological fissures, glacial striations, and bedrock fractures excluded from the archaeological figure silhouette.",
+      "required": false,
+      "styling": "open stroke <path> elements clearly distinguished from pecked grooves"
+    },
+    "uncertain": {
+      "svg_group_id": "uncertain",
+      "description": "Weathered, exfoliated, or low-confidence pecked edges where boundary continuity is uncertain.",
+      "required": false,
+      "styling": "stroke-dasharray=\"2 2\" open/dashed <path> elements"
+    },
+    "scale_bar": {
+      "svg_group_id": "scale_bar",
+      "description": "Verified physical metric scale bar (e.g. 100 mm / 10 cm) included whenever scale_calibrated is true.",
+      "required": false,
+      "styling": "labeled <rect> / <line> + <text> group present only when physical scale is calibrated"
+    }
+  },
+  "render_styles": {
+    "solid_pecked": "Filled pecked figure (e.g. Bronze Age ships/animals, filled Stone Age fauna); close micro-gaps, fill internal micro-holes, smooth cleanly.",
+    "outline_enclosed": "Contour/outline-carved figure (e.g. Stone Age contour reindeer, elk, whales, boats); close small outline breaks and flood-fill enclosed interior into a solid silhouette.",
+    "linear_motif": "Stick/line carving (e.g. Bronze Age ships with crew strokes, warriors, skiers, sun crosses, chariots); apply controlled morphological stroke-envelope thickening and rounded closing into a single connected laser-cuttable exterior silhouette."
+  },
+  "jigsaw_tiers": {
+    "A_ready": "Solid iconic silhouette with strong necks that survives conservative laser kerf/neck erosion without needing heavy thickening.",
+    "B_thickened": "Recognizable linear or thin-appendage motif made laser-cuttable via controlled stroke-envelope thickening and surviving kerf/neck erosion.",
+    "C_fragile_or_review": "Motif retained separately for manual Figma cleanup or visual review (e.g., borderline thin necks, partial contour, or ambiguous multi-figure fragment)."
+  },
+  "families": {
+    "animal": {
+      "label": "Animals & Fauna",
+      "description": "Game animals, marine fauna, birds, domesticates, and reptiles from both Hunter-Gatherer (veideristninger) and Agrarian Bronze Age (jordbruksristninger) rock art.",
+      "classes": {
+        "reindeer": {
+          "label": "Reindeer",
+          "typical_period": "stone_age_hunter",
+          "tradition": "veideristning",
+          "typical_render_styles": [
+            "outline_enclosed",
+            "solid_pecked"
+          ],
+          "keywords": [
+            "reindeer",
+            "rein",
+            "reinsdyr",
+            "bølareinen",
+            "bolareinen",
+            "ren",
+            "renar",
+            "caribou",
+            "bøla",
+            "bola",
+            "alta",
+            "corral",
+            "antler",
+            "gevir"
+          ],
+          "description": "Reindeer (Rangifer tarandus), often shown with branching antlers, characteristic muzzle, and sometimes internal life-line/heart patterns."
+        },
+        "elk_moose": {
+          "label": "Elk / Moose",
+          "typical_period": "stone_age_hunter",
+          "tradition": "veideristning",
+          "typical_render_styles": [
+            "outline_enclosed",
+            "solid_pecked"
+          ],
+          "keywords": [
+            "elk",
+            "moose",
+            "elg",
+            "älg",
+            "alg",
+            "alces",
+            "nämforsen",
+            "namforsen",
+            "leiknes",
+            "vingen",
+            "skavberget",
+            "møllerstufossen",
+            "bøla",
+            "elgku",
+            "elgokse"
+          ],
+          "description": "Eurasian elk/moose (Alces alces), iconic in Norwegian/Swedish hunter-gatherer rock art with bell/dewlap, heavy muzzle, and humped shoulders."
+        },
+        "bear": {
+          "label": "Bear",
+          "typical_period": "stone_age_hunter",
+          "tradition": "veideristning",
+          "typical_render_styles": [
+            "solid_pecked",
+            "outline_enclosed"
+          ],
+          "keywords": [
+            "bear",
+            "bjørn",
+            "bjorn",
+            "björn",
+            "ursus",
+            "bjørnespor",
+            "bear track",
+            "hi",
+            "den"
+          ],
+          "description": "Brown bear (Ursus arctos), compact heavy body, short limbs, rounded ears; common in Alta and northern hunter-gatherer panels."
+        },
+        "whale_cetacean": {
+          "label": "Whale / Cetacean",
+          "typical_period": "stone_age_hunter",
+          "tradition": "veideristning",
+          "typical_render_styles": [
+            "outline_enclosed",
+            "solid_pecked"
+          ],
+          "keywords": [
+            "whale",
+            "hval",
+            "val",
+            "cetacean",
+            "porpoise",
+            "nise",
+            "beluga",
+            "hvithval",
+            "killer whale",
+            "spekkhogger",
+            "dolphin",
+            "delfin",
+            "seal",
+            "sel",
+            "säl",
+            "leiknes",
+            "rødøy",
+            "rodoy",
+            "strand",
+            "drammen",
+            "skjeberg"
+          ],
+          "description": "Marine mammals including whales, porpoises, dolphins, and seals from coastal Norwegian Stone Age rock art."
+        },
+        "fish": {
+          "label": "Fish / Halibut / Salmon",
+          "typical_period": "stone_age_hunter",
+          "tradition": "veideristning",
+          "typical_render_styles": [
+            "outline_enclosed",
+            "solid_pecked"
+          ],
+          "keywords": [
+            "fish",
+            "fisk",
+            "halibut",
+            "kveite",
+            "hälleflundra",
+            "salmon",
+            "laks",
+            "lax",
+            "cod",
+            "torsk",
+            "flatfish",
+            "flyndre"
+          ],
+          "description": "Fish motifs including giant halibut (Alta fishing scenes), salmon, and coastal fish silhouettes."
+        },
+        "bird": {
+          "label": "Bird / Waterfowl",
+          "typical_period": "mixed",
+          "tradition": "both",
+          "typical_render_styles": [
+            "solid_pecked",
+            "outline_enclosed",
+            "linear_motif"
+          ],
+          "keywords": [
+            "bird",
+            "fugl",
+            "fågel",
+            "fagel",
+            "swan",
+            "svane",
+            "svan",
+            "duck",
+            "and",
+            "goose",
+            "gås",
+            "crane",
+            "trane",
+            "eagle",
+            "ørn",
+            "seabird",
+            "cormorant",
+            "skarv",
+            "waterfowl",
+            "sjofugl",
+            "sjøfugl"
+          ],
+          "description": "Waterfowl, swans, cranes, seabirds, and wading birds from Stone Age and Bronze Age sites."
+        },
+        "horse": {
+          "label": "Horse",
+          "typical_period": "bronze_age_agrarian",
+          "tradition": "jordbruksristning",
+          "typical_render_styles": [
+            "solid_pecked",
+            "linear_motif"
+          ],
+          "keywords": [
+            "horse",
+            "hest",
+            "häst",
+            "hast",
+            "stallion",
+            "hingst",
+            "mare",
+            "equus",
+            "sun horse",
+            "solhest"
+          ],
+          "description": "Bronze Age horses, frequently paired with chariots, sun discs, or riders (e.g., Tanum, Bohuslän, Østfold, Rogaland)."
+        },
+        "dog_wolf": {
+          "label": "Dog / Wolf",
+          "typical_period": "mixed",
+          "tradition": "both",
+          "typical_render_styles": [
+            "solid_pecked",
+            "linear_motif",
+            "outline_enclosed"
+          ],
+          "keywords": [
+            "dog",
+            "hund",
+            "wolf",
+            "ulv",
+            "varg",
+            "canid",
+            "fox",
+            "rev",
+            "räv"
+          ],
+          "description": "Hunting dogs and canids accompanying hunters, herds, or ships."
+        },
+        "snake": {
+          "label": "Snake / Serpent",
+          "typical_period": "bronze_age_agrarian",
+          "tradition": "jordbruksristning",
+          "typical_render_styles": [
+            "linear_motif",
+            "solid_pecked"
+          ],
+          "keywords": [
+            "snake",
+            "slange",
+            "orm",
+            "serpent",
+            "viper",
+            "huggorm",
+            "adder"
+          ],
+          "description": "Undulating serpentine forms from Bronze Age ritual scenes."
+        },
+        "quadruped_other": {
+          "label": "Other Quadruped / Deer / Cattle",
+          "typical_period": "mixed",
+          "tradition": "both",
+          "typical_render_styles": [
+            "solid_pecked",
+            "outline_enclosed",
+            "linear_motif"
+          ],
+          "keywords": [
+            "deer",
+            "hjort",
+            "red deer",
+            "kronhjort",
+            "stag",
+            "hind",
+            "vingen",
+            "bull",
+            "okse",
+            "ox",
+            "oxen",
+            "cattle",
+            "ku",
+            "ko",
+            "cow",
+            "boar",
+            "villsvin",
+            "pig",
+            "gris",
+            "svin",
+            "goat",
+            "geit",
+            "sheep",
+            "sau",
+            "quadruped",
+            "fyrfotadjur",
+            "firbeint",
+            "dyr",
+            "animal",
+            "djur"
+          ],
+          "description": "Red deer (classic Vingen motifs), oxen/cattle, boars, and other four-legged animals not classified more narrowly."
+        }
+      }
+    },
+    "vessel": {
+      "label": "Ships & Boats",
+      "description": "Bronze Age plank-built ships with prows and crew strokes, and Stone Age skin boats / elk-headed boats.",
+      "classes": {
+        "bronze_age_ship": {
+          "label": "Bronze Age Ship",
+          "typical_period": "bronze_age_agrarian",
+          "tradition": "jordbruksristning",
+          "typical_render_styles": [
+            "linear_motif",
+            "solid_pecked"
+          ],
+          "keywords": [
+            "ship",
+            "skip",
+            "skepp",
+            "skib",
+            "bronse",
+            "bronze",
+            "solberg",
+            "begby",
+            "kalnes",
+            "tanum",
+            "vitlycke",
+            "bohuslän",
+            "bohuslan",
+            "aspeberget",
+            "fossum",
+            "litsleby",
+            "himmelstalund",
+            "simrishamn",
+            "kivik",
+            "madsebakke",
+            "bornholm",
+            "austre åmøy",
+            "amoy",
+            "rogaland",
+            "østfold",
+            "ostfold",
+            "bardal",
+            "skeppsbild",
+            "hällristningsskepp"
+          ],
+          "description": "Nordic Bronze Age ship motif with upturned keel/gunwale prows, double-line or solid hull, and vertical crew strokes."
+        },
+        "stone_age_boat": {
+          "label": "Stone Age Boat",
+          "typical_period": "stone_age_hunter",
+          "tradition": "veideristning",
+          "typical_render_styles": [
+            "outline_enclosed",
+            "linear_motif",
+            "solid_pecked"
+          ],
+          "keywords": [
+            "boat",
+            "båt",
+            "bat",
+            "skin boat",
+            "skinnbaat",
+            "skinnbåt",
+            "umiak",
+            "elk-head boat",
+            "elghodebåt",
+            "alta",
+            "rødøy",
+            "rodoy",
+            "forselv",
+            "kåfjord",
+            "næmforsen",
+            "nämforsen",
+            "namforsen",
+            "veideristning"
+          ],
+          "description": "Stone Age hunter-gatherer boat (often with elk-head prow or crew silhouettes, e.g., Alta, Rødøy, Nämforsen)."
+        }
+      }
+    },
+    "human": {
+      "label": "Humans & Figures",
+      "description": "Human figures in action: skiers, hunters, warriors, lur players, acrobats, riders, and ritual anthropomorphs.",
+      "classes": {
+        "skier": {
+          "label": "Skier",
+          "typical_period": "stone_age_hunter",
+          "tradition": "veideristning",
+          "typical_render_styles": [
+            "solid_pecked",
+            "linear_motif"
+          ],
+          "keywords": [
+            "skier",
+            "skiløper",
+            "skiloper",
+            "skidåkare",
+            "skidakare",
+            "ski",
+            "rødøymannen",
+            "rodoymannen",
+            "bølamannen",
+            "bolamannen",
+            "rødøy",
+            "rodoy",
+            "bøla",
+            "bola",
+            "alstahaug",
+            "alta",
+            "zalavruga"
+          ],
+          "description": "Iconic Nordic rock-art skier figure (e.g., Rødøymannen, Bøla skier, Alta skiers)."
+        },
+        "hunter_warrior": {
+          "label": "Hunter / Warrior",
+          "typical_period": "mixed",
+          "tradition": "both",
+          "typical_render_styles": [
+            "linear_motif",
+            "solid_pecked"
+          ],
+          "keywords": [
+            "warrior",
+            "kriger",
+            "krigare",
+            "hunter",
+            "jeger",
+            "jägare",
+            "archer",
+            "bueskytter",
+            "bågskytt",
+            "spear",
+            "spyd",
+            "spjut",
+            "sword",
+            "sverd",
+            "svärd",
+            "shield",
+            "skjold",
+            "sköld",
+            "spearman",
+            "spjutguden",
+            "litsleby",
+            "battle",
+            "kamp",
+            "strid"
+          ],
+          "description": "Armed human figure carrying spear, bow, axe, sword, or shield (including Litsleby spear god and Alta hunters)."
+        },
+        "lur_blower": {
+          "label": "Lur Blower / Musician",
+          "typical_period": "bronze_age_agrarian",
+          "tradition": "jordbruksristning",
+          "typical_render_styles": [
+            "linear_motif",
+            "solid_pecked"
+          ],
+          "keywords": [
+            "lur",
+            "lurblåser",
+            "lurblaser",
+            "lurblåsare",
+            "lurblasare",
+            "horn",
+            "trumpet",
+            "musician",
+            "kalleby",
+            "tanum",
+            "kivik"
+          ],
+          "description": "Bronze Age figure blowing a curved bronze lur horn."
+        },
+        "acrobat_dancer": {
+          "label": "Acrobat / Dancer / Ritual",
+          "typical_period": "bronze_age_agrarian",
+          "tradition": "jordbruksristning",
+          "typical_render_styles": [
+            "linear_motif",
+            "solid_pecked"
+          ],
+          "keywords": [
+            "acrobat",
+            "akrobat",
+            "dancer",
+            "danser",
+            "dansare",
+            "brudparet",
+            "wedding",
+            "bride",
+            "adorant",
+            "ritual",
+            "jump",
+            "leap",
+            "somersault",
+            "saltomortal",
+            "vitlycke",
+            "tanum",
+            "sotts"
+          ],
+          "description": "Bronze Age ritual dancers, acrobats leaping over ships, adorants with raised hands, and sacred marriage pairs."
+        },
+        "rider": {
+          "label": "Rider / Equestrian",
+          "typical_period": "bronze_age_agrarian",
+          "tradition": "jordbruksristning",
+          "typical_render_styles": [
+            "linear_motif",
+            "solid_pecked"
+          ],
+          "keywords": [
+            "rider",
+            "rytter",
+            "ryttare",
+            "horseman",
+            "equestrian",
+            "mounted",
+            "tegneby",
+            "litsleby"
+          ],
+          "description": "Human figure mounted on horseback, sometimes armed with spear or shield."
+        },
+        "anthropomorph": {
+          "label": "Anthropomorph / Human",
+          "typical_period": "mixed",
+          "tradition": "both",
+          "typical_render_styles": [
+            "solid_pecked",
+            "linear_motif",
+            "outline_enclosed"
+          ],
+          "keywords": [
+            "human",
+            "menneske",
+            "människa",
+            "manniska",
+            "person",
+            "man",
+            "mann",
+            "woman",
+            "kvinne",
+            "kvinna",
+            "anthropomorph",
+            "figur",
+            "figure",
+            "menneskefigur",
+            "shaman",
+            "sjaman",
+            "drum",
+            "tromme",
+            "phallic",
+            "fallos",
+            "begby"
+          ],
+          "description": "General human or stylized anthropomorphic figure not in a narrower action subclass."
+        }
+      }
+    },
+    "symbol": {
+      "label": "Symbols, Tools & Cosmology",
+      "description": "Solar wheels, footprints, handprints, weapons, chariots/ploughs, trees, and geometric spirals.",
+      "classes": {
+        "sun_wheel": {
+          "label": "Sun Wheel / Wheel Cross",
+          "typical_period": "bronze_age_agrarian",
+          "tradition": "jordbruksristning",
+          "typical_render_styles": [
+            "linear_motif",
+            "solid_pecked",
+            "outline_enclosed"
+          ],
+          "keywords": [
+            "sun",
+            "sol",
+            "solhjul",
+            "solkors",
+            "hjul",
+            "hjulkors",
+            "wheel",
+            "wheel cross",
+            "sun cross",
+            "sun disc",
+            "solskive",
+            "solskiva",
+            "circle cross",
+            "ringkors",
+            "madsebakke"
+          ],
+          "description": "Four-spoked wheel cross, ringed sun disc, or concentric solar motif."
+        },
+        "footprint": {
+          "label": "Footprint / Foot Sole",
+          "typical_period": "bronze_age_agrarian",
+          "tradition": "jordbruksristning",
+          "typical_render_styles": [
+            "solid_pecked",
+            "outline_enclosed"
+          ],
+          "keywords": [
+            "footprint",
+            "fotsåle",
+            "fotsale",
+            "fotsula",
+            "fodspor",
+            "fotspor",
+            "foot",
+            "shoe",
+            "sko",
+            "sandal",
+            "sole",
+            "såle",
+            "fotsulor",
+            "fotsåler"
+          ],
+          "description": "Pecked or outlined foot soles / shod footprints, often in pairs or with strap crossbars."
+        },
+        "handprint": {
+          "label": "Handprint / Hand",
+          "typical_period": "bronze_age_agrarian",
+          "tradition": "jordbruksristning",
+          "typical_render_styles": [
+            "solid_pecked",
+            "linear_motif"
+          ],
+          "keywords": [
+            "hand",
+            "hånd",
+            "handprint",
+            "håndavtrykk",
+            "handavtryck",
+            "palm",
+            "fingers",
+            "händer",
+            "hender"
+          ],
+          "description": "Stylized handprints or outstretched palms."
+        },
+        "axe_weapon": {
+          "label": "Axe / Weapon",
+          "typical_period": "bronze_age_agrarian",
+          "tradition": "jordbruksristning",
+          "typical_render_styles": [
+            "solid_pecked",
+            "linear_motif"
+          ],
+          "keywords": [
+            "axe",
+            "øks",
+            "oks",
+            "yxa",
+            "halberd",
+            "dagger",
+            "dolk",
+            "sword",
+            "sverd",
+            "svärd",
+            "weapon",
+            "våpen",
+            "vapen",
+            "simris",
+            "simrishamn",
+            "kivik"
+          ],
+          "description": "Isolated bronze axes, ceremonial axes, daggers, halberds, or shields."
+        },
+        "chariot_plough": {
+          "label": "Chariot / Wagon / Plough",
+          "typical_period": "bronze_age_agrarian",
+          "tradition": "jordbruksristning",
+          "typical_render_styles": [
+            "linear_motif",
+            "solid_pecked"
+          ],
+          "keywords": [
+            "chariot",
+            "vogn",
+            "vagn",
+            "wagon",
+            "cart",
+            "plough",
+            "plow",
+            "plog",
+            "ard",
+            "ård",
+            "ardplog",
+            "frännarp",
+            "frannarp",
+            "litsleby",
+            "finntorp",
+            "kivik"
+          ],
+          "description": "Two-wheeled chariots, four-wheeled wagons, and Bronze Age ard/ploughing scenes."
+        },
+        "tree": {
+          "label": "Tree / Plant",
+          "typical_period": "bronze_age_agrarian",
+          "tradition": "jordbruksristning",
+          "typical_render_styles": [
+            "linear_motif",
+            "solid_pecked"
+          ],
+          "keywords": [
+            "tree",
+            "tre",
+            "träd",
+            "trad",
+            "branch",
+            "gren",
+            "plant",
+            "leaf",
+            "løv",
+            "gran",
+            "spruce",
+            "solberg"
+          ],
+          "description": "Stylized Bronze Age trees (e.g., Solberg tree) and botanical symbols."
+        },
+        "geometric_spiral": {
+          "label": "Geometric / Spiral / Net / Frame",
+          "typical_period": "mixed",
+          "tradition": "both",
+          "typical_render_styles": [
+            "linear_motif",
+            "outline_enclosed",
+            "solid_pecked"
+          ],
+          "keywords": [
+            "spiral",
+            "geometric",
+            "geometrisk",
+            "labyrinth",
+            "labyrint",
+            "ring",
+            "circle",
+            "sirkel",
+            "cirkel",
+            "net",
+            "nett",
+            "grid",
+            "frame",
+            "ramme",
+            "rammefigur",
+            "skålgrop",
+            "skalgrop",
+            "cupmark",
+            "cup mark",
+            "cup-mark",
+            "skålgropar",
+            "älvkvarn",
+            "abstract",
+            "symbol",
+            "tegn",
+            "ornament"
+          ],
+          "description": "Spirals, concentric rings, frame figures (rammefigurer), geometric patterns, and ritual signs."
+        }
+      }
+    },
+    "scene_or_unclassified": {
+      "label": "Scenes & Unclassified",
+      "description": "Multi-motif composite panels or distinct isolated carvings whose exact motif class is not yet determined from metadata.",
+      "classes": {
+        "multi_motif_panel": {
+          "label": "Multi-Motif Panel / Scene",
+          "typical_period": "mixed",
+          "tradition": "both",
+          "typical_render_styles": [
+            "linear_motif",
+            "solid_pecked",
+            "outline_enclosed"
+          ],
+          "keywords": [
+            "panel",
+            "felt",
+            "scene",
+            "komposisjon",
+            "composition",
+            "group",
+            "flock",
+            "herd",
+            "flokk",
+            "procesion",
+            "procession",
+            "opptog",
+            "bergkunstfelt"
+          ],
+          "description": "Composite scene containing tightly interlocking motifs (e.g., hunting scene, boat with crew and animal, wedding pair) preserved as a cohesive silhouette."
+        },
+        "unclassified_motif": {
+          "label": "Unclassified Motif",
+          "typical_period": "unknown",
+          "tradition": "unknown",
+          "typical_render_styles": [
+            "solid_pecked",
+            "linear_motif",
+            "outline_enclosed"
+          ],
+          "keywords": [],
+          "description": "Clean isolated rock-art motif without explicit class keywords in source metadata; ready for visual labeling or shape-prior clustering."
+        }
+      }
+    }
+  }
+}

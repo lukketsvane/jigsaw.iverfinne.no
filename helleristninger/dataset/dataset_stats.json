@@ -1,0 +1,82 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-11-28T11:10:14Z",
+  "figures_count": 7934,
+  "figures_commercial_safe_count": 6261,
+  "figures_research_only_count": 1673,
+  "figures_geolocated_count": 7312,
+  "figures_geolocated_pct": 92.16,
+  "figures_dated_count": 7918,
+  "figures_dated_pct": 99.8,
+  "figures_calibrated_count": 0,
+  "sites_count": 26879,
+  "sites_geolocated_count": 26089,
+  "sites_geolocated_pct": 97.06,
+  "sites_dated_count": 26367,
+  "sites_dated_pct": 98.1,
+  "sites_by_country": {
+    "NO": 4661,
+    "DK": 371,
+    "FI": 208,
+    "SE": 21596,
+    "NON_NORDIC": 43
+  },
+  "figures_by_country": {
+    "NO": 5589,
+    "SE": 2186,
+    "DK": 159
+  },
+  "figures_by_core_region": {
+    "alta": 2018,
+    "ostfold": 1105,
+    "bohuslan_tanum": 1363,
+    "other": 1270,
+    "vingen": 1380,
+    "trondelag": 485,
+    "namforsen": 313
+  },
+  "figures_by_dating_method": {
+    "shoreline_displacement": 5012,
+    "radiocarbon_14c": 1390,
+    "typological_stylistic": 1357,
+    "composite_archival": 14,
+    "stratigraphic": 145,
+    "unknown": 16
+  },
+  "sites_by_dating_method": {
+    "typological_stylistic": 19290,
+    "shoreline_displacement": 6583,
+    "unknown": 512,
+    "stratigraphic": 7,
+    "radiocarbon_14c": 372,
+    "composite_archival": 115
+  },
+  "figures_by_family": {
+    "scene_or_unclassified": 5027,
+    "human": 487,
+    "vessel": 923,
+    "animal": 1366,
+    "symbol": 131
+  },
+  "figures_by_archive": {
+    "altarockart": 1673,
+    "unimus": 1782,
+    "shfa": 3984,
+    "wikimedia": 434,
+    "zenodo_shfa": 25,
+    "digitaltmuseum": 13,
+    "europeana": 13,
+    "ksamsok": 10
+  },
+  "sources_count": 2823,
+  "sources_quarantined_count": 373,
+  "dual_trace_qa_count": 397,
+  "qa_mean_iou": 0.6039,
+  "qa_median_iou": 0.6561,
+  "explorer_bundle": {
+    "explorer_data_bytes": 21809243,
+    "svg_chunks_count": 20,
+    "svg_chunks_bytes": 61815827,
+    "total_explorer_bytes": 83625070
+  }
+}

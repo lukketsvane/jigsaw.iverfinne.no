@@ -1,0 +1,71 @@
+cff-version: 1.2.0
+title: "Nordic Helleristninger Scientific Corpus & 750-Piece Figurative Jigsaw Release (v2026.W48)"
+message: "If you use this scientific rock-art corpus, multi-layer SVG tracings, dual-trace QA dataset, or statistical findings, please cite this release and the underlying primary cultural heritage archives."
+type: dataset
+version: "v2026.W48"
+date-released: "2026-11-28"
+authors:
+  - name: "Nordic Rock-Art Open Corpus & Formverk Research Team"
+    affiliation: "jigsaw.iverfinne.no"
+repository-code: "https://github.com/iverfinne/jigsaw.iverfinne.no"
+license: "CC-BY-4.0"
+keywords:
+  - rock art
+  - helleristninger
+  - hällristningar
+  - Scandinavian archaeology
+  - veideristninger
+  - jordbruksristninger
+  - morphometrics
+  - open heritage
+  - SVG
+  - dual-trace QA
+abstract: >-
+  Versioned weekly release (v2026.W48) of the open Nordic rock-art (helleristninger /
+  hällristningar) scientific corpus, featuring provenance-verified archival sources,
+  multi-layer SVG tracings (figures, cup_marks, cracks, uncertain, scale_bar),
+  stratified independent dual-trace IoU quality assurance, reproducible morphometric
+  and regional iconographic analyses, and the consolidated 750-piece commercial-hygiene
+  wooden jigsaw production deliverables. Commercial licensing clearance remains pending
+  institutional review; all primary archive attributions and license URLs are preserved
+  per figure.
+references:
+  - type: article
+    authors:
+      - family-names: "Helskog"
+        given-names: "Knut"
+    title: "Communicating with the World of Beings: The World Heritage Rock Art Sites in Alta, Arctic Norway"
+    year: 2014
+    publisher: "Oxbow Books"
+  - type: book
+    authors:
+      - family-names: "Hallström"
+        given-names: "Gustaf"
+    title: "Monumental Art of Northern Sweden from the Stone Age: Nämforsen and Other Localities"
+    year: 1960
+    publisher: "Almqvist & Wiksell"
+  - type: book
+    authors:
+      - family-names: "Vogt"
+        given-names: "David"
+    title: "Rock Carvings in Østfold and Bohuslän, South Scandinavia: An Interpretation of Political and Economic Landscapes"
+    year: 2011
+    publisher: "Novus Press"
+  - type: article
+    authors:
+      - family-names: "Bertilsson"
+        given-names: "Ulf"
+      - family-names: "Milstreu"
+        given-names: "Gerhard"
+    title: "Swedish Rock Art Research Archives (SHFA) — Digital Documentation and Open Access"
+    journal: "Adoranten"
+    year: 2016
+  - type: book
+    authors:
+      - family-names: "Lødøen"
+        given-names: "Trond"
+      - family-names: "Mandt"
+        given-names: "Gro"
+    title: "The Rock Art of Norway"
+    year: 2010
+    publisher: "Windgather Press"

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nordic Helleristninger — Open Map, Chronology &amp; SVG Explorer</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" crossorigin="" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" crossorigin="" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">❖</span>
+      <div>
+        <h1>Nordic Helleristninger Explorer</h1>
+        <p class="subtitle">Norway · Sweden · Denmark · Finland · 9000 BCE – 500 CE</p>
+      </div>
+    </div>
+
+    <div class="search-wrap">
+      <input
+        id="searchInput"
+        type="search"
+        placeholder="Search Askeladden ID, RAÄ L-nummer, site name, figure ID…"
+        autocomplete="off"
+      />
+    </div>
+
+    <div class="topbar-controls">
+      <div class="segmented" role="group" aria-label="Map layer mode">
+        <button class="seg-btn active" data-mode="sites">Sites</button>
+        <button class="seg-btn" data-mode="figures">Traced Figures</button>
+        <button class="seg-btn" data-mode="both">Both</button>
+      </div>
+      <label class="toggle-pill">
+        <input type="checkbox" id="commercialOnlyToggle" />
+        <span>Commercial-OK Only</span>
+      </label>
+      <button id="mapEngineToggle" class="btn-ghost" title="Switch between Leaflet tiles and offline Nordic vector canvas">
+        Map: Auto
+      </button>
+    </div>
+  </header>
+
+  <section class="stats-strip" id="statsStrip">
+    <div class="stat-pill"><strong id="statSitesShown">—</strong><span>Sites shown</span></div>
+    <div class="stat-pill"><strong id="statFigsShown">—</strong><span>Traced figures shown</span></div>
+    <div class="stat-pill"><strong id="statGeoPct">—</strong><span>Geolocated</span></div>
+    <div class="stat-pill"><strong id="statDatedPct">—</strong><span>Numerically dated</span></div>
+    <div class="stat-pill"><strong id="statRangeLabel">9000 BCE – 500 CE</strong><span>Active year window</span></div>
+  </section>
+
+  <main class="workspace">
+    <!-- Left Filter Rail -->
+    <aside class="sidebar" id="filterSidebar">
+      <div class="panel-section">
+        <div class="section-head">
+          <h2>Chronology Filter</h2>
+          <button id="resetFiltersBtn" class="btn-link">Reset all</button>
+        </div>
+
+        <div class="year-readout">
+          <span id="yearMinLabel">9000 BCE</span>
+          <span class="dash">—</span>
+          <span id="yearMaxLabel">500 CE</span>
+        </div>
+
+        <svg id="timelineHistogram" class="histogram-svg" viewBox="0 0 280 46" preserveAspectRatio="none" aria-label="Temporal distribution"></svg>
+
+        <div class="dual-slider">
+          <div class="slider-track" id="sliderTrack"></div>
+          <input type="range" id="yearMinSlider" min="-9000" max="500" step="50" value="-9000" aria-label="Start year" />
+          <input type="range" id="yearMaxSlider" min="-9000" max="500" step="50" value="500" aria-label="End year" />
+        </div>
+
+        <div class="era-presets">
+          <button class="chip active" data-range="-9000,500">All</button>
+          <button class="chip" data-range="-9000,-4000">Mesolithic</button>
+          <button class="chip" data-range="-4000,-1800">Neolithic</button>
+          <button class="chip" data-range="-1800,-500">Bronze Age</button>
+          <button class="chip" data-range="-500,500">Iron Age</button>
+        </div>
+
+        <label class="checkbox-row">
+          <input type="checkbox" id="includeUndatedToggle" checked />
+          <span>Include undated records</span>
+        </label>
+      </div>
+
+      <div class="panel-section">
+        <h2>Dating Method</h2>
+        <div class="method-checks" id="datingMethodChecks">
+          <label><input type="checkbox" value="radiocarbon_14c" checked /> Radiocarbon <sup>14</sup>C</label>
+          <label><input type="checkbox" value="shoreline_displacement" checked /> Shoreline Displacement</label>
+          <label><input type="checkbox" value="stratigraphic" checked /> Stratigraphic</label>
+          <label><input type="checkbox" value="typological_stylistic" checked /> Typological / Stylistic</label>
+          <label><input type="checkbox" value="composite_archival" checked /> Composite Archival</label>
+          <label><input type="checkbox" value="unknown" checked /> Unknown</label>
+        </div>
+      </div>
+
+      <div class="panel-section filter-selects">
+        <h2>Geography, Motif &amp; Archive</h2>
+        <label>
+          <span>Country</span>
+          <select id="countrySelect">
+            <option value="">All Nordic Countries</option>
+            <option value="NO">Norway (NO)</option>
+            <option value="SE">Sweden (SE)</option>
+            <option value="DK">Denmark (DK)</option>
+            <option value="FI">Finland (FI)</option>
+            <option value="NON_NORDIC">Other / Baltic (NON_NORDIC)</option>
+          </select>
+        </label>
+        <label>
+          <span>Core Region</span>
+          <select id="regionSelect">
+            <option value="">All Regions</option>
+          </select>
+        </label>
+        <label>
+          <span>Motif Family (Figures)</span>
+          <select id="familySelect">
+            <option value="">All Families</option>
+          </select>
+        </label>
+        <label>
+          <span>Motif Class (Figures)</span>
+          <select id="classSelect">
+            <option value="">All Motif Classes</option>
+          </select>
+        </label>
+        <label>
+          <span>Archive</span>
+          <select id="archiveSelect">
+            <option value="">All Archives</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="panel-section list-section">
+        <div class="section-head">
+          <h2>Matching Finds</h2>
+          <span id="listCountBadge" class="badge">0</span>
+        </div>
+        <div id="resultsList" class="results-list"></div>
+      </div>
+    </aside>
+
+    <!-- Center Map -->
+    <section class="map-stage">
+      <div id="leafletMap" class="map-canvas"></div>
+      <canvas id="offlineCanvas" class="map-canvas hidden"></canvas>
+
+      <div class="map-legend">
+        <div><span class="dot dot-stone"></span> Stone Age (Veideristninger)</div>
+        <div><span class="dot dot-bronze"></span> Bronze Age (Jordbruksristninger)</div>
+        <div><span class="dot dot-mixed"></span> Multi-Period / Other</div>
+        <div><span class="dot dot-traced"></span> Traced SVG Figure</div>
+      </div>
+
+      <div class="offline-controls hidden" id="offlineControls">
+        <button id="zoomInBtn" title="Zoom in">+</button>
+        <button id="zoomOutBtn" title="Zoom out">−</button>
+        <button id="resetViewBtn" title="Reset Nordic view">⌂</button>
+      </div>
+
+      <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <p>Loading Nordic Helleristninger dataset…</p>
+      </div>
+    </section>
+
+    <!-- Right Scientific Inspector -->
+    <aside class="inspector" id="inspectorPanel">
+      <div class="inspector-empty" id="inspectorEmpty">
+        <h3>Scientific Inspector</h3>
+        <p>Select any site pin or traced figure on the map or list to inspect multi-layer SVG vector geometry, chronological evidence, EPSG:4326 precision, licensing, and dual-trace IoU QA.</p>
+      </div>
+
+      <div class="inspector-content hidden" id="inspectorContent">
+        <div class="inspector-header">
+          <div>
+            <div class="badge-row" id="inspBadges"></div>
+            <h2 id="inspTitle">—</h2>
+            <p class="insp-sub" id="inspSubtitle">—</p>
+          </div>
+          <button id="closeInspectorBtn" class="btn-ghost" title="Close inspector">✕</button>
+        </div>
+
+        <!-- Multi-layer SVG Viewer -->
+        <div class="svg-viewer-card" id="svgViewerCard">
+          <div class="svg-toolbar">
+            <span class="toolbar-title">True-Scale Multi-Layer Vector</span>
+            <div class="svg-actions">
+              <button id="svgZoomOut" class="btn-mini">−</button>
+              <button id="svgZoomReset" class="btn-mini">100%</button>
+              <button id="svgZoomIn" class="btn-mini">+</button>
+              <button id="downloadSvgBtn" class="btn-mini">Download SVG</button>
+            </div>
+          </div>
+
+          <div class="layer-toggles">
+            <label><input type="checkbox" class="layer-cb" data-layer="figures" checked /> <span class="swatch sw-fig"></span> #figures</label>
+            <label><input type="checkbox" class="layer-cb" data-layer="cup_marks" checked /> <span class="swatch sw-cup"></span> #cup_marks</label>
+            <label><input type="checkbox" class="layer-cb" data-layer="cracks" checked /> <span class="swatch sw-crk"></span> #cracks</label>
+            <label><input type="checkbox" class="layer-cb" data-layer="uncertain" checked /> <span class="swatch sw-unc"></span> #uncertain</label>
+            <label><input type="checkbox" class="layer-cb" data-layer="scale_bar" checked /> <span class="swatch sw-scl"></span> #scale_bar</label>
+          </div>
+
+          <div class="svg-stage" id="svgStage">
+            <div id="svgContainer" class="svg-container"></div>
+          </div>
+          <p class="svg-caption" id="svgCaption"></p>
+        </div>
+
+        <!-- Linked figures (when viewing a Site) -->
+        <div class="meta-card hidden" id="siteFiguresCard">
+          <h3>Traced Figures at This Site</h3>
+          <div id="siteFiguresList" class="chip-grid"></div>
+        </div>
+
+        <!-- Chronology & Dating -->
+        <div class="meta-card">
+          <h3>Chronology &amp; Dating Evidence</h3>
+          <dl class="kv-grid" id="inspChronology"></dl>
+        </div>
+
+        <!-- Coordinates & Geolocation -->
+        <div class="meta-card">
+          <h3>Geolocation (EPSG:4326)</h3>
+          <dl class="kv-grid" id="inspGeo"></dl>
+        </div>
+
+        <!-- Provenance, Licence & Dual-Trace QA -->
+        <div class="meta-card">
+          <h3>Archival Provenance, Licence &amp; QA</h3>
+          <dl class="kv-grid" id="inspProvenance"></dl>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js" crossorigin=""></script>
+  <script src="app.js"></script>
+</body>
+</html>

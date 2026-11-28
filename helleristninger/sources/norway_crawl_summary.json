@@ -1,0 +1,46 @@
+{
+  "askeladden_sites_total": 4210,
+  "askeladden_sites_with_epsg4326": 3712,
+  "askeladden_by_fylke": {
+    "Buskerud": 60,
+    "Østfold": 1738,
+    "Vestfold": 74,
+    "Trøndelag": 519,
+    "Vestland": 790,
+    "Nordland": 69,
+    "Innlandet": 137,
+    "Finnmark": 135,
+    "Telemark": 80,
+    "Troms": 29,
+    "Agder": 168,
+    "Møre og Romsdal": 62,
+    "Rogaland": 155,
+    "Akershus": 134,
+    "Oslo": 60
+  },
+  "askeladden_by_enkeltminneart": {
+    "Helleristning": 1847,
+    "Skålgrop": 2236,
+    "Slipt bergkunst": 27,
+    "Hellemaleri": 94,
+    "Hulemaleri": 6
+  },
+  "unimus_full_catalog_count": 5769,
+  "new_crawl_counts": {
+    "askeladden_kulturminnesok": 41,
+    "unimus_full": 462,
+    "alta_full": 144,
+    "dimu_no": 14,
+    "total_new_files": 661
+  },
+  "total_norway_manifest_records": 1708,
+  "total_norway_traceable": 878,
+  "total_norway_quarantined_painted": 119,
+  "total_norway_by_media_type": {
+    "bw_tracing": 785,
+    "photo_other": 711,
+    "painted_photo": 119,
+    "rubbing_frottage": 93
+  },
+  "elapsed_sec": 509.8
+}

@@ -1,0 +1,338 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Nordic Helleristninger Scientific Figure Record",
+  "type": "object",
+  "required": [
+    "figure_id",
+    "site_panel_id",
+    "coordinates",
+    "coordinates_provenance",
+    "motif",
+    "size_mm",
+    "period",
+    "source_image",
+    "crop_px",
+    "method",
+    "tracer",
+    "date",
+    "rights_holder",
+    "licence",
+    "licence_url",
+    "confidence",
+    "literature"
+  ],
+  "properties": {
+    "figure_id": {
+      "type": "string",
+      "minLength": 3
+    },
+    "site_panel_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "site_panel_id_provenance": {
+      "type": "string"
+    },
+    "site": {
+      "type": "string"
+    },
+    "region": {
+      "type": "string"
+    },
+    "core_region": {
+      "type": "string",
+      "enum": [
+        "alta",
+        "ostfold",
+        "bohuslan_tanum",
+        "namforsen",
+        "vingen",
+        "trondelag",
+        "other"
+      ]
+    },
+    "country": {
+      "type": "string"
+    },
+    "coordinates": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "crs": {
+          "type": "string",
+          "const": "EPSG:4326"
+        },
+        "lat": {
+          "type": "number",
+          "minimum": -90.0,
+          "maximum": 90.0
+        },
+        "lon": {
+          "type": "number",
+          "minimum": -180.0,
+          "maximum": 180.0
+        },
+        "precision": {
+          "type": "string"
+        },
+        "provenance": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "crs",
+        "lat",
+        "lon",
+        "provenance"
+      ]
+    },
+    "coordinates_provenance": {
+      "type": "object",
+      "required": [
+        "crs",
+        "status",
+        "reason"
+      ],
+      "properties": {
+        "crs": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "verified",
+            "unverified"
+          ]
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "motif": {
+      "type": "object",
+      "required": [
+        "family",
+        "motif_class"
+      ],
+      "properties": {
+        "family": {
+          "type": "string"
+        },
+        "motif_class": {
+          "type": "string"
+        }
+      }
+    },
+    "size_mm": {
+      "type": "object",
+      "required": [
+        "width_mm",
+        "height_mm",
+        "area_mm2",
+        "px_per_mm",
+        "scale_calibrated",
+        "scale_source",
+        "width_px",
+        "height_px",
+        "area_px2"
+      ],
+      "properties": {
+        "width_mm": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0
+        },
+        "height_mm": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0
+        },
+        "area_mm2": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0
+        },
+        "px_per_mm": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0
+        },
+        "scale_calibrated": {
+          "type": "boolean"
+        },
+        "scale_source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "width_px": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "height_px": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "area_px2": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "period": {
+      "type": "string"
+    },
+    "source_image": {
+      "type": "object",
+      "required": [
+        "source_id",
+        "raw_path",
+        "sha256"
+      ],
+      "properties": {
+        "source_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_archive": {
+          "type": "string"
+        },
+        "raw_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "media_type": {
+          "type": "string",
+          "enum": [
+            "bw_tracing",
+            "svg_vector",
+            "rubbing_frottage",
+            "rti_3d"
+          ]
+        },
+        "source_url": {
+          "type": "string"
+        }
+      }
+    },
+    "crop_px": {
+      "type": "array",
+      "items": {
+        "type": "integer"
+      },
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "method": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tracer": {
+      "type": "string",
+      "minLength": 1
+    },
+    "date": {
+      "type": "string"
+    },
+    "rights_holder": {
+      "type": "string"
+    },
+    "licence": {
+      "type": "string"
+    },
+    "licence_url": {
+      "type": "string"
+    },
+    "commercial_ok": {
+      "type": "boolean"
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "literature": {
+      "type": "array"
+    },
+    "svg_path": {
+      "type": "string"
+    },
+    "layers": {
+      "type": "object",
+      "properties": {
+        "figures_path_closed": {
+          "type": "boolean"
+        },
+        "cup_marks_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "cracks_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "uncertain_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "has_scale_bar": {
+          "type": "boolean"
+        }
+      }
+    },
+    "geometry": {
+      "type": "object",
+      "properties": {
+        "vertex_count": {
+          "type": "integer",
+          "minimum": 3
+        },
+        "solidity": {
+          "type": "number"
+        },
+        "compactness": {
+          "type": "number"
+        },
+        "aspect_ratio": {
+          "type": "number"
+        },
+        "perimeter_px": {
+          "type": "number"
+        },
+        "perimeter_mm": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "hole_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "component_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "euler_number": {
+          "type": "integer"
+        }
+      }
+    }
+  }
+}

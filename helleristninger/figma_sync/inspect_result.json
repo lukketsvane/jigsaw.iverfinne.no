@@ -1,0 +1,58 @@
+{
+  "page": { "id": "27:338", "name": "hellerisning" },
+  "topChildren": [
+    { "id": "42:18", "name": "helleristninger-tierB-thickened", "type": "SECTION", "x": -1664, "y": -546, "width": 1198, "height": 18542, "right": -466, "bottom": 17996 },
+    { "id": "42:17", "name": "collection", "type": "SECTION", "x": -363, "y": -546, "width": 2737, "height": 13182, "right": 2374, "bottom": 12636 },
+    { "id": "72:953", "name": "Frame 2", "type": "FRAME", "x": -1727, "y": -1221, "width": 127, "height": 103, "right": -1600, "bottom": -1118 }
+  ],
+  "refNodes": [
+    {
+      "id": "42:18",
+      "name": "helleristninger-tierB-thickened",
+      "type": "SECTION",
+      "x": -1664,
+      "y": -546,
+      "width": 1198,
+      "height": 18542,
+      "fills": [{ "type": "SOLID", "color": { "r": 0.9607843160629272, "g": 0.95686274766922, "b": 0.9372549057006836 }, "opacity": 1 }],
+      "sampleFonts": [
+        { "name": "Tier B Controlled Thickened — All Nordic (1372 motifs — 100x100 mm cells)", "fontName": { "family": "Inter", "style": "Bold", "variationSettings": { "wght": 700, "slnt": 0 } }, "fontSize": 12 },
+        { "name": "helleristning_00111 · unclassified_motif", "fontName": { "family": "Inter", "style": "Regular", "variationSettings": { "wght": 400, "slnt": 0 } }, "fontSize": 5.199999809265137 },
+        { "name": "NO:Nordre Land · B_thickened", "fontName": { "family": "Inter", "style": "Regular", "variationSettings": { "wght": 400, "slnt": 0 } }, "fontSize": 4.599999904632568 }
+      ]
+    },
+    {
+      "id": "42:17",
+      "name": "collection",
+      "type": "SECTION",
+      "x": -363,
+      "y": -546,
+      "width": 2737,
+      "height": 13182,
+      "fills": [{ "type": "SOLID", "color": { "r": 1, "g": 1, "b": 1 }, "opacity": 1 }],
+      "sampleFonts": []
+    }
+  ],
+  "availableFonts": {
+    "DM Sans": ["9pt Italic", "9pt Regular", "Black", "Black Italic", "Bold", "Bold Italic", "ExtraBold", "ExtraBold Italic", "ExtraLight", "ExtraLight Italic", "Italic", "Light", "Light Italic", "Medium", "Medium Italic", "Regular", "SemiBold", "SemiBold Italic", "Thin", "Thin Italic"],
+    "Fraunces": ["Black", "Black Italic", "Bold", "Bold Italic", "Italic", "Light", "Light Italic", "Regular", "SemiBold", "SemiBold Italic", "Thin", "Thin Italic"],
+    "Geist": ["Black", "Bold", "ExtraBold", "ExtraLight", "Light", "Medium", "Regular", "SemiBold", "Thin"],
+    "Geist Mono": ["Black", "Bold", "ExtraBold", "ExtraLight", "Light", "Medium", "Regular", "SemiBold", "Thin"],
+    "IBM Plex Mono": ["Bold", "Bold Italic", "ExtraLight", "ExtraLight Italic", "Italic", "Light", "Light Italic", "Medium", "Medium Italic", "Regular", "SemiBold", "SemiBold Italic", "Thin", "Thin Italic"],
+    "IBM Plex Sans": ["Bold", "Bold Italic", "ExtraLight", "ExtraLight Italic", "Italic", "Light", "Light Italic", "Medium", "Medium Italic", "Regular", "SemiBold", "SemiBold Italic", "Thin", "Thin Italic"],
+    "Instrument Serif": ["Italic", "Regular"],
+    "Inter": ["Black", "Black Italic", "Bold", "Bold Italic", "Extra Bold", "Extra Bold Italic", "Extra Light", "Extra Light Italic", "Italic", "Light", "Light Italic", "Medium", "Medium Italic", "Regular", "Semi Bold", "Semi Bold Italic", "Thin", "Thin Italic"],
+    "JetBrains Mono": ["Bold", "Bold Italic", "ExtraBold", "ExtraBold Italic", "ExtraLight", "ExtraLight Italic", "Italic", "Light", "Light Italic", "Medium", "Medium Italic", "Regular", "Thin", "Thin Italic"],
+    "Lora": ["Bold", "Bold Italic", "Italic", "Medium", "Medium Italic", "Regular", "SemiBold", "SemiBold Italic"],
+    "Merriweather": ["Black", "Black Italic", "Bold", "Bold Italic", "ExtraBold", "ExtraBold Italic", "Italic", "Light", "Light Italic", "Medium", "Medium Italic", "Regular", "SemiBold", "SemiBold Italic"],
+    "Newsreader": ["Bold", "Bold Italic", "ExtraBold", "ExtraBold Italic", "ExtraLight", "ExtraLight Italic", "Italic", "Light", "Light Italic", "Medium", "Medium Italic", "Regular", "SemiBold", "SemiBold Italic"],
+    "Plus Jakarta Sans": ["Bold", "Bold Italic", "ExtraBold", "ExtraBold Italic", "ExtraLight", "ExtraLight Italic", "Italic", "Light", "Light Italic", "Medium", "Medium Italic", "Regular", "SemiBold", "SemiBold Italic"],
+    "Roboto Mono": ["Bold", "Bold Italic", "ExtraLight", "ExtraLight Italic", "Italic", "Light", "Light Italic", "Medium", "Medium Italic", "Regular", "SemiBold", "SemiBold Italic", "Thin", "Thin Italic"],
+    "Source Serif 4": ["Black", "Black Italic", "Bold", "Bold Italic", "ExtraBold", "ExtraBold Italic", "ExtraLight", "ExtraLight Italic", "Italic", "Light", "Light Italic", "Medium", "Medium Italic", "Regular", "SemiBold", "SemiBold Italic"],
+    "Space Grotesk": ["Bold", "Light", "Medium", "Regular"],
+    "Space Mono": ["Bold", "Bold Italic", "Italic", "Regular"]
+  },
+  "localTextStyles": [],
+  "localPaintStyles": [],
+  "localVarCollections": [{ "id": "VariableCollectionId:30:19573", "name": "Variable collection", "varCount": 1 }]
+}

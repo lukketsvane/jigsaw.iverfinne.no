@@ -1,0 +1,19 @@
+{
+  "sites_total": 21463,
+  "sites_hallristning": 21380,
+  "sites_hallmalning": 83,
+  "sites_with_coords": 21463,
+  "sites_with_lamning_id": 21463,
+  "sites_with_raa_id": 20704,
+  "unique_parishes": 1279,
+  "manifest_total": 186,
+  "manifest_traceable": 90,
+  "manifest_quarantined": 96,
+  "download_stats": {
+    "downloaded_ok": 90,
+    "skipped_photo_other": 219,
+    "quarantined_painted": 96,
+    "skipped_reject": 11
+  },
+  "elapsed_sec": 235.2
+}

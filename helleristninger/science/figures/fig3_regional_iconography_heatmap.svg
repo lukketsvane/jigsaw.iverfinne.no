@@ -1,0 +1,172 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="680" viewBox="0 0 1280 680">
+<rect width="1280" height="680" fill="#FAF8F4"/>
+<text x="48.0" y="46.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="22" font-weight="700" fill="#1C252C">Regional Iconographic Structure &amp; Beta-Diversity Across Scandinavian Carvings</text>
+<text x="48.0" y="72.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="13" fill="#5C666E">Core &amp; neighbouring regions: motif-family share, Shannon H&#x27; / Pielou J&#x27;, and Bray-Curtis dissimilarity</text>
+<rect x="48.0" y="102.0" width="640.0" height="515.0" rx="8.0" fill="#FFFFFF" stroke="#D8D2C5" stroke-width="1.0"/>
+<text x="68.0" y="132.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="15" font-weight="700" fill="#1C252C">A. Motif-Family Share (%) &amp; Diversity Indices</text>
+<text x="239.0" y="168.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">Animal</text>
+<text x="311.0" y="168.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">Human</text>
+<text x="383.0" y="168.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">Scene Or U</text>
+<text x="455.0" y="168.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">Symbol</text>
+<text x="527.0" y="168.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">Vessel</text>
+<text x="618.0" y="168.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">H&#x27; / J&#x27; (N)</text>
+<text x="193.0" y="217.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="12" font-weight="700" text-anchor="end" fill="#1C252C">Alta</text>
+<rect x="205.0" y="186.0" width="68.0" height="52.0" rx="4.0" fill="#2D5B75" fill-opacity="0.08"/>
+<text x="239.0" y="217.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">0.1%</text>
+<rect x="277.0" y="186.0" width="68.0" height="52.0" rx="4.0" fill="#2D5B75" fill-opacity="0.09"/>
+<text x="311.0" y="217.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">7.5%</text>
+<rect x="349.0" y="186.0" width="68.0" height="52.0" rx="4.0" fill="#2D5B75"/>
+<text x="383.0" y="217.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#FFFFFF">87.4%</text>
+<rect x="421.0" y="186.0" width="68.0" height="52.0" rx="4.0" fill="#2D5B75" fill-opacity="0.08"/>
+<text x="455.0" y="217.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">1.2%</text>
+<rect x="493.0" y="186.0" width="68.0" height="52.0" rx="4.0" fill="#2D5B75" fill-opacity="0.08"/>
+<text x="527.0" y="217.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">3.8%</text>
+<text x="618.0" y="217.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" text-anchor="middle" fill="#1C252C">0.52 / 0.29 (2018)</text>
+<text x="193.0" y="275.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="12" font-weight="700" text-anchor="end" fill="#1C252C">Østfold</text>
+<rect x="205.0" y="244.0" width="68.0" height="52.0" rx="4.0" fill="#EAE5DA" fill-opacity="0.35"/>
+<text x="239.0" y="275.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">0.0%</text>
+<rect x="277.0" y="244.0" width="68.0" height="52.0" rx="4.0" fill="#2D5B75" fill-opacity="0.08"/>
+<text x="311.0" y="275.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">4.0%</text>
+<rect x="349.0" y="244.0" width="68.0" height="52.0" rx="4.0" fill="#2D5B75"/>
+<text x="383.0" y="275.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#FFFFFF">87.1%</text>
+<rect x="421.0" y="244.0" width="68.0" height="52.0" rx="4.0" fill="#2D5B75" fill-opacity="0.08"/>
+<text x="455.0" y="275.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">2.2%</text>
+<rect x="493.0" y="244.0" width="68.0" height="52.0" rx="4.0" fill="#2D5B75" fill-opacity="0.08"/>
+<text x="527.0" y="275.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">6.8%</text>
+<text x="618.0" y="275.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" text-anchor="middle" fill="#1C252C">0.54 / 0.30 (1105)</text>
+<text x="193.0" y="333.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="12" font-weight="700" text-anchor="end" fill="#1C252C">Bohuslän/Tanum</text>
+<rect x="205.0" y="302.0" width="68.0" height="52.0" rx="4.0" fill="#2D5B75" fill-opacity="0.08"/>
+<text x="239.0" y="333.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">0.3%</text>
+<rect x="277.0" y="302.0" width="68.0" height="52.0" rx="4.0" fill="#2D5B75" fill-opacity="0.15"/>
+<text x="311.0" y="333.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">12.7%</text>
+<rect x="349.0" y="302.0" width="68.0" height="52.0" rx="4.0" fill="#2D5B75" fill-opacity="0.63"/>
+<text x="383.0" y="333.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#FFFFFF">54.9%</text>
+<rect x="421.0" y="302.0" width="68.0" height="52.0" rx="4.0" fill="#2D5B75" fill-opacity="0.08"/>
+<text x="455.0" y="333.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">2.1%</text>
+<rect x="493.0" y="302.0" width="68.0" height="52.0" rx="4.0" fill="#2D5B75" fill-opacity="0.35"/>
+<text x="527.0" y="333.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">30.1%</text>
+<text x="618.0" y="333.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" text-anchor="middle" fill="#1C252C">1.06 / 0.59 (1363)</text>
+<text x="193.0" y="391.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="12" font-weight="700" text-anchor="end" fill="#1C252C">Nämforsen</text>
+<rect x="205.0" y="360.0" width="68.0" height="52.0" rx="4.0" fill="#2D5B75" fill-opacity="0.08"/>
+<text x="239.0" y="391.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">7.0%</text>
+<rect x="277.0" y="360.0" width="68.0" height="52.0" rx="4.0" fill="#2D5B75" fill-opacity="0.08"/>
+<text x="311.0" y="391.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">6.4%</text>
+<rect x="349.0" y="360.0" width="68.0" height="52.0" rx="4.0" fill="#2D5B75" fill-opacity="0.73"/>
+<text x="383.0" y="391.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#FFFFFF">63.9%</text>
+<rect x="421.0" y="360.0" width="68.0" height="52.0" rx="4.0" fill="#EAE5DA" fill-opacity="0.35"/>
+<text x="455.0" y="391.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">0.0%</text>
+<rect x="493.0" y="360.0" width="68.0" height="52.0" rx="4.0" fill="#2D5B75" fill-opacity="0.26"/>
+<text x="527.0" y="391.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">22.7%</text>
+<text x="618.0" y="391.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" text-anchor="middle" fill="#1C252C">0.99 / 0.71 (313)</text>
+<text x="193.0" y="449.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="12" font-weight="700" text-anchor="end" fill="#1C252C">Vingen</text>
+<rect x="205.0" y="418.0" width="68.0" height="52.0" rx="4.0" fill="#2D5B75" fill-opacity="0.84"/>
+<text x="239.0" y="449.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#FFFFFF">73.0%</text>
+<rect x="277.0" y="418.0" width="68.0" height="52.0" rx="4.0" fill="#2D5B75" fill-opacity="0.08"/>
+<text x="311.0" y="449.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">4.2%</text>
+<rect x="349.0" y="418.0" width="68.0" height="52.0" rx="4.0" fill="#2D5B75" fill-opacity="0.26"/>
+<text x="383.0" y="449.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">22.3%</text>
+<rect x="421.0" y="418.0" width="68.0" height="52.0" rx="4.0" fill="#2D5B75" fill-opacity="0.08"/>
+<text x="455.0" y="449.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">0.5%</text>
+<rect x="493.0" y="418.0" width="68.0" height="52.0" rx="4.0" fill="#EAE5DA" fill-opacity="0.35"/>
+<text x="527.0" y="449.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">0.0%</text>
+<text x="618.0" y="449.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" text-anchor="middle" fill="#1C252C">0.74 / 0.41 (1380)</text>
+<text x="193.0" y="507.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="12" font-weight="700" text-anchor="end" fill="#1C252C">Trøndelag</text>
+<rect x="205.0" y="476.0" width="68.0" height="52.0" rx="4.0" fill="#2D5B75" fill-opacity="0.22"/>
+<text x="239.0" y="507.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">19.2%</text>
+<rect x="277.0" y="476.0" width="68.0" height="52.0" rx="4.0" fill="#2D5B75" fill-opacity="0.08"/>
+<text x="311.0" y="507.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">0.4%</text>
+<rect x="349.0" y="476.0" width="68.0" height="52.0" rx="4.0" fill="#2D5B75" fill-opacity="0.80"/>
+<text x="383.0" y="507.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#FFFFFF">69.3%</text>
+<rect x="421.0" y="476.0" width="68.0" height="52.0" rx="4.0" fill="#2D5B75" fill-opacity="0.08"/>
+<text x="455.0" y="507.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">4.5%</text>
+<rect x="493.0" y="476.0" width="68.0" height="52.0" rx="4.0" fill="#2D5B75" fill-opacity="0.08"/>
+<text x="527.0" y="507.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">6.6%</text>
+<text x="618.0" y="507.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" text-anchor="middle" fill="#1C252C">1.10 / 0.48 (485)</text>
+<rect x="710.0" y="102.0" width="522.0" height="515.0" rx="8.0" fill="#FFFFFF" stroke="#D8D2C5" stroke-width="1.0"/>
+<text x="730.0" y="132.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="15" font-weight="700" fill="#1C252C">B. Pairwise Bray-Curtis Dissimilarity</text>
+<text x="874.0" y="182.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="10" font-weight="700" text-anchor="middle" fill="#1C252C">Alta</text>
+<text x="932.0" y="182.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="10" font-weight="700" text-anchor="middle" fill="#1C252C">Østfold</text>
+<text x="990.0" y="182.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="10" font-weight="700" text-anchor="middle" fill="#1C252C">Bohuslän</text>
+<text x="1048.0" y="182.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="10" font-weight="700" text-anchor="middle" fill="#1C252C">Nämforsen</text>
+<text x="1106.0" y="182.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="10" font-weight="700" text-anchor="middle" fill="#1C252C">Vingen</text>
+<text x="1164.0" y="182.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="10" font-weight="700" text-anchor="middle" fill="#1C252C">Trøndelag</text>
+<text x="835.0" y="227.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="end" fill="#1C252C">Alta</text>
+<rect x="847.0" y="196.0" width="54.0" height="54.0" rx="4.0" fill="#EAE5DA" fill-opacity="0.45"/>
+<text x="874.0" y="227.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">0.00</text>
+<rect x="905.0" y="196.0" width="54.0" height="54.0" rx="4.0" fill="#B85D3B" fill-opacity="0.08"/>
+<text x="932.0" y="227.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">0.07</text>
+<rect x="963.0" y="196.0" width="54.0" height="54.0" rx="4.0" fill="#B85D3B" fill-opacity="0.36"/>
+<text x="990.0" y="227.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">0.36</text>
+<rect x="1021.0" y="196.0" width="54.0" height="54.0" rx="4.0" fill="#B85D3B" fill-opacity="0.28"/>
+<text x="1048.0" y="227.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">0.28</text>
+<rect x="1079.0" y="196.0" width="54.0" height="54.0" rx="4.0" fill="#B85D3B" fill-opacity="0.73"/>
+<text x="1106.0" y="227.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#FFFFFF">0.73</text>
+<rect x="1137.0" y="196.0" width="54.0" height="54.0" rx="4.0" fill="#B85D3B" fill-opacity="0.27"/>
+<text x="1164.0" y="227.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">0.27</text>
+<text x="835.0" y="285.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="end" fill="#1C252C">Østfold</text>
+<rect x="847.0" y="254.0" width="54.0" height="54.0" rx="4.0" fill="#B85D3B" fill-opacity="0.08"/>
+<text x="874.0" y="285.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">0.07</text>
+<rect x="905.0" y="254.0" width="54.0" height="54.0" rx="4.0" fill="#EAE5DA" fill-opacity="0.45"/>
+<text x="932.0" y="285.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">0.00</text>
+<rect x="963.0" y="254.0" width="54.0" height="54.0" rx="4.0" fill="#B85D3B" fill-opacity="0.35"/>
+<text x="990.0" y="285.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">0.35</text>
+<rect x="1021.0" y="254.0" width="54.0" height="54.0" rx="4.0" fill="#B85D3B" fill-opacity="0.33"/>
+<text x="1048.0" y="285.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">0.33</text>
+<rect x="1079.0" y="254.0" width="54.0" height="54.0" rx="4.0" fill="#B85D3B" fill-opacity="0.74"/>
+<text x="1106.0" y="285.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#FFFFFF">0.74</text>
+<rect x="1137.0" y="254.0" width="54.0" height="54.0" rx="4.0" fill="#B85D3B" fill-opacity="0.29"/>
+<text x="1164.0" y="285.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">0.29</text>
+<text x="835.0" y="343.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="end" fill="#1C252C">Bohuslän</text>
+<rect x="847.0" y="312.0" width="54.0" height="54.0" rx="4.0" fill="#B85D3B" fill-opacity="0.36"/>
+<text x="874.0" y="343.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">0.36</text>
+<rect x="905.0" y="312.0" width="54.0" height="54.0" rx="4.0" fill="#B85D3B" fill-opacity="0.35"/>
+<text x="932.0" y="343.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">0.35</text>
+<rect x="963.0" y="312.0" width="54.0" height="54.0" rx="4.0" fill="#EAE5DA" fill-opacity="0.45"/>
+<text x="990.0" y="343.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">0.00</text>
+<rect x="1021.0" y="312.0" width="54.0" height="54.0" rx="4.0" fill="#B85D3B" fill-opacity="0.39"/>
+<text x="1048.0" y="343.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">0.39</text>
+<rect x="1079.0" y="312.0" width="54.0" height="54.0" rx="4.0" fill="#B85D3B" fill-opacity="0.73"/>
+<text x="1106.0" y="343.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#FFFFFF">0.73</text>
+<rect x="1137.0" y="312.0" width="54.0" height="54.0" rx="4.0" fill="#B85D3B" fill-opacity="0.43"/>
+<text x="1164.0" y="343.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">0.43</text>
+<text x="835.0" y="401.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="end" fill="#1C252C">Nämforsen</text>
+<rect x="847.0" y="370.0" width="54.0" height="54.0" rx="4.0" fill="#B85D3B" fill-opacity="0.28"/>
+<text x="874.0" y="401.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">0.28</text>
+<rect x="905.0" y="370.0" width="54.0" height="54.0" rx="4.0" fill="#B85D3B" fill-opacity="0.33"/>
+<text x="932.0" y="401.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">0.33</text>
+<rect x="963.0" y="370.0" width="54.0" height="54.0" rx="4.0" fill="#B85D3B" fill-opacity="0.39"/>
+<text x="990.0" y="401.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">0.39</text>
+<rect x="1021.0" y="370.0" width="54.0" height="54.0" rx="4.0" fill="#EAE5DA" fill-opacity="0.45"/>
+<text x="1048.0" y="401.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">0.00</text>
+<rect x="1079.0" y="370.0" width="54.0" height="54.0" rx="4.0" fill="#B85D3B" fill-opacity="0.73"/>
+<text x="1106.0" y="401.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#FFFFFF">0.73</text>
+<rect x="1137.0" y="370.0" width="54.0" height="54.0" rx="4.0" fill="#B85D3B" fill-opacity="0.23"/>
+<text x="1164.0" y="401.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">0.23</text>
+<text x="835.0" y="459.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="end" fill="#1C252C">Vingen</text>
+<rect x="847.0" y="428.0" width="54.0" height="54.0" rx="4.0" fill="#B85D3B" fill-opacity="0.73"/>
+<text x="874.0" y="459.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#FFFFFF">0.73</text>
+<rect x="905.0" y="428.0" width="54.0" height="54.0" rx="4.0" fill="#B85D3B" fill-opacity="0.74"/>
+<text x="932.0" y="459.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#FFFFFF">0.74</text>
+<rect x="963.0" y="428.0" width="54.0" height="54.0" rx="4.0" fill="#B85D3B" fill-opacity="0.73"/>
+<text x="990.0" y="459.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#FFFFFF">0.73</text>
+<rect x="1021.0" y="428.0" width="54.0" height="54.0" rx="4.0" fill="#B85D3B" fill-opacity="0.73"/>
+<text x="1048.0" y="459.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#FFFFFF">0.73</text>
+<rect x="1079.0" y="428.0" width="54.0" height="54.0" rx="4.0" fill="#EAE5DA" fill-opacity="0.45"/>
+<text x="1106.0" y="459.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">0.00</text>
+<rect x="1137.0" y="428.0" width="54.0" height="54.0" rx="4.0" fill="#B85D3B" fill-opacity="0.77"/>
+<text x="1164.0" y="459.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#FFFFFF">0.77</text>
+<text x="835.0" y="517.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="end" fill="#1C252C">Trøndelag</text>
+<rect x="847.0" y="486.0" width="54.0" height="54.0" rx="4.0" fill="#B85D3B" fill-opacity="0.27"/>
+<text x="874.0" y="517.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">0.27</text>
+<rect x="905.0" y="486.0" width="54.0" height="54.0" rx="4.0" fill="#B85D3B" fill-opacity="0.29"/>
+<text x="932.0" y="517.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">0.29</text>
+<rect x="963.0" y="486.0" width="54.0" height="54.0" rx="4.0" fill="#B85D3B" fill-opacity="0.43"/>
+<text x="990.0" y="517.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">0.43</text>
+<rect x="1021.0" y="486.0" width="54.0" height="54.0" rx="4.0" fill="#B85D3B" fill-opacity="0.23"/>
+<text x="1048.0" y="517.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">0.23</text>
+<rect x="1079.0" y="486.0" width="54.0" height="54.0" rx="4.0" fill="#B85D3B" fill-opacity="0.77"/>
+<text x="1106.0" y="517.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#FFFFFF">0.77</text>
+<rect x="1137.0" y="486.0" width="54.0" height="54.0" rx="4.0" fill="#EAE5DA" fill-opacity="0.45"/>
+<text x="1164.0" y="517.6" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#1C252C">0.00</text>
+<text x="48.0" y="662.0" font-family="Segoe UI, Arial, DejaVu Sans, sans-serif" font-size="11" fill="#5C666E">Indices computed over motif_class abundances: H&#x27; = -sum(p ln p), J&#x27; = H&#x27;/ln(S). Bray-Curtis: 0 = identical, 1 = disjoint.</text>
+</svg>

@@ -1,0 +1,104 @@
+{
+  "total_figures": 7934,
+  "calibrated_count": 0,
+  "uncalibrated_count": 7934,
+  "by_core_region": {
+    "alta": 2018,
+    "ostfold": 1105,
+    "bohuslan_tanum": 1363,
+    "other": 1270,
+    "vingen": 1380,
+    "trondelag": 485,
+    "namforsen": 313
+  },
+  "by_period": {
+    "stone_age_hunter": 4378,
+    "bronze_age_agrarian": 3323,
+    "mixed": 217,
+    "unknown": 16
+  },
+  "by_media_type": {
+    "bw_tracing": 6536,
+    "rubbing_frottage": 1359,
+    "svg_vector": 4,
+    "rti_3d": 35
+  },
+  "by_family": {
+    "scene_or_unclassified": 5027,
+    "human": 487,
+    "vessel": 923,
+    "animal": 1366,
+    "symbol": 131
+  },
+  "by_archive": {
+    "altarockart": 1673,
+    "unimus": 1782,
+    "shfa": 3984,
+    "wikimedia": 434,
+    "zenodo_shfa": 25,
+    "digitaltmuseum": 13,
+    "europeana": 13,
+    "ksamsok": 10
+  },
+  "coords_verified_count": 7312,
+  "site_panel_id_verified_count": 7209,
+  "ingest_summary": {
+    "manifests_read": [
+      "sources/alta_expansion/manifest.jsonl",
+      "sources/ksamsok_dimu_expansion/manifest.jsonl",
+      "sources/nordic_archives/manifest.jsonl",
+      "sources/norway_archives/manifest.jsonl",
+      "sources/shfa_expansion/manifest.jsonl",
+      "sources/unimus_expansion/manifest.jsonl",
+      "sources/wikimedia/manifest.jsonl"
+    ],
+    "accepted_carved_sources": 1168,
+    "excluded_by_reason": {
+      "quarantined_record": 104,
+      "excluded_media_type:photo_other": 182
+    },
+    "duplicate_sha256_skipped": 0,
+    "manifest_issues_count": 0,
+    "manifest_issues_sample": []
+  },
+  "plate_status": {
+    "ok": 1017,
+    "rejected_no_figures": 17,
+    "rejected_extract": 133,
+    "rejected_empty": 1
+  },
+  "plate_rejects": {
+    "no_figures": 17,
+    "rti_excessive_foreground": 54,
+    "noisy_rubbing_rejected": 44,
+    "excessive_speckle_fragmentation": 3,
+    "empty_after_chrome_removal": 1,
+    "bw_excessive_foreground": 4,
+    "bw_empty_foreground": 4,
+    "mislabeled_color_photo:sat=0.99": 1,
+    "mislabeled_color_photo:sat=0.86": 2,
+    "mislabeled_color_photo:sat=1.00": 1,
+    "mislabeled_color_photo:sat=0.54": 1,
+    "mislabeled_color_photo:sat=0.42": 1,
+    "mislabeled_color_photo:sat=0.81": 1,
+    "mislabeled_color_photo:sat=0.83": 1,
+    "mislabeled_color_photo:sat=0.80": 1,
+    "noisy_texture_not_tracing": 3,
+    "mislabeled_color_photo:sat=0.55": 1,
+    "mislabeled_color_photo:sat=0.58": 1,
+    "mislabeled_color_photo:sat=0.63": 1,
+    "svg_rasterize_failed": 6,
+    "mislabeled_color_photo:sat=0.95": 1,
+    "mislabeled_color_photo:sat=0.60": 1,
+    "mislabeled_color_photo:sat=0.48": 1
+  },
+  "schema_validation_errors": 0,
+  "qa_summary": {
+    "dual_traced_count": 397,
+    "dual_traced_pct": 5.0,
+    "mean_iou": 0.6039,
+    "median_iou": 0.6561,
+    "disagreement_count": 385
+  },
+  "elapsed_seconds": 506.97
+}

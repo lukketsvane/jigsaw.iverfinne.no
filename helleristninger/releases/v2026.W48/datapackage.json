@@ -1,0 +1,110 @@
+{
+  "$schema": "https://specs.frictionlessdata.io/schemas/data-package.json",
+  "profile": "tabular-data-package",
+  "name": "nordic-helleristninger-corpus-v2026-w48",
+  "title": "Nordic Helleristninger Scientific Corpus & Weekly Release v2026.W48",
+  "version": "2026.W48",
+  "created": "2026-11-28T00:00:00Z",
+  "description": "Self-contained open archival, morphometric, multi-layer SVG, dual-trace QA, and 750-piece laser-cut wooden puzzle release for Scandinavian rock carvings (Alta, Østfold, Bohuslän/Tanum, Nämforsen, Vingen, Trøndelag).",
+  "homepage": "https://github.com/iverfinne/jigsaw.iverfinne.no",
+  "licenses": [
+    {
+      "name": "heterogeneous-per-record",
+      "title": "Per-record archival licenses (CC0 1.0, Public Domain, CC BY 2.5/3.0/4.0, CC BY-SA 4.0, CC BY-NC-SA 4.0); see figures.jsonl and rights-inventory.csv"
+    }
+  ],
+  "keywords": [
+    "helleristninger",
+    "rock art",
+    "Scandinavia",
+    "Alta",
+    "Tanum",
+    "Bohuslän",
+    "Østfold",
+    "Nämforsen",
+    "morphometrics",
+    "SVG"
+  ],
+  "resources": [
+    {
+      "name": "scientific-figures-jsonl",
+      "path": "../../scientific_record/figures.jsonl",
+      "title": "Master Per-Figure Scientific Record (JSONL)",
+      "format": "jsonl",
+      "mediatype": "application/jsonl",
+      "encoding": "utf-8"
+    },
+    {
+      "name": "scientific-figures-csv",
+      "path": "../../scientific_record/figures.csv",
+      "title": "Master Per-Figure Scientific Record (Tabular CSV)",
+      "format": "csv",
+      "mediatype": "text/csv",
+      "encoding": "utf-8"
+    },
+    {
+      "name": "scientific-schema",
+      "path": "../../scientific_record/schema.json",
+      "title": "JSON Schema for figures.jsonl",
+      "format": "json",
+      "mediatype": "application/json",
+      "encoding": "utf-8"
+    },
+    {
+      "name": "site-gazetteer",
+      "path": "../../metadata/site_gazetteer.json",
+      "title": "Verified Nordic Rock-Art Site Gazetteer (Askeladden / RAÄ FMIS / EPSG:4326)",
+      "format": "json",
+      "mediatype": "application/json"
+    },
+    {
+      "name": "literature-bibliography",
+      "path": "../../metadata/literature.json",
+      "title": "Peer-Reviewed Rock-Art Literature Bibliography",
+      "format": "json",
+      "mediatype": "application/json"
+    },
+    {
+      "name": "dual-trace-qa-report",
+      "path": "../../qa/dual_trace_report.json",
+      "title": "Independent Dual-Trace IoU Quality Assurance Report",
+      "format": "json",
+      "mediatype": "application/json"
+    },
+    {
+      "name": "dual-trace-disagreements",
+      "path": "../../qa/dual_trace_disagreements.jsonl",
+      "title": "Complete Dual-Trace Disagreement Log",
+      "format": "jsonl",
+      "mediatype": "application/jsonl"
+    },
+    {
+      "name": "scientific-findings-metrics",
+      "path": "../../science/findings_metrics.json",
+      "title": "Quantitative Morphometric, Regional Diversity & Dual-Trace Reliability Metrics",
+      "format": "json",
+      "mediatype": "application/json"
+    },
+    {
+      "name": "scientific-findings-report",
+      "path": "../../science/findings_v2026.W48.md",
+      "title": "Scientific Findings Report v2026.W48",
+      "format": "md",
+      "mediatype": "text/markdown"
+    },
+    {
+      "name": "selected-750-catalog",
+      "path": "../../docs/selected-750-catalog.json",
+      "title": "Locked 750-Piece Commercial-Hygiene Jigsaw Motif Catalog",
+      "format": "json",
+      "mediatype": "application/json"
+    },
+    {
+      "name": "rights-inventory",
+      "path": "../../docs/rights-inventory.csv",
+      "title": "750-Piece Provenance & Legal Review Inventory (NOT CLEARED FOR SALE)",
+      "format": "csv",
+      "mediatype": "text/csv"
+    }
+  ]
+}

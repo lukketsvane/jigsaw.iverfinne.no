@@ -1,0 +1,479 @@
+{
+  "schema_version": "1.0.0",
+  "description": "Peer-reviewed archaeological literature & archival citations for Norwegian and Swedish rock carvings (helleristninger / hällristningar). DOIs verified via CrossRef; unverified DOIs/ISBNs are explicitly null.",
+  "count": 20,
+  "citations": [
+    {
+      "citation_id": "helskog_1988",
+      "authors": [
+        "Helskog, Knut"
+      ],
+      "year": 1988,
+      "title": "Helleristningene i Alta: spor etter ritualer og dagligliv i Finnmarks forhistorie",
+      "publication_type": "monograph",
+      "publisher": "Alta Museum",
+      "place": "Alta",
+      "language": "no",
+      "isbn": "8299170907",
+      "doi": null,
+      "regions": [
+        "Alta (Finnmark, NO)"
+      ],
+      "periods": [
+        "stone_age_hunter"
+      ],
+      "crossref_verified": false
+    },
+    {
+      "citation_id": "helskog_2012",
+      "authors": [
+        "Helskog, Knut"
+      ],
+      "year": 2012,
+      "title": "Samtaler med maktene: en historie om verdensarven i Alta",
+      "publication_type": "monograph",
+      "publisher": "Tromsø Museum — Universitetsmuseet",
+      "place": "Tromsø",
+      "language": "no",
+      "isbn": null,
+      "doi": null,
+      "regions": [
+        "Alta (Finnmark, NO)"
+      ],
+      "periods": [
+        "stone_age_hunter",
+        "mixed"
+      ],
+      "crossref_verified": false
+    },
+    {
+      "citation_id": "helskog_1999",
+      "authors": [
+        "Helskog, Knut"
+      ],
+      "year": 1999,
+      "title": "The Shore Connection. Cognitive Landscape and Communication with Rock Carvings in Northernmost Europe",
+      "publication_type": "journal_article",
+      "journal": "Norwegian Archaeological Review",
+      "volume": "32",
+      "issue": "2",
+      "pages": "73-94",
+      "language": "en",
+      "doi": "10.1080/00293659950136174",
+      "regions": [
+        "Alta (Finnmark, NO)",
+        "Northern Fennoscandia"
+      ],
+      "periods": [
+        "stone_age_hunter"
+      ],
+      "crossref_verified": true
+    },
+    {
+      "citation_id": "hallstrom_1938",
+      "authors": [
+        "Hallström, Gustaf"
+      ],
+      "year": 1938,
+      "title": "Monumental Art of Northern Europe from the Stone Age. I. The Norwegian Localities",
+      "publication_type": "monograph",
+      "publisher": "Thule",
+      "place": "Stockholm",
+      "language": "en",
+      "isbn": null,
+      "doi": null,
+      "regions": [
+        "Nordland",
+        "Trøndelag",
+        "Finnmark",
+        "Norway"
+      ],
+      "periods": [
+        "stone_age_hunter"
+      ],
+      "crossref_verified": false
+    },
+    {
+      "citation_id": "hallstrom_1960",
+      "authors": [
+        "Hallström, Gustaf"
+      ],
+      "year": 1960,
+      "title": "Monumental Art of Northern Sweden from the Stone Age: Nämforsen and Other Localities",
+      "publication_type": "monograph",
+      "publisher": "Almqvist & Wiksell",
+      "place": "Stockholm",
+      "language": "en",
+      "isbn": null,
+      "doi": null,
+      "regions": [
+        "Nämforsen (Ångermanland, SE)",
+        "Glösa (Jämtland, SE)",
+        "Norrfors (Västerbotten, SE)"
+      ],
+      "periods": [
+        "stone_age_hunter",
+        "mixed"
+      ],
+      "crossref_verified": false
+    },
+    {
+      "citation_id": "gjessing_1932",
+      "authors": [
+        "Gjessing, Gutorm"
+      ],
+      "year": 1932,
+      "title": "Arktiske helleristninger i Nord-Norge",
+      "publication_type": "monograph",
+      "series": "Instituttet for sammenlignende kulturforskning, Serie B: Skrifter XXI",
+      "publisher": "Aschehoug",
+      "place": "Oslo",
+      "language": "no",
+      "isbn": null,
+      "doi": null,
+      "regions": [
+        "Nordland",
+        "Troms",
+        "Finnmark"
+      ],
+      "periods": [
+        "stone_age_hunter"
+      ],
+      "crossref_verified": false
+    },
+    {
+      "citation_id": "gjessing_1936",
+      "authors": [
+        "Gjessing, Gutorm"
+      ],
+      "year": 1936,
+      "title": "Nordenfjelske ristninger og malinger av den arktiske gruppe",
+      "publication_type": "monograph",
+      "series": "Instituttet for sammenlignende kulturforskning, Serie B: Skrifter XXX",
+      "publisher": "Aschehoug",
+      "place": "Oslo",
+      "language": "no",
+      "isbn": null,
+      "doi": null,
+      "regions": [
+        "Trøndelag",
+        "Møre og Romsdal"
+      ],
+      "periods": [
+        "stone_age_hunter",
+        "mixed"
+      ],
+      "crossref_verified": false
+    },
+    {
+      "citation_id": "gjessing_1939",
+      "authors": [
+        "Gjessing, Gutorm"
+      ],
+      "year": 1939,
+      "title": "Østfolds jordbruksristninger: Idd, Berg og delvis Skjeberg",
+      "publication_type": "monograph",
+      "series": "Instituttet for sammenlignende kulturforskning, Serie B: Skrifter XXXVII",
+      "publisher": "Aschehoug",
+      "place": "Oslo",
+      "language": "no",
+      "isbn": null,
+      "doi": null,
+      "regions": [
+        "Østfold (NO)"
+      ],
+      "periods": [
+        "bronze_age_agrarian"
+      ],
+      "crossref_verified": false
+    },
+    {
+      "citation_id": "marstrander_1963",
+      "authors": [
+        "Marstrander, Sverre"
+      ],
+      "year": 1963,
+      "title": "Østfolds jordbruksristninger: Skjeberg",
+      "publication_type": "monograph",
+      "series": "Instituttet for sammenlignende kulturforskning, Serie B: Skrifter LIII",
+      "publisher": "Universitetsforlaget",
+      "place": "Oslo",
+      "language": "no",
+      "isbn": null,
+      "doi": null,
+      "regions": [
+        "Østfold (NO)"
+      ],
+      "periods": [
+        "bronze_age_agrarian"
+      ],
+      "crossref_verified": false
+    },
+    {
+      "citation_id": "vogt_2011",
+      "authors": [
+        "Vogt, David"
+      ],
+      "year": 2011,
+      "title": "Rock Carvings in Østfold and Bohuslän, South Scandinavia: An Interpretation of Political and Economic Landscapes",
+      "publication_type": "monograph",
+      "publisher": "Novus Forlag / Instituttet for sammenlignende kulturforskning",
+      "place": "Oslo",
+      "language": "en",
+      "isbn": null,
+      "doi": null,
+      "regions": [
+        "Østfold (NO)",
+        "Bohuslän / Tanum (SE)"
+      ],
+      "periods": [
+        "bronze_age_agrarian"
+      ],
+      "crossref_verified": false
+    },
+    {
+      "citation_id": "lodoen_mandt_2010",
+      "authors": [
+        "Lødøen, Trond",
+        "Mandt, Gro"
+      ],
+      "year": 2010,
+      "title": "The Rock Art of Norway",
+      "publication_type": "monograph",
+      "publisher": "Windgather Press / Oxbow Books",
+      "place": "Oxford",
+      "language": "en",
+      "isbn": null,
+      "doi": null,
+      "regions": [
+        "Norway (all core regions)"
+      ],
+      "periods": [
+        "stone_age_hunter",
+        "bronze_age_agrarian",
+        "mixed"
+      ],
+      "crossref_verified": false
+    },
+    {
+      "citation_id": "lodoen_mandt_2012",
+      "authors": [
+        "Lødøen, Trond",
+        "Mandt, Gro"
+      ],
+      "year": 2012,
+      "title": "Vingen — et naturens kolossalmuseum for helleristninger",
+      "publication_type": "monograph",
+      "publisher": "Akademika Forlag / Universitetet i Bergen",
+      "place": "Trondheim / Bergen",
+      "language": "no",
+      "isbn": null,
+      "doi": null,
+      "regions": [
+        "Vingen (Vestland, NO)"
+      ],
+      "periods": [
+        "stone_age_hunter"
+      ],
+      "crossref_verified": false
+    },
+    {
+      "citation_id": "bertilsson_1987",
+      "authors": [
+        "Bertilsson, Ulf"
+      ],
+      "year": 1987,
+      "title": "The Rock Carvings of Northern Bohuslän: Spatial Structures and Social Symbols",
+      "publication_type": "monograph",
+      "series": "Stockholm Studies in Archaeology 7",
+      "publisher": "Stockholms universitet",
+      "place": "Stockholm",
+      "language": "en",
+      "isbn": null,
+      "doi": null,
+      "regions": [
+        "Bohuslän / Tanum (SE)"
+      ],
+      "periods": [
+        "bronze_age_agrarian"
+      ],
+      "crossref_verified": false
+    },
+    {
+      "citation_id": "milstreu_prohl_1996",
+      "authors": [
+        "Milstreu, Gerhard",
+        "Prøhl, Henning"
+      ],
+      "year": 1996,
+      "title": "Dokumentation och registrering av hällristningar i Tanum 1: Aspeberget",
+      "publication_type": "monograph",
+      "publisher": "Tanums Hällristningsmuseum Underslös",
+      "place": "Tanumshede",
+      "language": "sv",
+      "isbn": null,
+      "doi": null,
+      "regions": [
+        "Bohuslän / Tanum (SE)"
+      ],
+      "periods": [
+        "bronze_age_agrarian"
+      ],
+      "crossref_verified": false
+    },
+    {
+      "citation_id": "shfa_archive",
+      "authors": [
+        "Bertilsson, Ulf",
+        "Bertilsson, Catarina",
+        "Horn, Christian",
+        "Ling, Johan",
+        "SHFA / GRIDH"
+      ],
+      "year": 2024,
+      "title": "Swedish Rock Art Research Archives (SHFA): Open Digital Infrastructure for Nordic Rock Art",
+      "publication_type": "digital_archive",
+      "publisher": "University of Gothenburg — Centre for Digital Humanities (GRIDH)",
+      "place": "Gothenburg",
+      "language": "en",
+      "url": "https://shfa.dh.gu.se/",
+      "license": "CC BY 4.0",
+      "doi": null,
+      "regions": [
+        "Bohuslän / Tanum (SE)",
+        "Nämforsen (Ångermanland, SE)",
+        "Sweden",
+        "Norway",
+        "Denmark"
+      ],
+      "periods": [
+        "stone_age_hunter",
+        "bronze_age_agrarian",
+        "mixed"
+      ],
+      "crossref_verified": false
+    },
+    {
+      "citation_id": "ling_2008",
+      "authors": [
+        "Ling, Johan"
+      ],
+      "year": 2008,
+      "title": "Elevated Rock Art: Towards a Maritime Understanding of Bronze Age Rock Art in Northern Bohuslän, Sweden",
+      "publication_type": "monograph",
+      "series": "GOTARC Series B, Gothenburg Archaeological Theses 49",
+      "publisher": "University of Gothenburg",
+      "place": "Gothenburg",
+      "language": "en",
+      "isbn": null,
+      "doi": null,
+      "regions": [
+        "Bohuslän / Tanum (SE)"
+      ],
+      "periods": [
+        "bronze_age_agrarian"
+      ],
+      "crossref_verified": false
+    },
+    {
+      "citation_id": "kaul_1998",
+      "authors": [
+        "Kaul, Flemming"
+      ],
+      "year": 1998,
+      "title": "Ships on Bronzes: A Study in Bronze Age Religion and Iconography",
+      "publication_type": "monograph",
+      "series": "Publications from the National Museum, Studies in Archaeology & History 3",
+      "publisher": "National Museum of Denmark",
+      "place": "Copenhagen",
+      "language": "en",
+      "isbn": null,
+      "doi": null,
+      "regions": [
+        "Denmark",
+        "Bohuslän / Tanum (SE)",
+        "Østfold (NO)"
+      ],
+      "periods": [
+        "bronze_age_agrarian"
+      ],
+      "crossref_verified": false
+    },
+    {
+      "citation_id": "sognnes_2001",
+      "authors": [
+        "Sognnes, Kalle"
+      ],
+      "year": 2001,
+      "title": "Prehistoric Imagery and Landscapes: Rock Art in Stjørdal, Trøndelag, Norway",
+      "publication_type": "monograph",
+      "series": "BAR International Series 998",
+      "publisher": "Archaeopress",
+      "place": "Oxford",
+      "language": "en",
+      "isbn": null,
+      "doi": "10.30861/9781841712796",
+      "regions": [
+        "Trøndelag (NO)"
+      ],
+      "periods": [
+        "stone_age_hunter",
+        "bronze_age_agrarian",
+        "mixed"
+      ],
+      "crossref_verified": true
+    },
+    {
+      "citation_id": "malmer_1981",
+      "authors": [
+        "Malmer, Mats P."
+      ],
+      "year": 1981,
+      "title": "A Chorological Study of North European Rock Art",
+      "publication_type": "monograph",
+      "series": "Kungl. Vitterhets Historie och Antikvitets Akademiens Handlingar, Antikvariska serien 32",
+      "publisher": "Almqvist & Wiksell",
+      "place": "Stockholm",
+      "language": "en",
+      "isbn": null,
+      "doi": null,
+      "regions": [
+        "Sweden",
+        "Norway",
+        "Denmark",
+        "Nämforsen (Ångermanland, SE)"
+      ],
+      "periods": [
+        "stone_age_hunter",
+        "bronze_age_agrarian"
+      ],
+      "crossref_verified": false
+    },
+    {
+      "citation_id": "horn_et_al_2022",
+      "authors": [
+        "Horn, Christian",
+        "Ivarsson, Oskar",
+        "Lindhé, Cecilia",
+        "Potter, Rich",
+        "Green, Ashely",
+        "Ling, Johan"
+      ],
+      "year": 2022,
+      "title": "Artificial Intelligence, 3D Documentation, and Rock Art — Approaching and Reflecting on the Automation of Identification and Classification of Rock Art Images",
+      "publication_type": "journal_article",
+      "journal": "Journal of Archaeological Method and Theory",
+      "language": "en",
+      "doi": null,
+      "regions": [
+        "Bohuslän / Tanum (SE)",
+        "Nämforsen (Ångermanland, SE)"
+      ],
+      "periods": [
+        "stone_age_hunter",
+        "bronze_age_agrarian"
+      ],
+      "crossref_verified": false
+    }
+  ]
+}

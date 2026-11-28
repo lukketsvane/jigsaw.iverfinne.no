@@ -1,0 +1,21 @@
+{
+  "catalog_total": 24914,
+  "catalog_sweden": 23699,
+  "catalog_with_coords": 24739,
+  "manifest_total": 1797,
+  "manifest_traceable": 1778,
+  "manifest_quarantined": 19,
+  "by_media_type": {
+    "bw_tracing": 873,
+    "rubbing_frottage": 518,
+    "rti_3d": 387,
+    "painted_photo": 19
+  },
+  "unique_parishes_in_manifest": 116,
+  "download_stats": {
+    "downloaded_ok": 1778,
+    "quarantined_painted": 19,
+    "sha256_duplicate_skipped": 3
+  },
+  "elapsed_sec": 546.4
+}
