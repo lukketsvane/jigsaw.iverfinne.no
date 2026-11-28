@@ -1,17 +1,23 @@
 """Map of the rock-carving corpus: every traced figure (processed/catalog.json) at the place its source names.
 
     ..\\.venv\\Scripts\\python.exe sitemap.py geocode      # site names -> coordinates (OpenStreetMap Nominatim, cached)
+    ..\\.venv\\Scripts\\python.exe sitemap.py exact        # Askeladden and RAÄ ids -> registered panel positions (cached)
     ..\\.venv\\Scripts\\python.exe sitemap.py build        # interactive map: runs/hellerisninger-map/index.html
 
 The sources carry site, region and country but no coordinates. `geocode` cleans each site name (drops panel numbers,
-Askeladden and RAÄ ids), then asks Nominatim for the most specific place it finds: the site itself, then the municipality
-or locality named in the region, then the region. Every point records which of these it is (`precision`), so a figure
-placed at a region centroid is never mistaken for a surveyed panel. Requests send only place names, one per second, and
-are cached in runs/hellerisninger-map/geocode-cache.json.
+Askeladden and RAÄ ids), anchors it at the locality, municipality or region its label names, and accepts a site-level
+match from Nominatim only if it lies near that anchor (same-named places elsewhere are rejected). Every point records
+which of these it is (`precision`), so a figure placed at a region centroid is never mistaken for a surveyed panel.
+Requests send only place names, one per second, and are cached in runs/hellerisninger-map/geocode-cache.json.
 
-`build` writes one marker per traced figure, spread in a small spiral around its place so figures from one panel do
-not hide each other, clustered by Leaflet.markercluster. Popups show the traced silhouette, period, motif class, site,
-precision, licence and source link. Exact panel coordinates (Askeladden, FMIS) are the next step: see `askeladden_id`.
+`exact` places sources that name a heritage-register id at the registered monument: Askeladden ids through
+Riksantikvaren's open API (single monument, else locality), RAÄ numbers through K-samsök records that name the number in
+the source's own county or province (parish names repeat across Sweden), followed to the FMIS monument's coordinates.
+These positions (`precision` 'panel') override the geocoded ones; exact.json lists them, exact-cache.json caches lookups.
+
+`build` writes one marker per traced figure, in a small rosette around its position (4 m apart on a registered panel,
+15 m at a named place) so figures do not hide each other, clustered by Leaflet.markercluster. Popups show the traced
+silhouette, period, motif class, site, precision with a link to the register record, licence and source link.
 """
 import argparse, json, math, re, sys, time
 from pathlib import Path
@@ -164,6 +170,127 @@ def geocode(_):
           dict(Counter(p['precision'] for p in placed.values())))
 
 
+# ---------------------------------------------------------------- exact panel positions from heritage-register ids
+
+RA_API = 'https://api.ra.no/LokaliteterEnkeltminnerOgSikringssoner/collections'      # Riksantikvaren, Askeladden data
+KSAMSOK = 'https://kulturarvsdata.se/ksamsok/api'                                    # K-samsök, links photos to FMIS monuments
+EXACT = OUT / 'exact-cache.json'
+NEAR_KM = 60.          # a register position further than this from the geocoded place is treated as a wrong id
+
+
+def register_ids(site):
+    """(Askeladden id, RAÄ number) named in a site label: 'Bak Vehammaren 2:1a / Askeladden 117465-1', 'Fossum Tanum / Tanum 255:1'"""
+    a = re.search(r'Askeladden\s*([0-9]+(?:-[0-9]+)?)', site); raa = None
+    for part in re.split(r'\s+/\s+', site)[1:]:
+        m = re.fullmatch(r'(.+?)\s+(\d+:\d+)', part.strip())
+        if m and 'Askeladden' not in part: raa = f'{m.group(1)} {m.group(2)}'
+    return (a.group(1) if a else None), raa
+
+
+def centre(geometry):
+    pts = []
+    def walk(c):
+        if c and isinstance(c[0], (int, float)): pts.append(c)
+        else:
+            for x in c: walk(x)
+    walk(geometry['coordinates'])
+    return sum(p[1] for p in pts) / len(pts), sum(p[0] for p in pts) / len(pts)
+
+
+def plausible(lat, lon):
+    return 54. < lat < 72. and 4. < lon < 32.
+
+
+def askeladden(kid, cache, ses):
+    """centre of the single monument (enkeltminne) or locality with this Askeladden id"""
+    key = f'NO|{kid}'
+    if key in cache: return cache[key]
+    base = kid.split('-')[0]
+    forms = [('enkeltminner', kid), ('lokaliteter', kid), ('lokaliteter', base)] if '-' in kid else [('lokaliteter', kid), ('enkeltminner', f'{kid}-1')]
+    cache[key] = None
+    for col, k in forms:
+        try:
+            r = ses.get(f'{RA_API}/{col}/items', params={'f': 'json', 'kulturminneId': k, 'limit': 1}, headers=UA, timeout=60); time.sleep(.3)
+            fs = r.json().get('features', []) if r.ok else []
+        except (requests.RequestException, ValueError):
+            fs = []
+        f = next((f for f in fs if f.get('geometry')), None)
+        if f:
+            lat, lon = centre(f['geometry'])
+            if plausible(lat, lon):
+                cache[key] = [round(lat, 6), round(lon, 6), f['properties'].get('navn', ''), f"{col} {k}", f['properties'].get('linkKulturminnesøk') or f['properties'].get('linkAskeladden', '')]
+                break
+    return cache[key]
+
+
+def raa_number(num, cache, ses, hints=()):
+    """position of the FMIS monument with this RAÄ number. K-samsök is searched for records named after it (photos,
+    documents), first by exact name, then by parish and number; only records whose label contains the full number are
+    used. Their links to the monument record (raa/fmi or raa/lamning) give its coordinates."""
+    key = f'SE|{num}|' + '/'.join(hints)          # parish names repeat across provinces: Bro, Foss, Björksta
+    if key in cache: return cache[key]
+    cache[key] = None
+    parish, number = num.rsplit(' ', 1)
+    refs = []
+    for query in (f'itemName="{num}"', f'text={parish} and text="{number}"'):
+        try:
+            r = ses.get(KSAMSOK, params={'method': 'search', 'hitsPerPage': 25, 'query': query, 'recordSchema': 'presentation'}, headers=UA, timeout=60); time.sleep(.3)
+            text = r.text if r.ok else ''
+        except requests.RequestException:
+            text = ''
+        for rec in text.split('<record>')[1:]:
+            labels = ' '.join(re.findall(r'<pres:itemLabel>([^<]+)', rec)); place = ' '.join(re.findall(r'<pres:placeLabel>([^<]+)', rec))
+            if num in labels and (not hints or any(h in place for h in hints)):
+                refs += re.findall(r'<pres:reference>(https?://kulturarvsdata\.se/raa/(?:fmi|lamning)/[^<]+)</pres:reference>', rec)
+        if refs: break
+    refs = list(dict.fromkeys(refs)); best = None
+    for uri in refs[:4]:
+        try:
+            rdf = ses.get(uri, headers=dict(UA, Accept='application/rdf+xml'), timeout=60); time.sleep(.3)
+        except requests.RequestException:
+            continue
+        for c in re.findall(r'<gml:coordinates[^>]*>([^<]+)</gml:coordinates>', rdf.text if rdf.ok else ''):
+            try: lon, lat = (float(v) for v in c.split()[0].split(',')[:2])
+            except ValueError: continue
+            if plausible(lat, lon):
+                hit = [round(lat, 6), round(lon, 6), num, rdf.url, rdf.url]
+                if num.replace(' ', '') in rdf.text.replace(' ', ''): cache[key] = hit; return hit      # the record names this number
+                best = best or hit
+                break
+    cache[key] = best
+    return best
+
+
+def province(region):
+    """county and province names to match K-samsök place labels: 'Västra Götalands län (Bohuslän) — Bro' -> ('Västra Götaland', 'Bohuslän')"""
+    plain, local, alias = parts(region); out = []
+    for r in plain[:1] + alias:
+        r = re.sub(r's? län$', '', r).strip()
+        if r and r.lower() not in GENERIC: out.append(r)
+    return tuple(out)
+
+
+def exact(_):
+    """look up the Askeladden and RAÄ ids of every source; positions land in exact.json, keyed by source id"""
+    cache = json.loads(EXACT.read_text(encoding='utf-8')) if EXACT.exists() else {}
+    rows = sources(); placed = json.loads((OUT / 'places.json').read_text(encoding='utf-8')); ses = requests.Session()
+    found, far, missing = {}, [], []
+    for i, (sid, d) in enumerate(rows.items()):
+        aid, raa = register_ids(d['site'])
+        if not (aid or raa): continue
+        hit = askeladden(aid, cache, ses) if aid else raa_number(raa, cache, ses, province(d['region']))
+        if hit is None: missing.append(aid or raa); continue
+        p = placed.get(sid)                                                # the register wins: its id is unique in its province
+        if p and km((hit[0], hit[1]), (p['lat'], p['lon'])) > NEAR_KM: far.append((aid or raa, round(km((hit[0], hit[1]), (p['lat'], p['lon'])))))
+        if True: found[sid] = dict(lat=hit[0], lon=hit[1], register=('Askeladden ' + aid) if aid else ('RAÄ ' + raa), name=hit[2], record=hit[4] or hit[3])
+        if i % 40 == 0: EXACT.write_text(json.dumps(cache, ensure_ascii=False, indent=0), encoding='utf-8')
+    EXACT.write_text(json.dumps(cache, ensure_ascii=False, indent=0), encoding='utf-8')
+    (OUT / 'exact.json').write_text(json.dumps(found, ensure_ascii=False, indent=1), encoding='utf-8')
+    print(f'{len(found)} sources placed at their registered panel; {len(missing)} ids not found; {len(far)} moved more than {NEAR_KM:g} km from the geocoded place (geocoder namesakes corrected)')
+    if far: print('  moved:', far[:12])
+    if missing: print('  not found:', sorted(set(missing))[:20])
+
+
 def silhouette(path, keep=90):
     """the traced outline (100 x 100 box) as an SVG path, thinned to about `keep` points"""
     try: d = json.loads((HERE / path.replace('\\', '/')).read_text(encoding='utf-8'))
@@ -176,20 +303,31 @@ def silhouette(path, keep=90):
 
 
 def build(_):
+    """one marker per traced figure. A figure whose source names an Askeladden or RAÄ id sits at that registered panel
+    (precision 'panel', from `exact`); the others at their geocoded place. Figures that share a position form a small
+    sunflower rosette: 4 m apart on a registered panel, 15 m apart at a named place."""
     rows = sources(); placed = json.loads((OUT / 'places.json').read_text(encoding='utf-8'))
+    exact_ = json.loads((OUT / 'exact.json').read_text(encoding='utf-8')) if (OUT / 'exact.json').exists() else {}
     cat = json.loads((HERE / 'processed' / 'catalog.json').read_text(encoding='utf-8'))
+
+    def where(sid):
+        e = exact_.get(sid)
+        if e: return dict(lat=e['lat'], lon=e['lon'], precision='panel', match=f"{e['register']}: {e['name']}", record=e['record'])
+        return placed.get(sid)
+
     groups = {}
     for m in cat:
-        p = placed.get(m['source_id'])
-        if p: groups.setdefault((round(p['lat'], 5), round(p['lon'], 5)), []).append(m)
+        p = where(m['source_id'])
+        if p: groups.setdefault((round(p['lat'], 6), round(p['lon'], 6)), []).append((m, p))
     feats = []; golden = math.pi * (3 - math.sqrt(5))
     for (lat, lon), ms in groups.items():
-        for i, m in enumerate(ms):          # sunflower rosette, about 15 m between neighbours: a place's figures side by side, not spread over the town
-            r = 15 * math.sqrt(i); a = i * golden; dy = r * math.cos(a) / 111320; dx = r * math.sin(a) / (111320 * math.cos(math.radians(lat)))
-            p = placed[m['source_id']]; src = rows.get(m['source_id'], {}); aid, raa = ids(m['site'])
+        for i, (m, p) in enumerate(ms):
+            r = (4 if p['precision'] == 'panel' else 15) * math.sqrt(i); a = i * golden
+            dy = r * math.cos(a) / 111320; dx = r * math.sin(a) / (111320 * math.cos(math.radians(lat)))
+            aid, raa = register_ids(m['site'])
             feats.append(dict(lat=round(lat + dy, 6), lon=round(lon + dx, 6), id=m['asset_id'], t=m['title'][:90], s=m['site'][:90], r=m['region'],
                               c=m['country'], p=m['period'], k=m['motif_class'], f=m.get('family', ''), pr=p['precision'], q=p['match'][:90],
-                              u=m['source_url'], l=m['license'], a=aid, raa=raa, d=silhouette(m['polygon_path'])))
+                              u=m['source_url'], l=m['license'], a=aid, raa=raa, rec=p.get('record', ''), d=silhouette(m['polygon_path'])))
     unplaced = len(cat) - len(feats)
     from collections import Counter
     summary = dict(figures=len(cat), placed=len(feats), unplaced=unplaced, places=len(groups), by_country=dict(Counter(f['c'] for f in feats)),
@@ -225,12 +363,12 @@ html,body{margin:0;height:100%;font:14px/1.4 system-ui,-apple-system,Segoe UI,Ro
 <label><input type="checkbox" data-p="bronze_age_agrarian" checked><span class="dot" style="background:var(--bronze)"></span>Bronsealder (bergkunst)</label>
 <label><input type="checkbox" data-p="other" checked><span class="dot" style="background:var(--other)"></span>Blanda / ukjend</label>
 <label><input type="checkbox" id="grp" checked>Grupper nære figurar</label>
-<p>Ein prikk per teikna figur, ved staden kjelda nemner. Ringar = presisjon: fylt = stad, open = kommune/region.</p></div>
+<p>Ein prikk per teikna figur, ved staden kjelda nemner. Kant = presisjon: mørk kant = registrert felt (Askeladden/RAÄ), fylt = stad, open = kommune/region.</p></div>
 <script>
 const F=__DATA__, S=__SUMMARY__;
 const COL={stone_age_hunter:'#2f7f86',bronze_age_agrarian:'#b5562a'};
 const PER={stone_age_hunter:'Steinalder (fangstkunst)',bronze_age_agrarian:'Bronsealder (bergkunst)',mixed:'Blanda',unknown:'Ukjend'};
-const PREC={site:'stad',locality:'lokalitet',municipality:'kommune',region:'region (grov)'};
+const PREC={panel:'registrert felt',site:'stad',locality:'lokalitet',municipality:'kommune',region:'region (grov)'};
 const map=L.map('map',{preferCanvas:true,fadeAnimation:false}).setView([64.6,14.5],5);
 const grey=L.tileLayer('https://cache.kartverket.no/v1/wmts/1.0.0/topograatone/default/webmercator/{z}/{y}/{x}.png',{maxZoom:18,attribution:'&copy; Kartverket'});
 const osm=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap-bidragsytarar'});
@@ -239,10 +377,10 @@ const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
 function popup(f){const ids=[f.a?'Askeladden '+esc(f.a):'',f.raa?'RAÄ '+esc(f.raa):''].filter(Boolean).join(' · ');
  return `<div class="pop"><svg viewBox="0 0 100 100" width="96" height="96"><path d="${f.d}" fill="#26282b" fill-rule="evenodd"/></svg><div><b>${esc(f.t)}</b>
  <small>${esc(f.s)} · ${esc(f.r)} (${esc(f.c)})</small><small>${esc(PER[f.p]||f.p)} · ${esc((f.k||'').replace(/_/g,' '))}</small>
- <small>Plassering: ${esc(PREC[f.pr]||f.pr)}${ids?' · '+ids:''}</small><small>${esc(f.l)} · <a href="${esc(f.u)}" target="_blank" rel="noopener">kjelde</a></small></div></div>`}
+ <small>Plassering: ${esc(PREC[f.pr]||f.pr)}${ids?' · '+(f.rec?`<a href="${esc(f.rec)}" target="_blank" rel="noopener">${ids}</a>`:ids):''}</small><small>${esc(f.l)} · <a href="${esc(f.u)}" target="_blank" rel="noopener">kjelde</a></small></div></div>`}
 const groups={stone_age_hunter:[],bronze_age_agrarian:[],other:[]};
-for(const f of F){const g=COL[f.p]?f.p:'other'; const c=COL[f.p]||'#7d7f83'; const exact=f.pr==='site'||f.pr==='locality';
- const m=L.circleMarker([f.lat,f.lon],{radius:6,color:c,weight:2,fillColor:c,fillOpacity:exact?.85:.15}); m.bindPopup(()=>popup(f),{maxWidth:340}); groups[g].push(m)}
+for(const f of F){const g=COL[f.p]?f.p:'other'; const c=COL[f.p]||'#7d7f83'; const exact=f.pr==='panel'||f.pr==='site'||f.pr==='locality'; const panel=f.pr==='panel';
+ const m=L.circleMarker([f.lat,f.lon],{radius:panel?7:6,color:panel?'#1d1f21':c,weight:panel?1.5:2,fillColor:c,fillOpacity:exact?.85:.15}); m.bindPopup(()=>popup(f),{maxWidth:340}); groups[g].push(m)}
 const cluster=L.markerClusterGroup({maxClusterRadius:40,spiderfyOnMaxZoom:true,showCoverageOnHover:false,chunkedLoading:true});
 const plain=L.layerGroup().addTo(map);
 function refresh(){cluster.clearLayers(); plain.clearLayers(); const grp=document.getElementById('grp').checked; let n=0; document.querySelectorAll('[data-p]').forEach(cb=>{if(cb.checked){const g=groups[cb.dataset.p]; if(grp) cluster.addLayers(g); else g.forEach(m=>plain.addLayer(m)); n+=g.length}});
@@ -252,5 +390,5 @@ if(new URLSearchParams(location.search).has('dots')) document.getElementById('gr
 </script></body></html>'''
 
 if __name__ == '__main__':
-    a = argparse.ArgumentParser(description=__doc__.split('\n')[0]); a.add_argument('cmd', choices=['geocode', 'build']); cmd = a.parse_args().cmd
-    {'geocode': geocode, 'build': build}[cmd](None)
+    a = argparse.ArgumentParser(description=__doc__.split('\n')[0]); a.add_argument('cmd', choices=['geocode', 'exact', 'build']); cmd = a.parse_args().cmd
+    {'geocode': geocode, 'exact': exact, 'build': build}[cmd](None)
