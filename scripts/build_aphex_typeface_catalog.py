@@ -84,7 +84,7 @@ def build_catalog(out: Path, pieces: int = 32, logo_scale: float = 2.6):
                 raise
             print(f"Skipping {variant}. {error}", file=sys.stderr)
 
-    out.mkdir(parents=True)
+    out.mkdir(parents=True, exist_ok=True)
     catalog = []
     for record, mask in targets:
         path = out / f"{record['asset_id']}.png"

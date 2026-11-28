@@ -2,6 +2,7 @@
 (function (global) {
   'use strict';
   const SVG_NS = 'http://www.w3.org/2000/svg';
+  let nextArtworkId = 0;
 
   function el(tag, attrs) {
     const node = document.createElementNS(SVG_NS, tag);
@@ -20,6 +21,26 @@
   }
 
   class PuzzlePlayer {
+    static artworkPaint(layer, artwork) {
+      if (!artwork?.href) return null;
+      const id = 'formverk-photo-' + (++nextArtworkId);
+      const defs = el('defs');
+      // Piece paths use assembled-board coordinates. A user-space pattern follows
+      // each piece when its parent group moves, retaining that piece's exact crop.
+      const pattern = el('pattern', {
+        id, x: 0, y: 0, width: artwork.width, height: artwork.height,
+        patternUnits: 'userSpaceOnUse', patternContentUnits: 'userSpaceOnUse',
+      });
+      pattern.appendChild(el('image', {
+        href: artwork.href, x: artwork.x, y: artwork.y,
+        width: artwork.width, height: artwork.height,
+        preserveAspectRatio: artwork.preserveAspectRatio,
+      }));
+      defs.appendChild(pattern);
+      layer.appendChild(defs);
+      return 'url(#' + id + ')';
+    }
+
     constructor(svg, layer, onStatus) {
       this.svg = svg;
       this.layer = layer;
@@ -82,6 +103,7 @@
       this.nodes = [];
       if (!this.puzzle) return;
 
+      const photo = PuzzlePlayer.artworkPaint(this.layer, this.puzzle.artwork);
       // Subtle guide outline of assembled board
       const W = this.puzzle.width_mm;
       const H = this.puzzle.height_mm;
@@ -96,8 +118,9 @@
         const g = el('g', { class: 'play-piece', 'data-id': idx });
         g.appendChild(
           el('path', {
-            d: polyD(p.outline),
-            fill: p.color,
+            d: polyD(p.outline) + (p.holes || []).map(polyD).join(''),
+            'fill-rule': 'evenodd',
+            fill: photo || p.color,
             stroke: '#251e18',
             'stroke-width': 0.35,
             'stroke-linejoin': 'round',

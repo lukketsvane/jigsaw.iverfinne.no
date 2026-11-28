@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 150" width="720" height="150" role="img" aria-labelledby="title desc">
+  <title id="title">Coral seam development</title>
+  <desc id="desc">Conceptual three-stage schematic. Two fixed endpoints admit many circular-arc chains. The selected chain includes rounded loops and avoids self-crossings.</desc>
+  <defs>
+    <style>.label{font:17px Arial,Helvetica,sans-serif;fill:#202020;text-anchor:middle}.edge,.fine,.branch,.active,.construction,.grid,.aux,.candidate,.motion,.arrow,.vortex{fill:none;stroke-linecap:round;stroke-linejoin:round}.edge{stroke:#202020;stroke-width:2}.fine{stroke:#666;stroke-width:1.25}.branch{stroke:#b72a2a;stroke-width:1.8}.active{stroke:#223fad;stroke-width:2.2}.construction{stroke:#b3b4b2;stroke-width:1}.grid{stroke:#cbccca;stroke-width:.85}.aux{stroke:#a7a8a6;stroke-width:1.1;stroke-dasharray:3 3}.candidate{stroke:#8d8e8c;stroke-width:1.15;stroke-dasharray:4 3}.motion,.vortex{stroke:#b72a2a;stroke-width:1.35}.vortex{marker-end:url(#arrow)}.arrow{stroke:#434343;stroke-width:1.45}</style>
+    <marker id="arrow" viewBox="0 0 6 6" refX="5" refY="3" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 5.4 3 0 6 1.8 3z" fill="#b72a2a"/></marker>
+  </defs>
+  <rect width="720" height="150" fill="white"/>
+  <g transform="translate(18 8)">
+    <path d="M9 49 L181 49 L181 92 H9 Z" fill="#f2f2f0"/><path class="construction" d="M9 49 1 34 M9 49 0 65 M181 49 189 33 M181 49 190 64"/><circle cx="9" cy="49" r="2.1" fill="#b72a2a"/><circle cx="181" cy="49" r="2.1" fill="#b72a2a"/><path class="fine" d="M9 49 L181 49"/>
+    <text class="label" x="95" y="125">Shared endpoints</text>
+  </g>
+  <g transform="translate(263 8)">
+    <path class="candidate" d="M9 49 A18 18 0 0 0 29 53 A15 15 0 0 1 50 51 A19 19 0 0 0 79 48 A12 12 0 1 1 102 45 A13 13 0 0 0 124 54 A15 15 0 1 0 150 60 A32 32 0 0 1 181 49"/><path class="candidate" d="M9 49 A20 20 0 0 1 36 44 A10 10 0 1 0 51 39 A14 14 0 0 0 76 40 A15 15 0 1 1 103 44 A17 17 0 0 0 130 44 A11 11 0 0 1 147 38 A31 31 0 0 0 181 49"/><path class="branch" d="M9 49 A20 20 0 0 1 33 39 A10 10 0 1 0 48 30 A13 13 0 0 1 70 41 A14 14 0 1 0 90 58 A11 11 0 0 1 109 53 A10 10 0 1 1 121 66 A16 16 0 0 0 145 51 A11 11 0 0 1 162 43 A29 29 0 0 0 181 49"/><circle cx="9" cy="49" r="2.1" fill="#202020"/><circle cx="181" cy="49" r="2.1" fill="#202020"/>
+    <text class="label" x="95" y="125">Candidate arc chains</text>
+  </g>
+  <g transform="translate(508 8)">
+    <path d="M9 49 A20 20 0 0 1 33 39 A10 10 0 1 0 48 30 A13 13 0 0 1 70 41 A14 14 0 1 0 90 58 A11 11 0 0 1 109 53 A10 10 0 1 1 121 66 A16 16 0 0 0 145 51 A11 11 0 0 1 162 43 A29 29 0 0 0 181 49 L181 92 H9 Z" fill="#f2f2f0"/><path class="active" d="M9 49 A20 20 0 0 1 33 39 A10 10 0 1 0 48 30 A13 13 0 0 1 70 41 A14 14 0 1 0 90 58 A11 11 0 0 1 109 53 A10 10 0 1 1 121 66 A16 16 0 0 0 145 51 A11 11 0 0 1 162 43 A29 29 0 0 0 181 49"/>
+    <text class="label" x="95" y="125">Selected seam</text>
+  </g>
+  <g transform="translate(227 57)"><path d="M-2 0 H16 M10 -5 L16 0 10 5" class="arrow"/></g>
+  <g transform="translate(472 57)"><path d="M-2 0 H16 M10 -5 L16 0 10 5" class="arrow"/></g>
+</svg>

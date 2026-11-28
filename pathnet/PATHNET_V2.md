@@ -42,6 +42,30 @@ The GPU was 97 % busy, shared with other jobs. Errors are measured at the smalle
 
 All four sizes reach errors far below the laser kerf (0.15 mm) within 15 minutes. From there the shape space and the rules decide the board, not the network's size.
 
+## Final model: 75 minutes
+
+Two runs trained side by side: batch 8192, rule weight 20 on 1024 logos per step, 60 % logos, GPU at 94–99 % and 190 W. The 13.7 M-parameter run (1024 × 6, lr 5e-4) beat the 39.8 M one (1536 × 8, lr 2.5e-4) throughout; at the same wall time the larger network sees fewer shapes. It is `runs/pathnet-v2/pathnet-v2-final.pt`, also on Drive in `jigsaw-sound-in-pieces/pathnet-v2/models`.
+
+| Run | Steps | Shapes seen | Logo rms (clean) | Logo worst (clean) | Necks < 2.8 mm | Glyph rms / worst |
+|---|---|---|---|---|---|---|
+| final-m: 1024 × 6, 13.7 M | 15,669 | 128.4 M | 0.0038 mm | 0.054 mm | 0 of 2048 | 0.013 / 0.066 mm |
+| final-l: 1536 × 8, 39.8 M | 10,897 | 89.3 M | 0.0046 mm | 0.059 mm | 0 of 2048 | 0.015 / 0.118 mm |
+
+Exact polygon evaluation (`train_v2.py evaluate`, 1000 logos, each network in the latent range the board optimiser may use):
+
+| Measure | v1 (`pathnet.pt`) | v2 final |
+|---|---|---|
+| Latents / range | 6, ±0.28 | 18, ±1 |
+| Parameters | 87,504 | 13,681,536 |
+| Plain logo (z = 0) against the traced logo: IoU, Hausdorff at 34 mm | 0.975, 0.25 mm | 0.9998, 0.004 mm |
+| IoU with the target shape, mean (min) | 0.975 (0.972) | 0.9993 (0.997) |
+| Rms error at 34 mm | 0.122 mm | 0.0039 mm |
+| Worst error at 34 mm | 0.28 mm | 0.099 mm (0.054 mm on targets that keep the rules) |
+| Valid outlines | 1000 / 1000 | 1000 / 1000 |
+| Necks under 2.8 mm (targets) | 0 (0) | 0 (5.1 %) |
+
+v2's worst case includes the deliberate deviations where a target breaks the neck rule. Its outputs stay recognisable across the whole cube but move further from the undeformed logo (IoU 0.78 on average, against 0.93 for v1's narrow range), which is the point: that freedom is what fills the board.
+
 ## The 368 mm board, seed 22: v1 against v2
 
 Same command, seed and board. v2 used the 15-minute `m` model; the cut was made with `--neck-repair 1.25` and `--bay 64` (see below).
@@ -62,5 +86,29 @@ During refinement the gap energy fell to about a third of v1's (0.28 against 0.7
 **Neck repair.** Tighter packing leaves thinner gap wedges. With the default partition, one wedge 2.5 mm wide became a 0.006 mm² crumb under the audit's 2.5 mm neck test. `field_large.py --neck-repair 1.25` (also `partition(..., repair=1.25)`) runs `field.despike` once more at the audit's radius with no reach allowance, so gap material a 2.5 mm disc cannot reach goes to the neighbour it lies against. Logo silhouettes are never touched. It is off by default, so existing boards cut exactly as before.
 
 **Bay rule.** Re-cutting the same v2 layout with `--bay 32 / 48 / 64` gives 48 / 52 / 57 pairs locked at 1 mm and assembly locks of 0.94 / 1.03 / 1.03 mm. Coverage and fit stay the same.
+
+**Same cut settings for both (bay 64, neck repair 1.25), two seeds.** v1's seed-22 layout was re-cut with these settings, and seed 23 was run from scratch with each network (v2 = the 15-minute `m` model):
+
+| Board | Covered | Piece vs logo IoU (min) | Reverted | Fabrication fails | Lock frameless / framed | Pairs locked 1 / 2 / 3 mm |
+|---|---|---|---|---|---|---|
+| v1, seed 22 | 68.5 % | 0.687 (0.464) | 0 | 0 | 0.56 / 9.84 mm | 83 / 56 / 45 |
+| v2, seed 22 | 77.4 % | 0.771 (0.564) | 0 | 0 | 1.03 / 11.63 mm | 57 / 34 / 24 |
+| v1, seed 23 | 68.3 % | 0.684 (0.427) | 7 | 1 | 0.09 / 10.22 mm | 84 / 57 / 44 |
+| v2, seed 23 | 77.0 % | 0.768 (0.575) | 0 | 0 | 0.47 / 10.59 mm | 61 / 33 / 24 |
+
+The lock margin of a single board depends a lot on how its packing falls out (0 to 1.6 mm across the refined layouts of one seed), so the production board should be chosen from several seeds by audit and lock.
+
+## The final board: the final model on four seeds
+
+`PATHNET_CKPT=../runs/pathnet-v2/pathnet-v2-final.pt`, 368 × 368 mm, 183 logos, `--bay 64 --neck-repair 1.25`, seeds 22–25 (`runs/aphex-logo-398-v2/seed2*-final`):
+
+| Seed | Covered | Piece vs logo IoU (min) | Fabrication fails | Worst tip | Lock frameless / framed | Pairs locked 1 / 2 / 3 mm |
+|---|---|---|---|---|---|---|
+| 22 | 76.4 % | 0.761 (0.558) | 1 (a 2.5–3 mm neck, warning level) | 1.86 mm | 0.00 / 9.94 mm | 69 / 37 / 25 |
+| **23** | **76.7 %** | **0.763 (0.564)** | **0** | **1.50 mm** | **1.22 / 10.88 mm** | **62 / 34 / 24** |
+| 24 | 76.7 % | 0.763 (0.591) | 0 | 1.43 mm | 0.00 / 12.00 mm | 55 / 26 / 15 |
+| 25 | 75.9 % | 0.756 (0.475) | 0 | 1.74 mm | 0.47 / 10.59 mm | 76 / 36 / 22 |
+
+Seed 23 is the production candidate: it passes every fabrication screen and has the highest frameless lock of any board in this study, v1 included (v1's shipped seed-22 board: 0.84 / 9.66 mm). Its frame files (`frame/`, one sheet 398 × 398 mm) and Blender renders, GLB and STL (`product/`) are in the run folder and on Drive in `jigsaw-sound-in-pieces/pathnet-v2/boards`. A summary of every board is in `runs/aphex-logo-398-v2/comparison.json`.
 
 The Aphex Twin logo is not cleared for commercial use. These boards are for personal, non-commercial research (see `README.md`).

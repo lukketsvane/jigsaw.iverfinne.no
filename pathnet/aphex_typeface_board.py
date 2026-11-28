@@ -385,9 +385,9 @@ def _relax_area_balanced(
         opt.step()
         if log and (it % 80 == 0 or it == steps - 1):
             log(
-                f"    relax {it:3d} E={float(E):.3f} cov={float((m1 <= 0).float().mean()):.3f} "
-                f"ovl_mm2={float((m2 < 0).float().sum() * cell_area):.0f} "
-                f"logo={float(est_area[0]):.0f} glyph=[{float(est_area[1:].min()):.0f},{float(est_area[1:].max()):.0f}]"
+                f"    relax {it:3d} E={float(E.detach()):.3f} cov={float((m1.detach() <= 0).float().mean()):.3f} "
+                f"ovl_mm2={float((m2.detach() < 0).float().sum() * cell_area):.0f} "
+                f"logo={float(est_area[0].detach()):.0f} glyph=[{float(est_area[1:].detach().min()):.0f},{float(est_area[1:].detach().max()):.0f}]"
             )
     return c.detach(), th.detach(), (s_lo + (s_hi - s_lo) * torch.sigmoid(a)).detach()
 
@@ -404,13 +404,14 @@ def pack_typeface_board(
     bay: float = 32.0,
     log=print,
 ) -> Dict[str, Any]:
-    """Run multi-restart centerpiece-pinned packing + area-balanced relaxation on GPU."""
+    """Run multi-restart centerpiece-pinned packing + bay-calibrated area-balanced relaxation on GPU."""
     n = len(records)
     G = canonical_grids(records, unit_polys)
     glyph_area_target = (W * H - logo_area_target) / float(n - 1)
-    target_area = T([logo_area_target] + [glyph_area_target] * (n - 1))
+    desired_area = np.array([logo_area_target] + [glyph_area_target] * (n - 1), dtype=np.float64)
+    target_area = T(desired_area)
 
-    # Target silhouette sizes scaled to equal glyph area (logo scaled to ~82% of logo_area_target)
+    # Target silhouette sizes scaled to equal glyph area (logo scaled to ~84% of logo_area_target)
     s_raw = np.zeros(n, dtype=np.float64)
     s_raw[0] = math.sqrt(0.84 * logo_area_target / unit_areas[0])
     s_raw[1:] = np.sqrt(0.76 * glyph_area_target / unit_areas[1:])
@@ -418,8 +419,8 @@ def pack_typeface_board(
     s_raw[1:] = np.clip(s_raw[1:], 0.72 * med_s, 1.32 * med_s)
 
     want = T(s_raw)
-    s_lo = want * T([0.95] + [0.84] * (n - 1))
-    s_hi = want * T([1.06] + [1.16] * (n - 1))
+    s_lo = want * T([0.95] + [0.80] * (n - 1))
+    s_hi = want * T([1.10] + [1.22] * (n - 1))
 
     if log:
         log(
@@ -436,53 +437,74 @@ def pack_typeface_board(
         c, th, size, forced = _construct_around_logo(G, want, W, H, px=2.0, K=48, rng_seed=seed + r * 101)
         for sw in range(2):
             c, th, size = _relax_area_balanced(
-                G, c, th, size, s_lo, s_hi, target_area, W, H, steps=180, px=2.0, w_area=32.0
+                G, c, th, size, s_lo, s_hi, target_area, W, H, steps=180, px=2.0, w_area=36.0
             )
             c, th, size, moved = _reinsert_glyphs(G, c, th, size, s_lo, s_hi, W, H, px=2.0, K=54)
         c, th, size = _relax_area_balanced(
-            G, c, th, size, s_lo, s_hi, target_area, W, H, steps=260, px=1.6, lam=(40.0, 600.0), w_area=48.0, log=log
+            G, c, th, size, s_lo, s_hi, target_area, W, H, steps=240, px=1.6, lam=(40.0, 600.0), w_area=52.0, log=log
         )
 
-        # Quick 0.5 mm bay-rule partition evaluation
+        # Post-bay-rule area feedback loop: compensate for bay-rule area transfers so final
+        # post-bay pieces hit logo/max_glyph >= 2.4x AND max_area/min_area <= 3.85 (<= 4.0 gate)
+        eff_target = desired_area.copy()
         polys = place_polygons(unit_polys, c.cpu().numpy(), th.cpu().numpy(), size.cpu().numpy())
-        try:
-            res_q = fll.partition(polys, W, H, px=0.5, bay=bay, margin=82.0)
-            faces_q = res_q["faces"]
-            areas = [f.area for f in faces_q]
-            logo_a = areas[0]
-            max_g = max(areas[1:])
-            min_a = min(areas)
-            logo_ratio = logo_a / max(max_g, 1.0)
-            area_ratio = max(areas) / max(min_a, 1.0)
-            sil_ious = [
-                f.intersection(Polygon(p).buffer(0)).area / max(f.union(Polygon(p).buffer(0)).area, 1e-6)
-                for f, p in zip(faces_q, polys)
-            ]
-            mean_iou = float(np.mean(sil_ious))
-            min_iou = float(np.min(sil_ious))
-            lm = fl.lock_margin(faces_q)
-            score = (
-                mean_iou * 2.0
-                + min_iou * 0.8
-                + min(lm, 4.0) * 0.15
-                - max(0.0, 2.35 - logo_ratio) * 3.0
-                - max(0.0, area_ratio - 3.85) * 2.0
-            )
-            if log:
-                log(
-                    f"  restart {r}: forced={forced} logo={logo_a:.0f}mm2 max_g={max_g:.0f}mm2 min={min_a:.0f}mm2 "
-                    f"logo/max_g={logo_ratio:.2f}x max/min={area_ratio:.2f}x "
-                    f"sil_iou={mean_iou:.3f}/{min_iou:.3f} lock={lm:.2f}mm score={score:.3f} ({time.time() - t0:.1f}s)"
+        eval_res = None
+        for fb in range(3):
+            try:
+                res_q = fll.partition(polys, W, H, px=0.5, bay=bay, margin=82.0)
+                faces_q = res_q["faces"]
+                areas = np.array([f.area for f in faces_q], dtype=np.float64)
+                logo_a = float(areas[0])
+                max_g = float(areas[1:].max())
+                min_a = float(areas.min())
+                logo_ratio = logo_a / max(max_g, 1.0)
+                area_ratio = float(areas.max()) / max(min_a, 1.0)
+                sil_ious = [
+                    f.intersection(Polygon(p).buffer(0)).area / max(f.union(Polygon(p).buffer(0)).area, 1e-6)
+                    for f, p in zip(faces_q, polys)
+                ]
+                mean_iou = float(np.mean(sil_ious))
+                min_iou = float(np.min(sil_ious))
+                lm = fl.lock_margin(faces_q)
+                score = (
+                    mean_iou * 2.0
+                    + min_iou * 0.8
+                    + min(lm, 4.0) * 0.15
+                    - max(0.0, 2.40 - logo_ratio) * 6.0
+                    - max(0.0, area_ratio - 3.85) * 14.0
                 )
-            if best is None or score > best["score"]:
-                best = dict(
+                if log:
+                    log(
+                        f"  restart {r} fb={fb}: forced={forced} logo={logo_a:.0f}mm2 max_g={max_g:.0f}mm2 min={min_a:.0f}mm2 "
+                        f"logo/max_g={logo_ratio:.2f}x max/min={area_ratio:.2f}x "
+                        f"sil_iou={mean_iou:.3f}/{min_iou:.3f} lock={lm:.2f}mm score={score:.3f} ({time.time() - t0:.1f}s)"
+                    )
+                cand = dict(
                     score=score, c=c.cpu().numpy(), th=th.cpu().numpy(), size=size.cpu().numpy(),
                     polys=polys, quick_logo_ratio=logo_ratio, quick_area_ratio=area_ratio,
                     quick_mean_iou=mean_iou, quick_lock=lm,
                 )
-        except ValueError as exc:
-            if log:
-                log(f"  restart {r} quick cut failed: {exc}")
+                if eval_res is None or cand["score"] > eval_res["score"]:
+                    eval_res = cand
+                if area_ratio <= 3.78 and logo_ratio >= 2.45:
+                    break
+                if fb < 2:
+                    ratio_corr = np.clip(desired_area / np.maximum(areas, 500.0), 0.72, 1.38)
+                    eff_target = eff_target * (ratio_corr ** 0.72)
+                    eff_target = np.clip(eff_target, 1450.0, 9200.0)
+                    eff_target *= (W * H) / eff_target.sum()
+                    c, th, size = _relax_area_balanced(
+                        G, c, th, size, s_lo, s_hi, T(eff_target), W, H,
+                        steps=160, px=1.6, lam=(60.0, 650.0), w_area=72.0, log=None,
+                    )
+                    polys = place_polygons(unit_polys, c.cpu().numpy(), th.cpu().numpy(), size.cpu().numpy())
+            except ValueError as exc:
+                if log:
+                    log(f"  restart {r} fb={fb} quick cut failed: {exc}")
+                break
+
+        if eval_res is not None and (best is None or eval_res["score"] > best["score"]):
+            best = eval_res
 
     if best is None:
         raise RuntimeError("All layout restarts failed quick partition")

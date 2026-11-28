@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Puzzle editions · Formverk</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body{display:block;overflow:auto} .topbar a,main a{color:var(--accent)}
+    main{max-width:1080px;margin:auto;padding:24px 20px 48px}
+    .picker{display:flex;align-items:end;gap:16px;flex-wrap:wrap}
+    .picker label{display:grid;gap:5px}.picker input,.picker select{padding:8px}
+    #preview{display:block;max-width:100%;width:100%;height:clamp(260px,51vh,620px);object-fit:contain;background:#fff}
+    #downloads{display:flex;flex-wrap:wrap;gap:8px 20px;padding:12px 0} #status{min-height:1em}
+  </style>
+</head>
+<body>
+<header class="topbar"><div class="brand"><h1>Formverk</h1><span class="subtitle">Puzzle editions</span></div><a href="/">Custom jigsaw studio</a></header>
+<main>
+  <form id="edition" class="picker">
+    <label>Edition<select id="family" required></select></label>
+    <label>Seed<input id="seed" type="number" step="1" min="0" max="4294967295" value="42" required></label>
+    <button class="btn" type="submit" id="generate" disabled>Generate edition</button>
+  </form>
+  <p id="description"></p><p id="status" role="status"></p>
+  <img id="preview" hidden alt="Selected puzzle edition">
+  <nav id="downloads" aria-label="Edition files"></nav>
+</main>
+<script src="editions.js"></script>
+</body></html>

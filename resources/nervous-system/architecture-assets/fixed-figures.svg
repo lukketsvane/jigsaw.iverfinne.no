@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 720 150" width="720" height="150" role="img" aria-labelledby="title desc">
+  <title id="title">Keeping a cat-shaped piece fixed as its neighbors grow</title>
+  <desc id="desc">Conceptual three-stage schematic. The same sitting cat stays in place inside the board. Red seeds lie outside its silhouette. An illustrative Voronoi partition shows neighboring cells meeting the cat and the board perimeter.</desc>
+  <defs>
+    <path id="board" d="M10 20 Q9 15 16 13 L56 7 Q62 6 75 6 L151 6 Q159 6 167 15 L179 29 Q183 34 181 42 L174 74 Q172 82 164 83 L56 87 Q37 87 22 81 L13 77 Q9 76 9 70 Z"/>
+    <path id="cat" transform="translate(8 -1) scale(.84)" d="M68 79 Q60 79 58 75 Q57 72 64 71 L68 70 Q65 62 68 55 Q71 50 75 46 L76 40 Q69 39 65 35 L62 32 L69 30 Q69 26 73 22 L72 12 L80 17 Q83 15 86 16 L91 10 L92 24 Q97 29 93 36 Q90 42 87 44 Q95 48 101 54 Q110 64 107 71 Q116 73 122 67 Q127 62 126 54 Q125 48 128 45 Q131 43 133 45 Q136 48 134 53 Q135 63 132 68 Q127 81 110 82 Q101 84 96 82 Z"/>
+    <clipPath id="inside-board"><use xlink:href="#board"/></clipPath>
+    <mask id="outside-cat" x="0" y="0" width="190" height="92" maskUnits="userSpaceOnUse"><rect width="190" height="92" fill="white"/><use xlink:href="#cat" fill="black"/></mask>
+    <g id="sites" fill="#b72a2a"><circle cx="28" cy="23" r="2"/><circle cx="55" cy="20" r="2"/><circle cx="101" cy="13" r="2"/><circle cx="131" cy="23" r="2"/><circle cx="162" cy="25" r="2"/><circle cx="40" cy="45" r="2"/><circle cx="61" cy="55" r="2"/><circle cx="102" cy="34" r="2"/><circle cx="143" cy="48" r="2"/><circle cx="167" cy="63" r="2"/><circle cx="27" cy="71" r="2"/><circle cx="53" cy="76" r="2"/><circle cx="85" cy="78" r="2"/><circle cx="115" cy="76" r="2"/><circle cx="144" cy="74" r="2"/></g>
+    <g id="contours" stroke="#202020" stroke-linejoin="round">
+      <use xlink:href="#board" fill="none" stroke-width="1.6"/>
+      <use xlink:href="#cat" fill="#ececea" stroke-width="2"/>
+    </g>
+    <path id="arrow" d="M-2 0 H16 M10 -5 16 0 10 5" fill="none" stroke="#434343" stroke-width="1.45" stroke-linejoin="round" stroke-linecap="round"/>
+    <style>.label{font:17px Arial,Helvetica,sans-serif;fill:#202020;text-anchor:middle}</style>
+  </defs>
+  <rect width="720" height="150" fill="white"/>
+  <g transform="translate(18 8)">
+    <use xlink:href="#contours"/>
+    <text class="label" x="95" y="125">Fix the cat outline</text>
+  </g>
+  <g transform="translate(263 8)">
+    <use xlink:href="#contours"/>
+    <use xlink:href="#sites"/>
+    <text class="label" x="95" y="125">Place seeds around it</text>
+  </g>
+  <g transform="translate(508 8)">
+    <g clip-path="url(#inside-board)" mask="url(#outside-cat)">
+      <path d="M39.11 0 L42.38 29.43 M42.38 29.43 L10.8 46.65 M10.8 46.65 L0 46.43 M75.49 0 L79.23 24.56 M56.31 37.79 L42.38 29.43 M76.31 34.36 L56.31 37.79 M79.23 24.56 L76.31 34.36 M122 0 L114.37 22.89 M114.37 22.89 L79.23 24.56 M148.05 0 L146.04 31.16 M121.9 42.75 L114.37 22.89 M146.04 31.16 L121.9 42.75 M161.98 44.33 L146.04 31.16 M190 40.64 L161.98 44.33 M56.31 37.79 L45.25 61.02 M42.15 62.32 L10.8 46.65 M45.25 61.02 L42.15 62.32 M76.31 34.36 L85.88 53.06 M69.42 70.23 L45.25 61.02 M85.88 53.06 L69.42 70.23 M121.9 42.75 L118.81 51.81 M98.73 58.02 L85.88 53.06 M118.81 51.81 L98.73 58.02 M161.98 44.33 L151.76 60.68 M128.57 61.57 L118.81 51.81 M151.76 60.68 L128.57 61.57 M166.74 92 L151.76 60.68 M42.15 62.32 L36.44 92 M69.42 70.23 L68.06 92 M98.73 58.02 L101 92 M128.57 61.57 L130.67 92" fill="none" stroke="#474747" stroke-width="1.15" stroke-linecap="round"/>
+      <use xlink:href="#sites"/>
+    </g>
+    <use xlink:href="#contours"/>
+    <text class="label" x="95" y="125">Fill to both outlines</text>
+  </g>
+  <use xlink:href="#arrow" transform="translate(227 57)"/>
+  <use xlink:href="#arrow" transform="translate(472 57)"/>
+</svg>

@@ -1,0 +1,138 @@
+{
+  "checked_on": "2026-11-28",
+  "upstream": "https://github.com/Jack000/Deepnest",
+  "source_commit": "https://github.com/Jack000/Deepnest/commit/2fb10513a30681971dcc991c528fa0738a2c0c76",
+  "revision": "2fb10513a30681971dcc991c528fa0738a2c0c76",
+  "commit_time_utc": "2018-08-26T02:25:22Z",
+  "package_version": "1.0.5",
+  "studio_source": "https://n-e-r-v-o-u-s.com/blog/?p=8637",
+  "studio_post_date": "2020-07-14",
+  "confirmed_stage": "Nervous System used Deepnest to fit cat-shaped figure pieces within the Herding Cats puzzle outline. The studio then adjusted their positions and grew the surrounding interlocks with its own software.",
+  "revision_selection": "The pinned upstream commit predates the studio article. The article names Deepnest and links deepnest.io, without identifying a version or a commit.",
+  "archive": "deepnest-2fb10513a306-nesting-source.zip",
+  "archive_byte_size": 50101,
+  "archive_sha256": "4ef5bb20c2f3b3fce6613db53e2fc351f4d0455ad1256e20445efc903a02c70c",
+  "contents": "Selected Deepnest source for genetic search, candidate placement, no-fit polygons, polygon geometry and native Minkowski sums, with upstream build metadata. The upstream workspace includes prebuilt native files, fonts and desktop UI assets; this source selection is for inspecting the nesting algorithm.",
+  "dependencies": "The full program uses an Electron renderer, its IPC background process, an SVG parser, Clipper, d3-polygon, parallel.js and other JavaScript helpers. The native addon needs compatible Node/NAN tooling and Boost.Polygon. Upstream package.json and background.html identify dependencies. Use the pinned full upstream tree for the desktop application.",
+  "license_evidence": [
+    "main/deepnest.js identifies GPLv3 in its header. notices/GPL-3.0.txt is the complete GNU text.",
+    "main/util/geometryutil.js identifies MIT and Jack Qiao in its header. The upstream MIT text is preserved at main/LICENSE.txt.",
+    "Some included files, such as main/background.js, have no file-specific license declaration. Boost.Polygon is an external dependency of the native addon. notices/BSL-1.0.txt is its license reference."
+  ],
+  "files": [
+    {
+      "path": "README.md",
+      "byte_size": 479,
+      "sha256": "3cbf3782f83792982b68dcbeb04e6f2ef56ff520cffd8b75ca55b5eed9999afd",
+      "url": "https://raw.githubusercontent.com/Jack000/Deepnest/2fb10513a30681971dcc991c528fa0738a2c0c76/README.md",
+      "git_blob_sha1": "70c84d5f6ff3d888b4444af279b0789ac045a410"
+    },
+    {
+      "path": "package.json",
+      "byte_size": 1481,
+      "sha256": "6436f4c429337c3beb58f4a6518c32f27bd75705b7f9701f31b2b13dbbacfcd2",
+      "url": "https://raw.githubusercontent.com/Jack000/Deepnest/2fb10513a30681971dcc991c528fa0738a2c0c76/package.json",
+      "git_blob_sha1": "849e14bb5ec3cc55b02a755b5a4fbd9159a75135"
+    },
+    {
+      "path": "main/LICENSE.txt",
+      "byte_size": 1075,
+      "sha256": "63249e67e62c3c4142252688c170ab27fa401f55a96f12b54cd6187ba2f699af",
+      "url": "https://raw.githubusercontent.com/Jack000/Deepnest/2fb10513a30681971dcc991c528fa0738a2c0c76/main/LICENSE.txt",
+      "git_blob_sha1": "885e060289f32c870a4bb97a5078300eb2211dbe"
+    },
+    {
+      "path": "main/deepnest.js",
+      "byte_size": 39028,
+      "sha256": "dd2e187ace0bc8545d72aac574c22357767786b50bb87c8410eb141d68437ac6",
+      "url": "https://raw.githubusercontent.com/Jack000/Deepnest/2fb10513a30681971dcc991c528fa0738a2c0c76/main/deepnest.js",
+      "git_blob_sha1": "97e0166d5f1fce2c7b38d079fa04dcbfed0e13d2"
+    },
+    {
+      "path": "main/background.js",
+      "byte_size": 30373,
+      "sha256": "8e1c1f59975d73fe9bc4b99ee9d48ba982b0497ef72dd4615d46577244ef02fd",
+      "url": "https://raw.githubusercontent.com/Jack000/Deepnest/2fb10513a30681971dcc991c528fa0738a2c0c76/main/background.js",
+      "git_blob_sha1": "6424b1582a647f7f26b209bdcbae21172d2fc81e"
+    },
+    {
+      "path": "main/background.html",
+      "byte_size": 281,
+      "sha256": "0f2b39027920f61ed4a4deefdb1f771d0f4b49e07874f1a8503f8a50e72b2bcd",
+      "url": "https://raw.githubusercontent.com/Jack000/Deepnest/2fb10513a30681971dcc991c528fa0738a2c0c76/main/background.html",
+      "git_blob_sha1": "f78bdaf9488265a33c664e8b5fb1e6bc919ebcb8"
+    },
+    {
+      "path": "main/util/geometryutil.js",
+      "byte_size": 52043,
+      "sha256": "2b818000dc018436a1d71f30e5ec43ea86d1cf2d7dc426fd6f88c48761c4b4c5",
+      "url": "https://raw.githubusercontent.com/Jack000/Deepnest/2fb10513a30681971dcc991c528fa0738a2c0c76/main/util/geometryutil.js",
+      "git_blob_sha1": "dd41e0406f10a3b347b5fce2ab80c88d19f9e939"
+    },
+    {
+      "path": "addon.cc",
+      "byte_size": 446,
+      "sha256": "3e89ff974e1991418cdb5376a31a05d2285b6070f2df05819f8aacc7e2e065e1",
+      "url": "https://raw.githubusercontent.com/Jack000/Deepnest/2fb10513a30681971dcc991c528fa0738a2c0c76/addon.cc",
+      "git_blob_sha1": "791ae659d359c8c69892df2f7ce5edd68bb1bf0c"
+    },
+    {
+      "path": "minkowski.cc",
+      "byte_size": 9459,
+      "sha256": "7b73156dd44ce7450eeccff990236c144105331e96d8cae4bf0c2639304bfc63",
+      "url": "https://raw.githubusercontent.com/Jack000/Deepnest/2fb10513a30681971dcc991c528fa0738a2c0c76/minkowski.cc",
+      "git_blob_sha1": "ff38c0f9e05dc67c190ef07509e4e4f91d00a0e2"
+    },
+    {
+      "path": "minkowski.h",
+      "byte_size": 101,
+      "sha256": "27b79da86374d9244e80aaaadf9640c4ba528220b0c9e559848a0eaf0469d851",
+      "url": "https://raw.githubusercontent.com/Jack000/Deepnest/2fb10513a30681971dcc991c528fa0738a2c0c76/minkowski.h",
+      "git_blob_sha1": "3f1f371b2307218e35e8cebee2f32115f21de490"
+    },
+    {
+      "path": "binding.gyp",
+      "byte_size": 501,
+      "sha256": "fc0cd3e5cd64e59554232e57d8ec504fca3e6e65453c7938050ba8171ebc8b9e",
+      "url": "https://raw.githubusercontent.com/Jack000/Deepnest/2fb10513a30681971dcc991c528fa0738a2c0c76/binding.gyp",
+      "git_blob_sha1": "b5a30ea96a14c71722982407724a6e3edc76d53d"
+    },
+    {
+      "path": "binding.gyp mac",
+      "byte_size": 501,
+      "sha256": "fc0cd3e5cd64e59554232e57d8ec504fca3e6e65453c7938050ba8171ebc8b9e",
+      "url": "https://raw.githubusercontent.com/Jack000/Deepnest/2fb10513a30681971dcc991c528fa0738a2c0c76/binding.gyp%20mac",
+      "git_blob_sha1": "b5a30ea96a14c71722982407724a6e3edc76d53d"
+    },
+    {
+      "path": "binding.windowsgyp",
+      "byte_size": 544,
+      "sha256": "34a9096cf7a0a3de514bd5b4540b8d0bc97bfa68e5c45c717aea2206e021e364",
+      "url": "https://raw.githubusercontent.com/Jack000/Deepnest/2fb10513a30681971dcc991c528fa0738a2c0c76/binding.windowsgyp",
+      "git_blob_sha1": "68795a04f529d28663a58779263f871c426765d1"
+    },
+    {
+      "path": "notices/GPL-3.0.txt",
+      "byte_size": 35149,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "url": "https://www.gnu.org/licenses/gpl-3.0.txt"
+    },
+    {
+      "path": "notices/BSL-1.0.txt",
+      "byte_size": 1338,
+      "sha256": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566",
+      "url": "https://www.boost.org/LICENSE_1_0.txt"
+    }
+  ],
+  "full_archive": {
+    "name": "deepnest-2fb10513a306-full.zip",
+    "download": "https://codeload.github.com/Jack000/Deepnest/zip/2fb10513a30681971dcc991c528fa0738a2c0c76",
+    "byte_size": 3392062,
+    "sha256": "7cf805a18c9ed222c9323b1e2cee292cb94ec28703753926a278a7006980b003",
+    "git_tree": "https://api.github.com/repos/Jack000/Deepnest/git/trees/2fb10513a30681971dcc991c528fa0738a2c0c76?recursive=1",
+    "git_blob_count": 123,
+    "uncompressed_file_bytes": 7843430,
+    "scope": "Unchanged GitHub source ZIP of the entire pinned upstream repository, including desktop UI, vendor libraries, assets, historical build products and all source files.",
+    "verification": "The ZIP member list matches the upstream Git tree. Every stored file matched its Git blob SHA-1 and size, every ZIP member passed CRC validation, and the stored archive passed a second SHA-256 check."
+  }
+}

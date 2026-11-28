@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Formverk · Wood trial</title>
+<style>
+  :root { color-scheme:light; font:16px/1.5 "Segoe UI",sans-serif; color:#252e29; background:#f5f3ec }
+  * { box-sizing:border-box } body { max-width:63rem; margin:auto; padding:2rem 1.3rem 4rem }
+  h1,h2 { font-family:Georgia,serif; line-height:1.15; font-weight:normal } h1 { font-size:clamp(2.3rem,6vw,4rem); margin:.2em 0 } h2 { font-size:2rem; margin:.5em 0 }
+  h3 { margin:1.5rem 0 .3rem; font-size:1.06rem } p { margin:.55rem 0 .85rem; max-width:80ch }
+  a { color:#185749; text-underline-offset:3px } section { border-top:2px solid #324e41; padding-top:.7rem; margin:2rem 0 }
+  .grid,.tools { display:flex; flex-wrap:wrap; gap:.7rem 1rem } .grid label { flex:1 1 13rem }
+  label { font-weight:600; font-size:.9rem } input,select,textarea,button,.upload { font:inherit }
+  input,select,textarea { width:100%; border:1px solid #acaea4; background:white; color:inherit; border-radius:3px; padding:.38rem .48rem }
+  textarea { min-height:3.5rem; resize:vertical } button,.upload { background:#254e40; color:white; border:0; border-radius:4px; padding:.48rem .8rem; cursor:pointer }
+  .upload { position:relative } .upload input { position:absolute; inset:0; opacity:0; cursor:pointer } .upload:focus-within { outline:2px solid #784a14 }
+  .tools { align-items:center; margin-top:.7rem } .scroller { overflow-x:auto } table { width:100%; border-collapse:collapse; margin:.7rem 0 1rem; font-variant-numeric:tabular-nums }
+  th,td { text-align:left; border-bottom:1px solid #c5c8bb; padding:.35rem; vertical-align:middle } thead { background:#e6e8df } th { font-size:.85rem } td { font-size:.93rem } td input { min-width:5.5rem }
+  .hint,output { color:#46564b } .warn { color:#963d21 } .links a { display:inline-block; margin:0 1rem .3rem 0 }
+  @media print {
+    @page { margin:14mm } :root,body { background:white; color:black; font-size:10pt } body { padding:0; max-width:none }
+    h1 { font-size:24pt } h2 { font-size:18pt } section { margin:1em 0; border-width:1px }
+    .newpage { break-before:page } .tools,.screen { display:none } input,select,textarea { background:white; color:black; border-color:#888 }
+    table { margin:.4rem 0 } tr,.grid,.scroller { break-inside:avoid } .scroller { overflow:visible } td input { min-width:0 } th,td { padding:.18rem } textarea { min-height:2.5em }
+  }
+</style>
+<main>
+<header><h1>Wood trial</h1><p>Measure the cut width in the actual stock, compare six seam families, then test two 183-piece puzzle designs at full scale. This sheet opens offline. Download your record before closing it.</p></header>
+<div class="tools"><button type="button" id="save">Download record</button><label class="upload">Open saved record<input id="load" type="file" accept=".json,application/json"></label><button type="button" id="print">Print worksheet</button><span id="status" role="status"></span></div>
+<noscript>Enable JavaScript to display the measurement rows, calculate kerf and download or print the worksheet.</noscript>
+<form id="bench" autocomplete="off">
+<section><h2>Material and setup</h2>
+<div class="grid">
+<label>Trial ID<input name="trial_id"></label><label>Date<input type="date" name="date"></label><label>Operator or team code<input name="operator"></label>
+<label>Material, sheet or lot ID<input name="stock"></label><label>Thickness measured (mm)<input name="thickness_mm" type="number" step="any" min="0"></label><label>Grain direction relative to page X<input name="grain"></label>
+<label>Machine, lens and settings<input name="machine_settings"></label><label>Scale and compensation used<input name="scale_compensation"></label><label>Face, backing and finish<input name="finish"></label>
+</div></section>
+<section><h2>Measure the kerf</h2>
+<p class="links"><a href="calibration/coupon-cut.svg">Coupon cut file</a><a href="calibration/coupon-map.svg">Coupon locator</a></p>
+<p>Import at 1:1 in millimetres with controller kerf compensation off. Each square cut yields one plug and its matching opening. Keep track of the face, site and original orientation. On the same face, measure the inside of the opening and the outside of the plug parallel to each page axis, away from the corners. Use the same calipers throughout.</p>
+<div class="scroller"><table><thead><tr><th>Site</th><th>Axis</th><th>Opening (mm)</th><th>Plug (mm)</th><th>Kerf (mm)</th></tr></thead><tbody id="kerf"></tbody></table></div>
+<p>Kerf = (opening − plug) / 2. Check the two axes and all three sites for variation before interpreting fit.</p></section>
+<section class="newpage"><h2>Six cut families</h2>
+<p class="links"><a href="style-sampler/cut.svg">Sampler cut file</a><a href="style-sampler/placement-map.svg">Style locator</a></p>
+<p>The 297 × 160 mm sheet holds six 90 × 70 mm coupons with ten pieces each. Keep each coupon’s parts together. Count pieces damaged during release. Assemble the coupon flat, then separate and reassemble it. Record any chipped projection, split neck, jam or unexpectedly loose joint and its location. Use the same handling sequence for each style. The family names link to individual cut files for recuts.</p>
+<div class="scroller"><table><thead><tr><th>Cut family</th><th>Pieces checked</th><th>Pieces damaged at release</th><th>Fit and breakage observations</th></tr></thead><tbody id="styles"></tbody></table></div>
+<h3>Shop observations</h3><textarea name="sampler_notes" aria-label="Shop observations"></textarea></section>
+<section class="newpage"><h2>Matched board trial</h2>
+<p class="links"><a href="boards/A-cut.svg">A cut file</a><a href="boards/A-map.svg">A seam locator</a><a href="boards/B-cut.svg">B cut file</a><a href="boards/B-map.svg">B seam locator</a></p>
+<p>Import each 368 × 368 mm board at 1:1. Match stock lot, grain, face, settings, artwork and support. With plain wood, leave both faces plain. Mark each board’s top edge on its tray. Record sheet positions and cut order. Keep the design key and locators with the observer during a timed solve.</p>
+<div class="grid"><label>Sheet positions and cut order<input name="cut_order"></label><label>Tray, frame and support condition<input name="support"></label><label>Solver code and A/B solve order<input name="solver_order"></label></div>
+<h3>Whole board</h3>
+<p>Count pieces damaged at release. Time each solve from the first piece handled to the last piece placed. Record elapsed time for an unfinished attempt and mark it unfinished. Use the same sorting rules and time limit. Alternate A-first and B-first across solvers and record each solver separately.</p>
+<div class="scroller"><table><thead><tr><th>Board</th><th>Damaged at release / 183</th><th>Solve status</th><th>Elapsed seconds</th></tr></thead><tbody id="boards"></tbody></table></div>
+<p>For a whole-board movement observation, use the same tray, orientation, frame condition and handling action on both boards. Describe the action, then record the number or location of pieces that moved. The seam measurements below concern individual pairs.</p>
+<label>Whole-board handling action and observations for A and B<textarea name="board_movement"></textarea></label>
+<h3>Marked seams</h3>
+<p>Use each locator to select the two adjacent pieces at S1 through S4. Isolate each pair on a level surface. Record how it mates on the first assembly. Aim for ten hand assembly and separation cycles per pair. Stop if it breaks and record the completed cycles and the affected piece. At the first and last cycle, try sliding one flat piece away while holding the other in place. Record whether it separates in-plane or needs a lift. Record the direction tried and use the same handling on both boards.</p>
+<div class="scroller"><table><thead><tr><th>Board / site</th><th>Initial fit</th><th>Cycles completed</th><th>Chip, break or other observation</th></tr></thead><tbody id="seams"></tbody></table></div>
+</section>
+<section><h2>Comparison notes</h2>
+<p>These two boards compare complete local designs. Each optimizer placed its own piece centers. Testing a studio puzzle adds a separate reference. Record its edition, material, dimensions, piece count, artwork, prior wear and test conditions alongside any measurements you compare.</p>
+<textarea name="comparison" aria-label="Comparison notes"></textarea>
+<p class="screen"><a href="observer.md">Observer’s study notes</a> · <a href="boards/verification.json">Design key and digital measurements</a> · <a href="manifest.json">Package checksums</a></p>
+</section></form></main>
+<script>
+"use strict";
+const form = document.getElementById("bench");
+const statusLine = document.getElementById("status");
+const families = ["Dendrite", "Amoeba", "Maze", "Wave", "Coral", "Matrix"];
+const kerfKeys = [];
+function row(table, label, cells) {
+  const tr = document.getElementById(table).insertRow();
+  const heading = document.createElement("th");
+  heading.scope = "row";
+  heading.append(label);
+  tr.append(heading);
+  for (const cell of cells) tr.insertCell().append(cell);
+}
+function field(name, label, type = "text", choices) {
+  const control = document.createElement(choices ? "select" : "input");
+  control.name = name;
+  control.setAttribute("aria-label", label);
+  if (choices) {
+    for (const value of ["", ...choices]) control.add(new Option(value, value));
+  } else {
+    control.type = type;
+    if (type === "number") { control.step = "any"; control.min = "0"; }
+  }
+  return control;
+}
+function count(name, label, max) {
+  const input = field(name, label, "number");
+  input.step = "1";
+  if (max !== undefined) input.max = max;
+  return input;
+}
+for (const site of ["A","B","C"]) for (const axis of ["X","Y"]) {
+  const key = site + "_" + axis, result = document.createElement("output");
+  result.id = key + "_result";
+  kerfKeys.push(key);
+  row("kerf", site, [axis,field(key+"_opening",key+" opening in mm","number"),field(key+"_plug",key+" plug in mm","number"),result]);
+}
+for (const style of families) {
+  const link = document.createElement("a");
+  link.href = "style-sampler/coupons/"+style.toLowerCase()+"/cut.svg";
+  link.textContent = style;
+  row("styles", link, [count(style+"_checked",style+" pieces checked",10), count(style+"_damaged",style+" pieces damaged",10),field(style+"_fit",style+" fit notes")]);
+}
+for (const board of ["A","B"]) {
+  row("boards", board, [count(board+"_release",board+" damaged at release",183),field(board+"_solve",board+" solve status","text",["Finished","Unfinished","Not attempted"]),count(board+"_seconds",board+" solve seconds")]);
+  for (const site of ["S1","S2","S3","S4"]) {
+    const key = board+"_"+site;
+    row("seams", board+" / "+site, [field(key+"_fit",key+" initial fit","text",["Loose","Seats by hand","Binds","Already damaged"]),count(key+"_cycles",key+" cycles completed",10),field(key+"_notes",key+" observation")]);
+  }
+}
+function update() {
+  const results = {};
+  for (const key of kerfKeys) {
+    const opening = form.elements.namedItem(key+"_opening").valueAsNumber;
+    const plug = form.elements.namedItem(key+"_plug").valueAsNumber;
+    const output = document.getElementById(key+"_result");
+    const measured = Number.isFinite(opening) && Number.isFinite(plug);
+    const invalid = measured && (opening < plug || plug <= 0);
+    results[key] = measured && !invalid ? Number(((opening-plug)/2).toFixed(4)) : null;
+    output.textContent = invalid ? "Recheck sizes" : measured ? results[key].toFixed(3) : "—";
+    output.className = invalid ? "warn" : "";
+  }
+  return results;
+}
+form.addEventListener("input", update);
+document.getElementById("print").onclick = () => window.print();
+document.getElementById("save").onclick = () => {
+  if (!form.reportValidity()) return;
+  const fields = Object.fromEntries(new FormData(form));
+  const record = { schema:"formverk-wood-trial/1", fields, kerf_mm:update() };
+  const url = URL.createObjectURL(new Blob([JSON.stringify(record,null,2)],{type:"application/json"}));
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = (fields.trial_id.trim().replace(/[^a-zA-Z0-9_-]/g,"_").slice(0,64) || "wood-trial")+".json";
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url),1000);
+  statusLine.textContent = "Record prepared for download.";
+};
+document.getElementById("load").onchange = async event => {
+  const file = event.target.files[0];
+  if (!file) return;
+  try {
+    const record = JSON.parse(await file.text());
+    if (record.schema !== "formverk-wood-trial/1" || !record.fields || typeof record.fields !== "object" || Array.isArray(record.fields)) throw Error();
+    if (!Object.keys(record.fields).length || !Object.entries(record.fields).every(([key,value]) => {
+      const control = form.elements.namedItem(key);
+      return control && control.name === key && typeof value === "string";
+    })) throw Error();
+    form.reset();
+    for (const [key,value] of Object.entries(record.fields)) form.elements.namedItem(key).value = value;
+    update();
+    statusLine.textContent = "Record opened.";
+  } catch { statusLine.textContent = "Could not open this wood-trial record."; }
+  event.target.value = "";
+};
+update();
+</script>
+</html>

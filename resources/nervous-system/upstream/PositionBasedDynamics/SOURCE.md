@@ -4,7 +4,9 @@ Nervous System credits PositionBasedDynamics and describes how its Maze puzzle e
 
 The upstream revision selected for reference is `39a5099c39df84494df14aaad6fb9af845793ff7`, the last revision on the upstream default branch before the article appeared. It dates to July 5, 2017 and carries the MIT license. [Upstream commit](https://github.com/InteractiveComputerGraphics/PositionBasedDynamics/commit/39a5099c39df84494df14aaad6fb9af845793ff7)
 
-Start with `PositionBasedCosseratRods::solve_StretchShearConstraint` and `solve_BendTwistConstraint` in the implementation. The demo shows how a rod model connects those constraints along a curve. Building the demo requires the full upstream project.
+Start with `PositionBasedCosseratRods::solve_StretchShearConstraint` and `solve_BendTwistConstraint` in the implementation. The demo shows how a rod model connects those constraints along a curve. The [complete upstream project ZIP](PositionBasedDynamics-39a5099c39df.zip) includes the build files, demos, model data and bundled libraries with their individual notices. Its bundled Eigen version header identifies 3.3.4.
+
+All 623 files in the ZIP matched the upstream Git blobs. The archive is 4,798,169 bytes with SHA-256 `985ffac98adc18e880deccfba5c5999a616ed70e4d978f3d9032bc645d7067bb`. [Original archive](https://codeload.github.com/InteractiveComputerGraphics/PositionBasedDynamics/zip/39a5099c39df84494df14aaad6fb9af845793ff7)
 
 Each local file was compared to the corresponding Git blob in the pinned tree. The filenames link to the exact upstream raw bytes.
 

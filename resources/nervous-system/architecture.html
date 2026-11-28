@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How a puzzle grows · Nervous System research</title>
+  <meta name="description" content="An illustrated field guide to six puzzle cuts, their fabrication, and the independent Formverk generator.">
+  <link rel="stylesheet" href="architecture-assets/guide.css">
+  <script src="architecture-assets/guide.js" defer></script>
+</head>
+<body id="top">
+  <a class="skip" href="#main">Skip to the guide</a>
+  <header class="mast">
+    <a class="mast-title" href="#top">Jigsaw research</a>
+    <nav aria-label="Guide contents">
+      <a href="#overview">System</a><a href="#cuts">Six cuts</a><a href="#process">Fabrication</a><a href="#local">Local engine</a><a href="#sources">Sources</a>
+    </nav>
+    <a class="print-link" href="architecture-guide.pdf">Print edition <span aria-hidden="true">↗</span></a>
+  </header>
+  <main id="main">
+    <section class="intro" aria-labelledby="title">
+      <div class="intro-copy">
+        <p class="kicker">Nervous System / Generative jigsaws</p>
+        <h1 id="title">How a puzzle<br><em>grows</em></h1>
+        <p class="standfirst">One cut makes two edges. How does a sheet of wood become a set of pieces that hold each other in place?</p>
+        <p class="intro-note">An illustrated guide to the studio’s six cut styles and the independent Formverk engine.</p>
+      </div>
+      <figure class="seed-figure">
+        <div class="fig-line"><span>Voronoi construction</span><i>Fig. 1</i></div>
+        <svg class="seed-diagram" viewBox="0 0 460 235" role="img" aria-labelledby="seed-title seed-desc">
+          <title id="seed-title">A seed and its nearest-neighbor cell</title>
+          <desc id="seed-desc">Twelve points divide a rectangle into cells. Seed A is red. Its polygon has a heavy blue outline. Moving A changes the boundaries with its neighbors.</desc>
+          <g id="seed-plot"><polygon class="cell" points="0.00,111.19 0.00,0.00 94.08,0.00 104.68,82.12"/>
+          <polygon class="cell" points="134.76,102.17 104.68,82.12 94.08,0.00 205.13,0.00 204.23,52.55"/>
+          <polygon class="cell" points="259.70,98.40 204.23,52.55 205.13,0.00 332.07,0.00 319.55,64.78"/>
+          <polygon class="cell" points="375.32,123.09 319.55,64.78 332.07,0.00 460.00,0.00 460.00,80.75"/>
+          <polygon class="cell" points="90.06,191.85 0.00,138.33 0.00,111.19 104.68,82.12 134.76,102.17 141.18,133.79"/>
+          <polygon class="cell" points="303.47,183.06 254.03,143.77 259.70,98.40 319.55,64.78 375.32,123.09 368.30,152.19"/>
+          <polygon class="cell" points="368.30,152.19 375.32,123.09 460.00,80.75 460.00,235.00 429.32,235.00"/>
+          <polygon class="cell" points="0.00,138.33 90.06,191.85 94.06,235.00 0.00,235.00"/>
+          <polygon class="cell" points="90.06,191.85 141.18,133.79 200.11,173.07 195.43,235.00 94.06,235.00"/>
+          <polygon class="cell" points="200.11,173.07 254.03,143.77 303.47,183.06 300.41,235.00 195.43,235.00"/>
+          <polygon class="cell" points="303.47,183.06 368.30,152.19 429.32,235.00 300.41,235.00"/>
+          <polygon class="active-cell" points="200.11,173.07 141.18,133.79 134.76,102.17 204.23,52.55 259.70,98.40 254.03,143.77"/>
+          <circle class="seed" cx="53" cy="48" r="3.1"/>
+          <circle class="seed" cx="146" cy="36" r="3.1"/>
+          <circle class="seed" cx="263" cy="38" r="3.1"/>
+          <circle class="seed" cx="382" cy="61" r="3.1"/>
+          <circle class="seed" cx="78" cy="138" r="3.1"/>
+          <circle class="seed active-seed" cx="201" cy="113" r="5.5"/>
+          <circle class="seed" cx="313" cy="127" r="3.1"/>
+          <circle class="seed" cx="429" cy="155" r="3.1"/>
+          <circle class="seed" cx="37" cy="207" r="3.1"/>
+          <circle class="seed" cx="145" cy="197" r="3.1"/>
+          <circle class="seed" cx="251" cy="205" r="3.1"/>
+          <circle class="seed" cx="353" cy="211" r="3.1"/>
+          <text class="seed-label" x="212" y="106">A</text></g>
+        </svg>
+        <div class="seed-controls" hidden><label for="seed-position">Move seed <i>A</i></label><input id="seed-position" type="range" min="115" max="278" value="201" aria-describedby="seed-caption"></div>
+        <figcaption id="seed-caption">Every point inside the blue cell is closer to <i>A</i> than to any other seed. This sketch explains a starting geometry used in several cuts.</figcaption>
+      </figure>
+    </section>
+    <aside class="proof" aria-label="Why a shared boundary moves">
+      <img src="architecture-assets/bisector.svg" width="230" height="110" alt="Two dotted lines of equal length connect P on the blue boundary to seeds A and B.">
+      <div><p class="kicker">On the boundary</p><p>At <i>P</i>, the distance to <i>A</i> equals the distance to <i>B</i>. Move either seed and the line of equal distance moves with it.</p></div>
+    </aside>
+    <section id="overview" class="chapter" aria-labelledby="overview-title">
+      <header class="chapter-head">
+        <p class="kicker">System overview</p><h2 id="overview-title">Two paths meet at the laser</h2>
+        <p>The photograph supplies the image on the wood. A separate path determines where the wood is cut. The custom maker connects the two through the board’s size, shape, cut style and special pieces.</p>
+      </header>
+      <figure class="system-figure">
+        <a href="architecture-assets/production-route.svg" aria-label="Open the production flow at full size"><img src="architecture-assets/production-route.svg" width="1040" height="296" alt="The photo becomes printed artwork on plywood. The board choices feed a cut generator, and the laser follows its paths on the printed board."></a>
+        <div class="mobile-map"><span class="map-node">Photograph</span><span class="map-wire" aria-hidden="true">↙　↘</span><div class="map-lanes"><span>Print artwork<small>Image on the wood</small></span><span>Set board and grow pieces<small>Geometry of the cut paths</small></span></div><span class="map-wire" aria-hidden="true">↘　↙</span><span class="map-node">Laser cuts the printed board</span></div><figcaption><i>Fig. 2.</i> &nbsp;The artwork path carries physical material. The cut path carries geometry. <a class="full-map" href="architecture-assets/production-route.svg">Open full diagram</a></figcaption>
+      </figure>
+      <div class="overview-notes">
+        <div><h3>What the customer chooses</h3><p>Upload a JPG or PNG, choose a size and outline, then select a cut style. Letters, numbers and figures can become special pieces, and an optional message can be engraved on the back.</p></div>
+        <div><h3>What the generator decides</h3><p>With the board and fixed figures set, the generator has to divide the remaining area. A curve drawn between two neighbors becomes the edge of both when the laser follows it.</p></div>
+      </div>
+      <p class="source-links"><a href="https://n-e-r-v-o-u-s.com/customPuzzle/">Custom puzzle maker</a> · <a href="https://n-e-r-v-o-u-s.com/works/puzzles/">Studio methods</a> · <a href="https://n-e-r-v-o-u-s.com/blog/?p=6221">Making a wooden puzzle</a></p>
+    </section>
+    <section id="cuts" class="chapter cuts">
+  <header class="chapter-head">
+    <p class="kicker">Cut families</p>
+    <h2>Six ways to shape a seam</h2>
+    <p>Crystal growth makes Dendrite and Amoeba branch. Elastic rods buckle in Maze and curl in Wave. Coral selects arcs. Matrix trades cells. Each sketch follows one seam, paired with the studio’s photograph of the finished wood.</p>
+  </header>
+  <nav class="cut-tabs" aria-label="Choose a cut style">
+    <a href="#cut-dendrite">Dendrite</a>
+    <a href="#cut-amoeba">Amoeba</a>
+    <a href="#cut-maze">Maze</a>
+    <a href="#cut-wave">Wave</a>
+    <a href="#cut-coral">Coral</a>
+    <a href="#cut-matrix">Matrix</a>
+  </nav>
+  <article class="cut-panel" id="cut-dendrite">
+    <div class="cut-body">
+      <p class="kicker">Crystal growth</p>
+      <h3>Dendrite</h3>
+      <p>A slight ripple can become a branching knob. The published solver lets both pieces advance along their shared boundary.</p></div>
+    <figure class="mechanism-plate"><a href="architecture-assets/dendrite.svg"><img src="architecture-assets/dendrite.svg" width="720" height="150" alt="Conceptual three-stage schematic. A rippled boundary develops a few broad projections, then secondary branches grow on their sides."></a></figure>
+    <figure class="cut-photo">
+      <img src="images/style_dendrite_photo.jpg" width="1000" height="1000" alt="Branching fingers interlock along the edges of wooden pieces.">
+      <figcaption>Each branch grows into the space held by a neighboring piece.</figcaption>
+    </figure>
+    <ol class="mechanism">
+        <li><strong>Seed and ripple the boundary</strong><span class="stage-sketch" aria-hidden="true" style="--i:0"><img src="architecture-assets/dendrite.svg" alt=""></span><span>Seeds spread until regions meet. The 2012 solver assigns different phase labels to neighbors, reuses five labels across the board and ripples the boundaries.</span></li>
+        <li><strong>Extend the tips</strong><span class="stage-sketch" aria-hidden="true" style="--i:1"><img src="architecture-assets/dendrite.svg" alt=""></span><span>Each phase has a temperature field. As one tip advances it releases heat, slowing growth beside it. This lets the tip protrude farther.</span></li>
+        <li><strong>Form side branches</strong><span class="stage-sketch" aria-hidden="true" style="--i:2"><img src="architecture-assets/dendrite.svg" alt=""></span><span>Smaller tips form along a growing finger. Long runs can soften these fine branches as heat travels between distant pieces that share a phase label.</span></li>
+      </ol>
+    <p class="source-links"><a href="papers/nervousSystem_2012-jigsaw-puzzle-paper.pdf">2012 solver paper, §§3–6</a> · <a href="figures/dendriteCut-1-825x619.png">Growth sequence</a> · <a href="https://n-e-r-v-o-u-s.com/works/puzzles/">Studio project</a></p>
+  </article>
+  <article class="cut-panel" id="cut-amoeba">
+    <div class="cut-body">
+      <p class="kicker">Crystal growth</p>
+      <h3>Amoeba</h3>
+      <p>Amoeba uses the Dendrite solver with a different set of parameters. The result has smaller, more repetitive protrusions and more pieces per unit area.</p></div>
+    <figure class="mechanism-plate"><a href="architecture-assets/amoeba.svg"><img src="architecture-assets/amoeba.svg" width="720" height="150" alt="Conceptual three-stage schematic. Many closely spaced ripples develop into a row of short, rounded fingers."></a></figure>
+    <figure class="cut-photo">
+      <img src="images/style_amoeba_photo.jpg" width="1000" height="1000" alt="A finely toothed wooden seam with many small, closely spaced projections.">
+      <figcaption>Rows of short projections give Amoeba its fine-toothed edge.</figcaption>
+    </figure>
+    <ol class="mechanism">
+        <li><strong>Place the seeds</strong><span class="stage-sketch" aria-hidden="true" style="--i:0"><img src="architecture-assets/amoeba.svg" alt=""></span><span>Seed shape and spacing determine which regions meet and how much boundary each piece shares with its neighbors.</span></li>
+        <li><strong>Tune the ripples and growth</strong><span class="stage-sketch" aria-hidden="true" style="--i:1"><img src="architecture-assets/amoeba.svg" alt=""></span><span>The paper identifies ripple wavelength, amplitude and supercooling as style controls. The studio describes Amoeba as a distinct preset without publishing its values.</span></li>
+        <li><strong>Follow the fine branches</strong><span class="stage-sketch" aria-hidden="true" style="--i:2"><img src="architecture-assets/amoeba.svg" alt=""></span><span>The same crystal-growth rule amplifies the initial ripples. The finished edge carries many slender fingers that look alike, making individual fits harder to recognize.</span></li>
+      </ol>
+    <p class="source-links"><a href="papers/nervousSystem_2012-jigsaw-puzzle-paper.pdf">Style controls, §5</a> · <a href="https://n-e-r-v-o-u-s.com/blog/?p=9738">Studio cut guide</a></p>
+  </article>
+<aside class="thermal"><div><p class="kicker">Dendrite / Growth feedback</p><h3>Why a tip pulls ahead</h3><p>A protruding tip reaches colder material. As it advances, the heat it releases diffuses sideways and slows growth along its flanks. A small difference in shape can grow into a branch.</p><p class="source-links"><a href="papers/nervousSystem_2012-jigsaw-puzzle-paper.pdf">Dendrite paper, Fig. 2 and §3.1</a></p></div><figure class="process-figure "><a href="architecture-assets/thermal-feedback.svg"><img src="architecture-assets/thermal-feedback.svg" width="820" height="291" alt="A protruding tip reaches farther into supercooled material, which favors further advance. As the front advances, freezing releases heat. Heat diffuses to the flanks faster than the front moves, warming them and slowing nearby growth. The plus marks a reinforcing influence. The minus marks inhibition."></a></figure></aside>
+  <article class="cut-panel" id="cut-maze">
+    <div class="cut-body">
+      <p class="kicker">Elastic rods</p>
+      <h3>Maze</h3>
+      <p>Maze starts with the same kind of cellular layout as Dendrite. Once the cells meet, their edges become rods with more length than the outline can accommodate.</p></div>
+    <figure class="mechanism-plate"><a href="architecture-assets/maze.svg"><img src="architecture-assets/maze.svg" width="720" height="150" alt="Conceptual three-stage schematic. A straight elastic edge buckles as it lengthens, then folds back on itself within the space between neighboring edges."></a></figure>
+    <figure class="cut-photo">
+      <img src="images/style_maze_photo.jpg" width="1000" height="1000" alt="Long, tightly folded wooden seams double back into narrow corridors.">
+      <figcaption>Long folds pack into the space between the original cells.</figcaption>
+    </figure>
+    <ol class="mechanism">
+        <li><strong>Form the starting edge</strong><span class="stage-sketch" aria-hidden="true" style="--i:0"><img src="architecture-assets/maze.svg" alt=""></span><span>Seed regions expand around fixed figures until they meet. The boundary between two neighbors becomes the initial elastic edge.</span></li>
+        <li><strong>Lengthen each rod</strong><span class="stage-sketch" aria-hidden="true" style="--i:1"><img src="architecture-assets/maze.svg" alt=""></span><span>Each shared edge becomes an elastic rod that tends to stay straight. As it grows inside the confined puzzle, the excess length makes it buckle.</span></li>
+        <li><strong>Resolve collisions</strong><span class="stage-sketch" aria-hidden="true" style="--i:2"><img src="architecture-assets/maze.svg" alt=""></span><span>Neighboring folds meet and push one another aside. Continued growth packs the edges into deep, narrow turns.</span></li>
+      </ol>
+    <p class="source-links"><a href="figures/maze.gif">Rod-growth animation</a> · <a href="https://n-e-r-v-o-u-s.com/blog/?p=7821">Studio account of Maze</a></p>
+  </article>
+  <article class="cut-panel" id="cut-wave">
+    <div class="cut-body">
+      <p class="kicker">Elastic rods and vortices</p>
+      <h3>Wave</h3>
+      <p>Wave uses the growing rods from Maze. A flow field sets the starting direction of the pieces, and vortices curl their edges as they lengthen.</p></div>
+    <figure class="mechanism-plate"><a href="architecture-assets/wave.svg"><img src="architecture-assets/wave.svg" width="720" height="150" alt="Conceptual three-stage schematic. A direction field biases the initial cells. Rotating forces attach to the growing edge and draw curls into it."></a></figure>
+    <figure class="cut-photo">
+      <img src="images/style_wave_photo.jpg" width="1000" height="1000" alt="Wooden pieces ending in spiral hooks that curl into adjacent pieces.">
+      <figcaption>Curls and hammerhead-shaped tips mark the path of the vortices.</figcaption>
+    </figure>
+    <ol class="mechanism">
+        <li><strong>Orient the starting cells</strong><span class="stage-sketch" aria-hidden="true" style="--i:0"><img src="architecture-assets/wave.svg" alt=""></span><span>An anisotropic centroidal Voronoi layout elongates cells along a flow field. The arrangement already follows broad waves before any edge grows.</span></li>
+        <li><strong>Place the vortices</strong><span class="stage-sketch" aria-hidden="true" style="--i:1"><img src="architecture-assets/wave.svg" alt=""></span><span>The length of each edge determines how many vortices it receives. These centers of rotation travel with the edge.</span></li>
+        <li><strong>Curl the growing seam</strong><span class="stage-sketch" aria-hidden="true" style="--i:2"><img src="architecture-assets/wave.svg" alt=""></span><span>As the elastic rods lengthen, the rotating forces draw them into spirals. A piece can keep the broad sweep of its starting cell while acquiring a hook at its tip.</span></li>
+      </ol>
+    <p class="source-links"><a href="figures/waveDiagram-825x322.jpg">Starting cells and finished edges</a> · <a href="https://n-e-r-v-o-u-s.com/blog/?p=9225">Wave development</a> · <a href="https://n-e-r-v-o-u-s.com/blog/?p=9738">Studio cut guide</a></p>
+  </article>
+  <figure class="studio-plate" data-cut="cut-wave">
+    <a href="figures/waveDiagram-825x322.jpg"><img src="figures/waveDiagram-825x322.jpg" width="825" height="322" alt="A field of elongated cells on the left and a field of spiraling seams on the right. Both have the same broad directional flow."></a>
+    <figcaption><strong>Wave at board scale.</strong> The starting cells already follow a flow. The tight curls appear as the individual edges grow. <a href="https://n-e-r-v-o-u-s.com/blog/?p=9225">Studio drawing and development notes</a></figcaption>
+  </figure>
+  <article class="cut-panel" id="cut-coral">
+    <div class="cut-body">
+      <p class="kicker">Circular arcs</p>
+      <h3>Coral</h3>
+      <p>Jules Khan’s Coral generator tries several routes for a shared edge. The choice affects both the grip between neighbors and the strength of the wood left in each piece.</p></div>
+    <figure class="mechanism-plate"><a href="architecture-assets/coral.svg"><img src="architecture-assets/coral.svg" width="720" height="150" alt="Conceptual three-stage schematic. Two fixed endpoints admit many circular-arc chains. The selected chain includes rounded loops and avoids self-crossings."></a></figure>
+    <figure class="cut-photo">
+      <img src="images/style_coral_photo.jpg" width="1000" height="1000" alt="A wooden cut pattern with rounded, wandering arms of several sizes.">
+      <figcaption>Successive circular arcs form the rounded arms.</figcaption>
+    </figure>
+    <ol class="mechanism">
+        <li><strong>Start from a cellular layout</strong><span class="stage-sketch" aria-hidden="true" style="--i:0"><img src="architecture-assets/coral.svg" alt=""></span><span>Each pair of neighboring pieces has a shared boundary. That boundary provides the starting point for a replacement curve.</span></li>
+        <li><strong>Try chains of arcs</strong><span class="stage-sketch" aria-hidden="true" style="--i:1"><img src="architecture-assets/coral.svg" alt=""></span><span>Random walks of connected circular arcs give the generator candidate seams with different lengths and degrees of interlock.</span></li>
+        <li><strong>Choose a viable seam</strong><span class="stage-sketch" aria-hidden="true" style="--i:2"><img src="architecture-assets/coral.svg" alt=""></span><span>The search scores length and interlock, avoids self-crossings and keeps enough wood in narrow regions for a strong piece.</span></li>
+      </ol>
+    <p class="source-links"><a href="figures/nervousSystem_puzzleCuts_2025-825x779.png">Six-cut comparison</a> · <a href="https://n-e-r-v-o-u-s.com/blog/?p=9636">Studio account of Coral</a> · <a href="https://n-e-r-v-o-u-s.com/blog/?p=9738">Studio cut guide</a></p>
+  </article>
+  <article class="cut-panel" id="cut-matrix">
+    <div class="cut-body">
+      <p class="kicker">Grid optimization</p>
+      <h3>Matrix</h3>
+      <p>The grid itself turns to follow the puzzle. The generator moves individual grid cells across shared edges until neighboring pieces catch one another.</p></div>
+    <figure class="mechanism-plate"><a href="architecture-assets/matrix.svg"><img src="architecture-assets/matrix.svg" width="720" height="150" alt="Conceptual three-stage schematic. Two adjoining tile groups start with a straight boundary. Exchanging a few tiles yields a stepped edge whose turns improve interlocking."></a></figure>
+    <figure class="cut-photo">
+      <img src="images/style_matrix_photo.jpg" width="1000" height="1000" alt="Angular wooden seams step around a small figure piece on a turning grid.">
+      <figcaption>Neighboring pieces exchange whole grid cells, leaving stepped edges.</figcaption>
+    </figure>
+    <ol class="mechanism">
+        <li><strong>Fit the grid</strong><span class="stage-sketch" aria-hidden="true" style="--i:0"><img src="architecture-assets/matrix.svg" alt=""></span><span>The outline, figure pieces and any guide curves orient a fine mesh made mostly of quadrilaterals.</span></li>
+        <li><strong>Trade cells</strong><span class="stage-sketch" aria-hidden="true" style="--i:1"><img src="architecture-assets/matrix.svg" alt=""></span><span>Groups with roughly equal cell counts form the initial pieces. The optimizer looks several swaps ahead while balancing piece size and interlock.</span></li>
+        <li><strong>Measure the turn</strong><span class="stage-sketch" aria-hidden="true" style="--i:2"><img src="architecture-assets/matrix.svg" alt=""></span><span>Trace a tangent along the shared edge and mark its directions on a circle. The studio uses coverage beyond 180° as an indication of interlock, with stronger interlock as coverage approaches 360°.</span></li>
+      </ol>
+    <p class="source-links"><a href="figures/matrix4-825x279.png">Grid-to-pieces sequence</a> · <a href="https://n-e-r-v-o-u-s.com/blog/?p=9465">Studio account of Matrix</a> · <a href="https://n-e-r-v-o-u-s.com/blog/?p=9738">Studio cut guide</a></p>
+  </article>
+  <figure class="studio-plate" data-cut="cut-matrix">
+    <a href="figures/matrix4-825x279.png"><img src="figures/matrix4-825x279.png" width="825" height="279" alt="The studio’s circular puzzle in three views showing its fine grid, initial groups of cells, and the stepped outlines of interlocking pieces."></a>
+    <figcaption><strong>Matrix at board scale.</strong> Follow one patch of grid through the sequence. The animal figures keep their outlines while the surrounding pieces acquire stepped edges. <a href="https://n-e-r-v-o-u-s.com/blog/?p=9465">Studio drawing and development notes</a></figcaption>
+  </figure>
+
+</section>
+<section id="process" class="chapter" aria-labelledby="process-title">
+  <header class="chapter-head">
+    <p class="kicker">Production detail</p>
+    <h2 id="process-title">From mask to wood</h2>
+    <p>The silhouette sets the outer edge. Whimsies reserve space inside it. The remaining seams must interlock and leave enough wood for each piece to hold together.</p>
+  </header>
+  <article class="study" aria-labelledby="mask-title">
+    <div class="study-head"><h3 id="mask-title">How Magic Shape finds a silhouette</h3><p>The studio credits rembg for identifying the subject of a photo. A local replay with U²-Net shows how a photograph becomes a foreground mask.</p></div>
+    <ol class="steps">
+      <li><strong>Prepare the photo</strong><span>Resize the RGB image to 320 × 320 pixels and normalize its color channels.</span></li>
+      <li><strong>Find the subject</strong><span>U²-Net uses nested U-shaped blocks to combine local detail with a wider view. Six side outputs contribute to the final prediction.</span></li>
+      <li><strong>Recover the mask</strong><span>Scale the fused prediction to grayscale and resize it to the original photo dimensions. Bright pixels indicate likely foreground.</span></li>
+      <li><strong>Set the perimeter</strong><span>Magic Shape suggests an outline. The studio leaves the mask-to-perimeter conversion undocumented. A customer can also upload a black-and-white outline.</span></li>
+    </ol>
+    <figure class="process-figure">
+      <a href="architecture-assets/mask-flow.png"><img src="architecture-assets/mask-flow.png" width="1466" height="380" loading="lazy" alt="The same white tiger shown as a photograph, a grayscale foreground mask, and a photograph with the mask boundary traced in red."></a>
+      <figcaption><strong>Threshold contour.</strong> The red line traces the largest outer boundary at a mask value of 128. This research diagnostic visualizes the replayed prediction. The studio’s production perimeter is undocumented. <a href="https://github.com/danielgatis/rembg/blob/332c16b58e0194f0960f9d6cf38746e7be8546b7/examples/animal-1.jpg">Photograph from the rembg examples</a> · <a href="upstream/rembg/SOURCE.md">Mask and replay</a></figcaption>
+    </figure>
+    <details class="note"><summary>How closely did the two models reproduce the reference mask?</summary>
+      <p><strong>Full U²-Net 0.99916</strong> · <strong>Compact U²-Net 0.97213</strong>. Both processed the same 1000 × 667 photograph, <code>animal-1.jpg</code>. The reference was the alpha channel of the upstream <code>animal-1.out.png</code>.</p>
+      <p>At a threshold of 128, intersection over union divides the area marked foreground by both masks by the area marked foreground by either. These scores measure agreement on this one upstream example. Production-outline accuracy remains unknown.</p>
+    </details>
+    <p class="source-links"><a href="https://n-e-r-v-o-u-s.com/blog/?p=8656">Studio announcement</a> · <a href="upstream/rembg/SOURCE.md">Model replay and weights</a> · <a href="upstream/rembg/animal-1-mask.png">Resulting mask</a> · <a href="papers/U2-Net-2005.09007v2.pdf">U²-Net paper</a></p>
+  </article>
+  <article class="study" aria-labelledby="whimsy-title">
+    <div class="study-head"><h3 id="whimsy-title">Growing pieces around fixed shapes</h3><p>A whimsy keeps its recognizable silhouette while neighboring pieces grow around it. The custom maker lets customers position figures, letters and digits.</p></div>
+    <figure class="process-figure wide-sketch"><a href="architecture-assets/fixed-figures.svg"><img src="architecture-assets/fixed-figures.svg" width="720" height="150" alt="Conceptual three-stage schematic. The same sitting cat stays in place inside the board. Red seeds lie outside its silhouette. An illustrative Voronoi partition shows neighboring cells meeting the cat and the board perimeter."></a><figcaption>A single cat stands in for the fixed silhouettes. The dots seed the surrounding pieces. Their boundaries stop at the cat.</figcaption></figure>
+    <ol class="steps">
+      <li><strong>Choose the figures</strong><span>The outer board and the silhouettes constrain placement. Each cat in the studio’s <em>Herding Cats</em> puzzle has to fit inside a larger cat outline.</span></li>
+      <li><strong>Place and fix the shapes</strong><span>For this edition, the studio used Deepnest to pack the cats. The designers then adjusted their placement by hand.</span></li>
+      <li><strong>Grow between them</strong><span>Cells expand through the gaps until they meet their neighbors. The resulting interlocks hold the cats within the assembled puzzle.</span></li>
+    </ol>
+    <p class="source-links"><a href="https://n-e-r-v-o-u-s.com/customPuzzle/">Custom maker</a> · <a href="https://n-e-r-v-o-u-s.com/blog/?p=8637">Herding Cats process</a> · <a href="upstream/Deepnest/source.json">Deepnest source record</a> · <a href="papers/nervousSystem_2012-jigsaw-puzzle-paper.pdf">Puzzle paper, §4</a></p>
+  </article>
+  <article class="study" aria-labelledby="cut-title">
+    <div class="study-head"><h3 id="cut-title">Turning Dendrite boundaries into cut paths</h3><p>The original solver produces regions on a grid. A tiny detached island or a narrow neck in that grid can become a loose sliver or a fragile piece in wood.</p></div>
+    <figure class="process-figure wide-sketch"><a href="architecture-assets/cut-to-wood.svg"><img src="architecture-assets/cut-to-wood.svg" width="780" height="184" alt="Three views show the same rectangular board. The first shows the blank outline. The second adds a blue tab-shaped vector path across the board. The last shows the two pieces separated slightly. Their matching blue edges follow the original line, and the shaded vertical faces show the thickness of the wood."></a><figcaption>Follow the blue line from the flat board to the two matching edges. The drawing separates the pieces to show their thickness.</figcaption></figure>
+    <ol class="steps">
+      <li><strong>Remove detached regions</strong><span>Dilate each piece in turn with a disk whose radius is just under the piece-width tolerance. Remove fragments pinched off during each pass.</span></li>
+      <li><strong>Trace the seams</strong><span>Modified marching squares turns the phase grid into geometric boundaries shared by adjacent pieces.</span></li>
+      <li><strong>Widen tight folds</strong><span>Where a boundary point lies too close to another line, apply local Laplacian smoothing. Repeat the clearance check before exporting the paths.</span></li>
+      <li><strong>Cut the plywood</strong><span>The laser follows the vector paths. In a later fabrication project the studio fitted a Trotec Speedy 360 with a coaxial air-assist nozzle to clear smoke and debris from the cut.</span></li>
+    </ol>
+    <p class="source-links"><a href="https://n-e-r-v-o-u-s.com/works/puzzles/">Studio cleanup and export account</a> · <a href="https://n-e-r-v-o-u-s.com/blog/?p=8722">Air-assist testing</a> · <a href="fabrication/air-assist/SOURCE.md">Released nozzle and license</a></p>
+  </article>
+</section>
+    <section id="local" class="chapter">
+  <header class="chapter-head">
+    <p class="kicker">Repository implementation</p>
+    <h2>Inside the local engine</h2>
+    <p>Formverk Studio and the command line share a generator. Its eight cut styles build seams by growing neighboring regions, bending elastic rods, joining circular arcs or exchanging cells in a mesh.</p>
+  </header>
+  <figure class="system-figure"><a href="architecture-assets/local-engine.svg"><img src="architecture-assets/local-engine.svg" width="1080" height="258" alt="Formverk Studio and the CLI select among four solver families. Phase fields, elastic rods, circular arcs and quadrilateral cell exchange all produce polygon faces and shared cuts for the exporter."></a><div class="mobile-map"><span class="map-node">Formverk Studio or command line</span><span class="map-wire" aria-hidden="true">↓</span><div class="map-lanes"><span>Phase fields<small>Trace piece labels</small></span><span>Elastic rods<small>Bend shared edges</small></span><span>Coral<small>Join tangent arcs</small></span><span>Matrix<small>Exchange mesh cells</small></span></div><span class="map-wire" aria-hidden="true">↓</span><span class="map-node">Faces and seams → export and SVG audit</span></div><figcaption><i>Fig. 3.</i> &nbsp;Four solver families return polygon faces and shared cut paths to one exporter. <a class="full-map" href="architecture-assets/local-engine.svg">Open full diagram</a></figcaption></figure>
+  <figure class="process-figure" id="cut-comparison">
+    <a href="../../local/technical/cut-comparison.svg"><img src="../../local/technical/cut-comparison.svg" width="1120" height="735" alt="Eight Formverk cuts on the same rectangular board, drawn from the exported paths at a common scale. Each panel lists the piece count, cut length, planar lock margin and audit outcome."></a>
+    <figcaption><i>Fig. 4.</i> &nbsp;<span class="cut-plate-hint">Scroll across the plate to see all eight cuts. </span>Eight exports of the same 200 × 160 mm rectangle with seed 42. Reopening each cut SVG recovered the requested 14 pieces, and all eight passed the geometry audit. Phase fields ran for 240 CPU steps on a 0.8 mm grid. Rods ran for 45 growth steps, with a fixed border for Maze. Coral and Matrix used default arc and mesh settings. Every run used a 3.0 mm minimum neck setting and a 0.15 mm kerf. <a href="../../local/technical/cut-comparison.svg">Full-size plate</a> · <a href="../../local/technical/cut-comparison.csv">Measurements (CSV)</a> · <a href="../../local/technical/compare_cuts.py">Reproduce the comparison</a></figcaption>
+  </figure>
+  <p class="note"><strong>Similar cut lengths, different interlock.</strong> For this seed, Dendrite, Amoeba and Linear differed in total cut length by just 8.45 mm across roughly 2.4 m of cuts. Their estimated lock margins ranged from 0.891 mm for Linear to 3.141 mm for Amoeba. The audit samples 360 planar translation directions and searches up to 12 mm, with a final bracket of at most 0.0625 mm below the ceiling.</p>
+  <div class="flow-card">
+    <h3>One request supplies the board</h3>
+    <p><code>python -m dendrite_engine generate</code> and Formverk’s <code>POST /api/generate</code> both call <code>generate_puzzle_run</code>. The inputs include an outline, dimensions in millimetres, a target piece count, a random seed and optional fixed figure pieces called whimsies. The generator collects any engraving strokes before choosing a branch.</p>
+  </div>
+  <div class="two-col">
+    <section class="flow-card">
+      <h3>Dendrite, Amoeba, Linear and Grid</h3>
+      <ol class="steps">
+        <li><strong>Fill the outline.</strong> <span>Rasterize the outline and reserve the whimsy pixels. Seeds usually fill the remaining space by shortest-path distance. The solver also offers reaction–diffusion initialization for up to 64 moving pieces, or accepts an initial label grid directly.</span></li>
+        <li><strong>Grow neighboring regions.</strong> <span>Add ripples at two scales, assign phase channels by graph distance, then evolve phase and temperature fields on the GPU or CPU. Optional artwork modulates growth parameters. Auto-tuning uses a trained model when available and preset-based values when its checkpoint is missing.</span></li>
+        <li><strong>Recover the piece edges.</strong> <span>The solver returns a height-by-width grid of piece IDs, with −1 outside the outline, and a stack of continuous phase fields. Cleanup reassigns stray pixels and repairs narrow necks. The vectorizer traces shared edges once, reduces smoothing if needed and checks that each label corresponds to one polygon.</span></li>
+      </ol>
+    </section>
+    <section class="flow-card">
+      <h3>Maze and Wave</h3>
+      <ol class="steps">
+        <li><strong>Build rods along shared edges.</strong> <span>Clip Voronoi cells around the fixed figures and convert their boundaries into linked nodes and segments. Wave elongates the initial cells. Maze can also let the perimeter move.</span></li>
+        <li><strong>Lengthen and bend the rods.</strong> <span>Increase segment rest lengths, subdivide long segments and solve stretch, shear, bending and collision constraints. Wave adds rotating forces. The solver periodically saves a candidate that passes its face and neck checks.</span></li>
+        <li><strong>Return vector geometry.</strong> <span>The exporter receives polygons and cut lines built directly from the chosen rod positions. The solver first tries a smoothing pass, retries with the unsmoothed snapshot if polygonization fails, then raises an error if neither yields valid faces. Its initial fallback is the perturbed starting graph.</span></li>
+      </ol>
+    </section>
+  </div>
+  <div class="two-col">
+    <section class="flow-card">
+      <h3>Coral</h3>
+      <p>Start with a seeded network of shared edges. For each editable edge, test chains of tangent circular arcs between its endpoints. Keep a simple chain whose curved section clears the neighboring cuts, then rebuild the pieces from the selected seams.</p>
+    </section>
+    <section class="flow-card">
+      <h3>Matrix</h3>
+      <p>Fit a quadrilateral mesh to the perimeter and assign connected groups of cells to pieces. Transfer boundary cells between neighbors to improve their interlock. Edges between different owners form the shared cuts.</p>
+    </section>
+  </div>
+  <section class="flow-card">
+    <h3>All four families share an exporter</h3>
+    <ol class="steps">
+      <li><strong>Write millimetre-scale SVGs.</strong> <span><code>cut.svg</code> separates internal cuts, the perimeter and engraving. <code>artwork.svg</code> colors the resulting piece polygons in the same coordinate system.</span></li>
+      <li><strong>Read the cut back.</strong> <span>The exporter reopens <code>cut.svg</code>, skips engraving and rebuilds faces. <code>audit.json</code> records duplicate segments, coverage, inward-offset kerf and neck checks, and an interlock estimate sampled across 360 planar translation directions. A borderless Maze is checked against its reconstructed union because it has no fixed target outline.</span></li>
+      <li><strong>Render and play.</strong> <span><code>preview.png</code> shows the assembled board, <code>pieces_sheet.png</code> shows individual pieces and <code>puzzle.json</code> carries their outlines, positions, engraving and neighbors to the player.</span></li>
+    </ol>
+  </section>
+  <p class="note"><strong>Reading a clearance measurement.</strong> In the seed-42 Wave example, the closest eligible pair of rod segments is 3.050 mm apart after the accepted geometry is rounded to a 0.01 mm grid. The retained collision sweep recorded 2.723 mm before applying a repulsion correction. Both numbers are solver measurements. The SVG audit independently rebuilds the exported pieces and checks their geometry. Physical fit and cut quality require measurements on fabricated pieces.</p>
+  <p class="source-links"><a href="../../dendrite_engine/cli.py">Generator</a> · <a href="../../dendrite_engine/solvers.py">Solver dispatch</a> · <a href="../../dendrite_engine/server.py">Formverk API</a> · <a href="../../dendrite_engine/phase_field.py">Phase solver</a> · <a href="../../dendrite_engine/rod_growth.py">Rods and clearance</a> · <a href="../../dendrite_engine/coral.py">Coral arcs</a> · <a href="../../dendrite_engine/matrix.py">Matrix cell exchange</a> · <a href="../../dendrite_engine/neural_guide.py">Parameter guide</a> · <a href="../../dendrite_engine/postprocess.py">Export and audit</a> · <a href="../../local/technical/geometry.md">Reproduce the Wave measurement</a> · <a href="../../tests/test_dendrite_engine.py">Repository tests</a></p>
+</section>
+    <section id="sources" class="chapter" aria-labelledby="sources-title">
+      <header class="chapter-head"><p class="kicker">Source notes</p><h2 id="sources-title">What can be checked</h2>
+        <p>The 2012 paper gives update equations for Dendrite. Later studio articles describe the other cuts. The public sources reviewed leave the deployed engine, current parameter values and service layout undocumented.</p>
+      </header>
+      <dl class="evidence">
+        <div><dt>Studio publications</dt><dd>The Dendrite paper covers initialization, heat transfer, ripples and style controls. The six-cut guide describes how each family shapes a shared edge. <a href="papers/nervousSystem_2012-jigsaw-puzzle-paper.pdf">Read the paper</a> · <a href="https://n-e-r-v-o-u-s.com/blog/?p=9738">Compare the six cuts</a></dd></div>
+        <div><dt>Software credits</dt><dd>In 2017 the studio credited openFrameworks for the application framework, Eigen for matrix operations, Clipper for polygon operations and PositionBasedDynamics for physics. The archive includes public releases and their original license records. <a href="README.md#libraries-credited-in-2017">Library sources</a></dd></div>
+        <div><dt>Independent checks</dt><dd>The archived FiPy example reproduces a single-crystal benchmark across 1,600 cells after ten time steps. The rembg replay tests two foreground models on one photograph. Each check records its input, method and result. <a href="upstream/FiPy/SOURCE.md">Crystal benchmark</a> · <a href="upstream/rembg/SOURCE.md">Mask replay</a></dd></div>
+        <div><dt>Production evidence</dt><dd>The studio documented using Deepnest for a particular cat puzzle and released its air-assist nozzle for laser cutting. A separate inventory records the visible custom-maker images and the scripts and styles referenced by its page. <a href="upstream/Deepnest/source.json">Deepnest</a> · <a href="fabrication/air-assist/SOURCE.md">Nozzle</a> · <a href="configurator-assets.json">Images</a> · <a href="configurator-includes.json">Page references</a></dd></div>
+      </dl>
+    </section>
+  </main>
+  <footer><span>Formverk / Jigsaw research</span><a href="README.md">Research archive</a><a href="#top">Back to top ↑</a></footer>
+</body>
+</html>

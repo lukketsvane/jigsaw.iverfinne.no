@@ -1,10 +1,11 @@
-"""Clean-room GPU Dendritic Solidification, Cosserat Rod Growth, and Neural Puzzle Engine.
+"""Formverk generative jigsaw geometry, fabrication files and local Studio.
 
 Implements:
 - Multiphase Kobayashi/Steinbach Allen-Cahn dendritic solidification (2012 paper Eqs. 1-11)
   accelerated on CUDA with distance-2 graph coloring and reflective whimsy/outline BCs.
 - 2D planar Position-Based Cosserat Rod elastic growth (MIT PositionBasedDynamics,
   Kugelstadt & Schomer 2016) for Maze and Wave cuts.
+- Circular arc candidate search for Coral and conforming quad-cell exchanges for Matrix.
 - Fabrication-safe common-line 1:1 mm SVG export with separate interior/exterior/engrave layers
   and independent re-parse, kerf, 3 mm neck, and 360-direction interlock audits.
 - GPU-trained neural parameter/quality surrogate and Formverk Studio web backend.
@@ -25,9 +26,14 @@ from .phase_field import (
 from .rod_growth import RodConfig, RodResult, run_rod_growth
 from .whimsies import WhimsySpec, WhimsyPlacement, build_whimsy_geometry, list_builtin_whimsies
 from .postprocess import ExportResult, audit_cut_svg, export_puzzle
+from .solvers import CutGeometry, solve_cut
+from .styles import CUT_FAMILIES
 
 __all__ = [
     "__version__",
+    "CutGeometry",
+    "solve_cut",
+    "CUT_FAMILIES",
     "DendriteConfig",
     "DendriteResult",
     "STYLE_PRESETS",

@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="258" viewBox="0 0 1080 258" role="img" aria-labelledby="title desc">
+  <title id="title">Four solver families feed the Formverk exporter</title>
+  <desc id="desc">Formverk Studio and the command line select a style. Phase fields trace labels, elastic rods bend shared edges, Coral selects circular arcs and Matrix exchanges mesh cells. Each solver supplies polygon faces and cut paths for SVG export, geometry checks, previews and player data.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5.2" markerHeight="5.2" orient="auto">
+      <path d="M0 0L8 4L0 8Z" fill="#252525"/>
+    </marker>
+    <style>
+      text { font-family: "DM Sans", "Segoe UI", Arial, sans-serif; fill: #181818; }
+      .stage { font-size: 13px; font-weight: 700; letter-spacing: 1.15px; }
+      .name { font-size: 17px; font-weight: 650; }
+      .detail { font-size: 14.5px; }
+      .wire { fill: none; stroke: #252525; stroke-width: 1.5; stroke-linejoin: round; stroke-linecap: round; }
+      .arrow { marker-end: url(#arrow); }
+      .card { fill: #fff; stroke: #252525; }
+      .shared { fill: #f3f3f3; stroke: #252525; }
+    </style>
+  </defs>
+  <rect width="1080" height="258" fill="#fff"/>
+  <g class="stage">
+    <text x="13" y="22">ENTRY</text><text x="206" y="22">DISPATCH</text>
+    <text x="399" y="22">SOLVER FAMILY</text><text x="681" y="22">GEOMETRY</text><text x="895" y="22">EXPORT AND AUDIT</text>
+  </g>
+  <g class="wire">
+    <path class="arrow" d="M171 142H201"/>
+    <path d="M346 142H369M369 56V227"/>
+    <path class="arrow" d="M369 56H394"/><path class="arrow" d="M369 113H394"/>
+    <path class="arrow" d="M369 170H394"/><path class="arrow" d="M369 227H394"/>
+    <path d="M614 56H646V227H614M614 113H646M614 170H646"/>
+    <path class="arrow" d="M646 142H676"/><path class="arrow" d="M858 142H890"/>
+  </g>
+  <g fill="#252525"><circle cx="369" cy="142" r="2.6"/><circle cx="646" cy="142" r="2.6"/></g>
+  <rect class="card" x="13" y="110" width="158" height="64"/>
+  <text class="name" x="24" y="137">Formverk Studio</text><text class="detail" x="24" y="159">or command line</text>
+  <rect class="shared" x="206" y="110" width="140" height="64"/>
+  <text class="name" x="217" y="137">Select a style</text><text class="detail" x="217" y="159">solve_cut</text>
+  <g>
+    <rect class="card" x="399" y="33" width="215" height="46"/>
+    <text class="name" x="410" y="53">Phase fields</text><text class="detail" x="410" y="71">Trace shared label edges</text>
+    <rect class="card" x="399" y="90" width="215" height="46"/>
+    <text class="name" x="410" y="110">Elastic rods</text><text class="detail" x="410" y="128">Grow and bend shared edges</text>
+    <rect class="card" x="399" y="147" width="215" height="46"/>
+    <text class="name" x="410" y="167">Circular arcs · Coral</text><text class="detail" x="410" y="185">Select tangent arc chains</text>
+    <rect class="card" x="399" y="204" width="215" height="46"/>
+    <text class="name" x="410" y="224">Cell exchange · Matrix</text><text class="detail" x="410" y="242">Transfer boundary cells</text>
+  </g>
+  <rect class="shared" x="681" y="110" width="177" height="64"/>
+  <text class="name" x="692" y="137">Piece polygons</text><text class="detail" x="692" y="159">and shared cut paths</text>
+  <rect class="card" x="895" y="101" width="172" height="82"/>
+  <text class="name" x="906" y="126">Write SVG files</text><text class="detail" x="906" y="149">Read back cut paths</text><text class="detail" x="906" y="170">Audit, player, previews</text>
+</svg>

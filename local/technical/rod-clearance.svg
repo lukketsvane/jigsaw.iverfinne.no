@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="332" viewBox="0 0 860 332" role="img" aria-labelledby="title desc">
+  <title id="title">Clearance between rod centerlines</title>
+  <desc id="desc">A schematic marks the gap between two eligible segments and a separate junction excluded because its branches share a node. On one millimetre scale, the minimum recorded during the last collision sweep is 2.723 and the minimum on the settled, snapped rod centerlines is 3.050. The regression reference is 2.8. The minimizing pairs may differ.</desc>
+  <rect width="860" height="332" fill="white"/>
+  <g font-family="Arial, Helvetica, sans-serif" fill="#1b2024">
+    <text x="28" y="38" font-size="26" font-weight="700">Clearance between rod centerlines</text>
+    <text x="29" y="63" font-size="15" fill="#50575d">Wave probe · seed 42 · 14 pieces · 45 growth steps</text>
+    <path d="M28 79 H832" stroke="#9ea4a8"/>
+    <path d="M413 97 V286" stroke="#ced1d3"/>
+
+    <text x="29" y="109" font-size="18" font-weight="700">Which segments count?</text>
+    <text x="439" y="109" font-size="18" font-weight="700">Minimum spacing at each stage</text>
+
+    <!-- Deliberately schematic polylines. The highlighted parallel segments are equally close along their overlap. -->
+    <g fill="none" stroke="#20252a" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M33 138 L56 144 L79 157 L99 163 L132 163 L153 157 L175 142 L201 136"/>
+      <path d="M33 224 L57 218 L79 201 L99 195 L132 195 L154 201 L177 218 L201 224"/>
+      <path d="M244 217 L261 205 L281 185 L309 169 L330 153 L347 135"/>
+      <path d="M281 185 L308 194 L330 207 L354 211"/>
+    </g>
+    <g stroke="#285d9a" fill="none">
+      <path d="M99 163 H132 M99 195 H132" stroke-width="3.6"/>
+      <path d="M115.5 167 V191" stroke-width="1.6"/>
+    </g>
+    <path d="M112 170 L115.5 163 L119 170 Z M112 188 L115.5 195 L119 188 Z" fill="#285d9a"/>
+    <circle cx="281" cy="185" r="4.3" fill="white" stroke="#20252a" stroke-width="2"/>
+    <g text-anchor="middle" font-size="15">
+      <text x="117" y="250" font-weight="700">Eligible gap</text>
+      <text x="117" y="269" fill="#50575d">Distinct nearby segments</text>
+      <text x="301" y="250" font-weight="700">Excluded junction</text>
+      <text x="301" y="269" fill="#50575d">Branches share a node</text>
+    </g>
+
+    <!-- The shared scale runs from 2.6 to 3.1 mm, at 680 SVG units per millimetre. -->
+    <g fill="none" stroke="#d0d3d5" stroke-width="1">
+      <path d="M456 160 H482 M530 160 H796 M456 213 H706 M754 213 H796"/>
+    </g>
+    <path d="M592 145 V177 M592 200 V242" stroke="#5b6268" stroke-width="1.5" stroke-dasharray="4 4"/>
+    <g font-size="15">
+      <text x="456" y="142">Last collision sweep</text>
+      <text x="456" y="195">Settled, snapped centerlines</text>
+    </g>
+    <path d="M539.64 153 L546.64 160 L539.64 167 L532.64 160 Z" fill="white" stroke="#285d9a" stroke-width="2.3"/>
+    <circle cx="762" cy="213" r="6.2" fill="#285d9a"/>
+    <g fill="#214e83" font-size="15" font-weight="700">
+      <text x="525" y="165" text-anchor="end">2.723</text>
+      <text x="749" y="218" text-anchor="end">3.050</text>
+    </g>
+    <path d="M456 238 H796 M456 238 v6 M524 238 v6 M592 238 v6 M660 238 v6 M728 238 v6 M796 238 v6" fill="none" stroke="#454a4e" stroke-width="1.2"/>
+    <g text-anchor="middle" font-size="14">
+      <text x="456" y="263">2.6</text><text x="524" y="263">2.7</text><text x="592" y="263">2.8</text>
+      <text x="660" y="263">2.9</text><text x="728" y="263">3.0</text><text x="796" y="263">3.1</text>
+    </g>
+    <text x="815" y="263" font-size="14">mm</text>
+    <path d="M455 282 H477" stroke="#5b6268" stroke-width="1.5" stroke-dasharray="4 4"/>
+    <text x="486" y="287" font-size="14">2.8 mm settled-geometry regression reference</text>
+    <path d="M28 299 H832" stroke="#ced1d3"/>
+    <text x="29" y="320" font-size="14" fill="#41484e">Each stage reports its own minimum. Different segment pairs can supply the two readings.</text>
+  </g>
+</svg>

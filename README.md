@@ -2,6 +2,12 @@
 
 Whole-piece neural SVG geometry and constrained puzzle composition for laser cutting.
 
+## Formverk custom jigsaw workshop
+
+Run `.\.venv\Scripts\python.exe -m dendrite_engine serve` from the repository root and open [Formverk Studio](http://127.0.0.1:8765/). Design a board from a photograph or a generated print, place fixed figures and cut letters, and export registered front and reverse artwork alongside the cutting paths. The same engine runs from the command line. [Feature inventory, algorithms and usage](resources/nervous-system/feature-inventory.md)
+
+Start with the [local technical guide](local/technical/README.md) for runnable Python examples, trained model contracts and development experiments. The [illustrated research archive](resources/nervous-system/README.md) covers the studio’s published methods, diagrams and papers.
+
 ## Øglepuslespelet
 
 Lag eit kantlaust puslespel med 216 øgler. Kvar brikke har fire føter, krumma hale og sin eigen farge. Øgler på venstresida passar til naboane på høgresida, og det same gjeld oppe og nede. Forma og fargefeltet endrar seg med frøet. Utforminga byggjer på [Nervous System sitt Lizard Infinity Puzzle](https://n-e-r-v-o-u-s.com/shop/product.php?code=387).
@@ -63,7 +69,7 @@ The supplied typeface is not included. The source logo, glyph-derived dataset, a
 
 Install the dependencies in `requirements.txt`. On a new GPU machine see [Shadow PC migration](SHADOW_PC.md).
 
-The source-only checkout keeps large model and raster files in private storage. An ordered catalog of 2?32 motifs drives the free-form solver:
+Large training runs and raster caches live in private storage. The free-form solver reads an ordered catalog of motifs.
 
 ```powershell
 python -m heller_jigsaw compose --catalog runs/scale32_targets/aphex/catalog.json --seed 103 --mode 3 --out runs/layout
@@ -73,7 +79,7 @@ python -m heller_jigsaw audit-fabrication --run-dir runs/locked --rigid
 
 Use `--method mincost` for the alternative minimum-cost spanning seam construction. The four layout modes vary the placement objective; each explores six outline configurations. A reference catalog can rank modified targets against their original silhouettes. Outputs are separate, so validated runs cannot be overwritten by these commands.
 
-The fabrication screen checks re-imported SVG geometry, four kerf widths (0.10?0.25 mm), conservative 3 mm neck erosion, sampled translational motion and thin-feature loss. The optional rigid screen samples individual planar motions; it does not prove group rotation is impossible. Reports are not a physical certification.
+The fabrication screen checks re-imported SVG geometry, four kerf widths (0.10, 0.15, 0.20 and 0.25 mm), conservative 3 mm neck erosion, sampled translational motion and thin-feature loss. The optional rigid screen samples individual planar motions. Group rotation and physical fit require separate evaluation.
 
 V10 evaluated 72 layouts, 432 partition configurations and 46 locking finalists across Animal, Aphex and Helleristning editions. The 96px CC0-only model was selected over the 128px model by validation performance. The original source silhouettes, their licenses and the previous successful runs remain separate from modified manufacturing targets. The V11 robust-target investigation is experimental.
 

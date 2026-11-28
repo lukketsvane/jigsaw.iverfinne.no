@@ -13,6 +13,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html, body { height: 100%; margin: 0; }
 body {
   font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
@@ -268,4 +269,43 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
   .workspace { grid-template-columns: 1fr; }
   .sidebar { max-height: 45vh; border-right: 0; border-bottom: 1px solid var(--border); }
   .audit-bar { grid-template-columns: repeat(4, 1fr); height: auto; padding: 8px 12px; }
+}
+
+details > summary { cursor: pointer; font-size: 12px; color: var(--accent); }
+details[open] > summary { margin-bottom: 8px; }
+.settings, #photoRow, #drawRow { display: flex; flex-direction: column; align-items: stretch; gap: 7px; }
+#photoRow button { align-self: flex-start; }
+.file-row label { min-width: 0; flex: 1; }
+input[type="file"] { max-width: 100%; }
+.button-row { display: flex; flex-wrap: wrap; gap: 5px; }
+.stage-toolbar { height: auto; min-height: 46px; padding-block: 6px; flex-wrap: wrap; }
+.downloads, .play-controls, .layer-toggles { flex-wrap: wrap; gap: 5px; }
+.downloads { margin-left: auto; }
+.btn:disabled, .style-btn:disabled { opacity: .5; cursor: default; }
+.stage-toolbar .btn, .tab { white-space: nowrap; }
+.stage-toolbar .btn { padding-inline: 8px; }
+#stageSvg.drawing { cursor: crosshair; }
+.hint:empty { display: none; }
+@media (max-width: 960px) {
+  .workspace { grid-template-rows: minmax(0, 44%) minmax(0, 1fr); }
+  .sidebar { max-height: none; display: grid; align-content: start; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .generate-bar { grid-column: 1 / -1; }
+  .topbar { padding-inline: 10px; }
+  .topbar-actions { gap: 5px; }
+  .showcase-picker select { max-width: 180px; }
+}
+@media (max-width: 620px) {
+  .topbar { height: auto; min-height: 64px; flex-wrap: wrap; gap: 3px; padding-block: 5px; }
+  .brand h1 { font-size: 23px; }
+  .brand { gap: 6px; }
+  .topbar-actions { width: 100%; justify-content: space-between; }
+  .showcase-picker span, .gpu-pill { display: none; }
+  .showcase-picker { flex: 1; min-width: 0; }
+  .showcase-picker select { min-width: 0; max-width: 138px; }
+  .sidebar { display: flex; padding: 8px; }
+  .tab { padding: 4px 7px; }
+  .stage-toolbar { padding-inline: 6px; }
+  .audit-bar { padding: 4px 6px; gap: 3px; }
+  .metric .label { font-size: 9px; }
+  .metric strong { font-size: 11px; }
 }

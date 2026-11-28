@@ -1,0 +1,14 @@
+# openFrameworks 0.9.8 core source
+
+Nervous System credits openFrameworks as the C++ platform it used in its October 24, 2017 article about the Maze cut. The article leaves the exact framework revision unspecified. Version 0.9.8 was the current stable release at the time. Its tag points to a November 22, 2016 commit, and the next stable release, 0.10.0, points to a May 7, 2018 commit. [Studio article](https://n-e-r-v-o-u-s.com/blog/?p=7821) · [Official release history](https://openframeworks.cc/download/older/) · [0.9.8 commit](https://github.com/openframeworks/openFrameworks/commit/8c7ddba5b7a8c7e58452ec3113da348d5d4bc693) · [0.10.0 commit](https://github.com/openframeworks/openFrameworks/commit/5ccbb37e30cd78ae4aace5cf10069680bb5d1b26)
+
+The [core source ZIP](openFrameworks-0.9.8-core.zip) includes every file in `libs/openFrameworks/` at revision `8c7ddba5b7a8c7e58452ec3113da348d5d4bc693`, plus the root MIT [license](LICENSE.md). The 181 core files total 3,309,130 uncompressed bytes. For geometry research, start with `graphics/ofPolyline.cpp` for operations on paths and contours or `math/ofMath.cpp` for the framework's math utilities, both under `libs/openFrameworks/`. The full tag download includes examples, add-ons and build files. [Pinned source tree](https://github.com/openframeworks/openFrameworks/tree/8c7ddba5b7a8c7e58452ec3113da348d5d4bc693/libs/openFrameworks) · [Full upstream ZIP](https://codeload.github.com/openframeworks/openFrameworks/zip/refs/tags/0.9.8)
+
+| Archive | Bytes | SHA-256 |
+| --- | ---: | --- |
+| Local core ZIP | 734,749 | `3a9a3f9c59887d1c9b69e3c6297b60ca2a6c748ec29d11a31e0d0b10ae0d0267` |
+| [Full upstream ZIP, saved locally](cache/openFrameworks-0.9.8.zip) | 491,976,125 | `b1a82f3ca9985b48458354fc09559ac4e53af0ad533327e18e513db28c183cef` |
+
+The [file manifest](manifest.csv) gives each core ZIP member's original path, byte count, Git blob SHA-1 and SHA-256. The core ZIP passed its CRC check. Its contents matched all 181 blobs in the upstream core tree `3e15d54cdaf7d7b8cf0c136648b5c13c7262a001` plus the upstream license blob `6421c9087e69921ca651282c04711226cca971a3`.
+
+The full ZIP is cached locally and excluded from Git. Verification covered the CRC and upstream Git blob for every one of its 6,913 files. Of those files, 6,881 matched the blob bytes directly. The other 32 matched after accounting for the Windows line endings specified by upstream. The ZIP comment contains the pinned commit ID. Git records `apps/projectGenerator` separately as a submodule at `da225803e3d1c6408ada33d18e22b2e9fb611c0d`. Its source is available at the pinned submodule link. [Upstream line-ending rules](https://github.com/openframeworks/openFrameworks/blob/8c7ddba5b7a8c7e58452ec3113da348d5d4bc693/.gitattributes) · [Project generator source](https://github.com/openframeworks/projectGenerator/tree/da225803e3d1c6408ada33d18e22b2e9fb611c0d) · [Platform downloads](https://openframeworks.cc/download/older/)

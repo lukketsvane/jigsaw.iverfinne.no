@@ -8,7 +8,8 @@ Every built-in whimsy provides:
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, field
+import string
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
@@ -250,7 +251,8 @@ def _make_ammonite() -> WhimsySpec:
     poly = Polygon(np.stack([xs, ys], axis=1)).buffer(0.01).buffer(-0.01)
 
     # Engraved logarithmic spiral + chamber septa
-    ts = np.linspace(0.4, 4.6 * math.pi, 140)
+    # End before the spiral meets the outer lip; engraving stays on the shell.
+    ts = np.linspace(0.4, 4.5 * math.pi, 140)
     rs = 0.04 * np.exp(0.155 * ts)
     engrave = [[(float(rv * math.cos(tv)), float(rv * math.sin(tv))) for tv, rv in zip(ts, rs)]]
     for tv in np.linspace(1.6 * math.pi, 4.4 * math.pi, 14):
@@ -333,16 +335,59 @@ _BUILTIN_CACHE: Dict[str, WhimsySpec] = {}
 
 
 def list_builtin_whimsies() -> List[str]:
-    return sorted(_BUILTIN_BUILDERS.keys())
+    return sorted(_BUILTIN_BUILDERS) + ["glyph:" + c for c in string.ascii_uppercase + string.digits]
 
 
 def get_builtin_whimsy(name: str) -> WhimsySpec:
     key = name.strip().lower()
+    if len(key) == 7 and key.startswith("glyph:") and key[6:].upper() in string.ascii_uppercase + string.digits:
+        char = key[6:].upper()
+        if key not in _BUILTIN_CACHE:
+            strokes = [LineString([(x, -y) for x,y in path]).buffer(.11) for path in _STROKE_FONT[char]]
+            shape = shapely.union_all(strokes)
+            counters = [list(r.coords) for r in shape.interiors]
+            polygon, engrave = _normalize_whimsy(shape, counters)
+            _BUILTIN_CACHE[key] = WhimsySpec("glyph:" + char, "glyph", polygon, engrave)
+        return _BUILTIN_CACHE[key]
     if key not in _BUILTIN_BUILDERS:
         raise ValueError(f"Unknown built-in whimsy {name!r}; expected one of {list_builtin_whimsies()}")
     if key not in _BUILTIN_CACHE:
         _BUILTIN_CACHE[key] = _BUILTIN_BUILDERS[key]()
     return _BUILTIN_CACHE[key]
+
+
+def place_whimsies(outline, placements, seed, clearance_mm, automatic=False):
+    """Pack fixed silhouettes with a seeded clearance search, or validate manual positions."""
+    rng = np.random.default_rng(seed)
+    positions = list(placements)
+    accepted = []
+    domain = outline.buffer(-clearance_mm)
+    x0,y0,x1,y1 = outline.bounds
+    for index in sorted(range(len(positions)), key=lambda i: -positions[i].polygon.area):
+        item = positions[index]
+        if not np.isfinite(item.size_mm) or item.size_mm <= 0 or item.polygon.is_empty:
+            raise ValueError(f"Invalid size for {item.name}.")
+        if automatic:
+            cx,cy = item.center_mm
+            best = None
+            best_space = -1.
+            for dx,dy in rng.uniform([x0-cx,y0-cy], [x1-cx,y1-cy], (160,2)):
+                moved = shapely.affinity.translate(item.polygon, dx, dy)
+                if not domain.covers(moved):
+                    continue
+                space = min([moved.distance(outline.boundary), *(moved.distance(p) for p in accepted)])
+                if space >= clearance_mm and space > best_space:
+                    best, best_space = (dx,dy,moved), space
+            if best is None:
+                raise ValueError(f"No room for {item.name} at {item.size_mm:g} mm. Reduce its size or the number of figures.")
+            dx,dy,moved = best
+            item = replace(item, polygon=moved, center_mm=(cx+dx,cy+dy),
+                           engrave_paths=[[(x+dx,y+dy) for x,y in line] for line in item.engrave_paths])
+            positions[index] = item
+        if not domain.covers(item.polygon) or any(item.polygon.distance(p) < clearance_mm for p in accepted):
+            raise ValueError(f"{item.name} needs {clearance_mm:g} mm clearance from the board edge and other figures.")
+        accepted.append(item.polygon)
+    return positions
 
 
 def load_whimsy_from_svg(svg_path: str | Path, name: Optional[str] = None) -> WhimsySpec:

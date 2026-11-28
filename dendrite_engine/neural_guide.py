@@ -218,6 +218,34 @@ def _simulate_training_sample(
     return x, y
 
 
+def _per_target_metrics(
+    train_true: np.ndarray, train_pred: np.ndarray, val_true: np.ndarray, val_pred: np.ndarray,
+) -> Dict[str, Dict[str, float | int | None]]:
+    """Summarize patch-level predictions. Rate targets are fractions of a patch's pieces."""
+    result = {}
+    for j, name in enumerate(TARGET_KEYS):
+        observed = val_true[:, j].astype(np.float64)
+        error = val_pred[:, j] - observed
+        squared_error = error ** 2
+        mean = float(observed.mean())
+        ss_tot = float(np.sum((observed - mean) ** 2))
+        r2 = None
+        if ss_tot > 1e-8:
+            r2 = round(1.0 - float(squared_error.sum()) / ss_tot, 4)
+        metrics = {
+            "train_mae": round(float(np.mean(np.abs(train_pred[:, j] - train_true[:, j]))), 4),
+            "val_mae": round(float(np.mean(np.abs(error))), 4),
+            "val_rmse": round(float(np.sqrt(squared_error.mean())), 4),
+            "val_r2": r2,
+            "val_mean_true": round(mean, 4),
+        }
+        if name in ("neck_pass_rate", "kerf_pass_rate"):
+            metrics["val_all_pass_patches"] = int(np.count_nonzero(observed == 1.0))
+            metrics["val_patches_with_failures"] = int(np.count_nonzero(observed < 1.0))
+        result[name] = metrics
+    return result
+
+
 def train_neural_guide(
     out_dir: str | Path = "runs/dendrite-engine",
     num_samples: int = 120,
@@ -308,21 +336,7 @@ def train_neural_guide(
         tr_pred = model(X_tr).cpu().numpy()
         tr_true = Y[tr_idx]
 
-    metrics_per_target: Dict[str, Dict[str, float]] = {}
-    for j, name in enumerate(TARGET_KEYS):
-        mae = float(np.mean(np.abs(val_pred[:, j] - val_true[:, j])))
-        rmse = float(np.sqrt(np.mean((val_pred[:, j] - val_true[:, j]) ** 2)))
-        ss_res = float(np.sum((val_pred[:, j] - val_true[:, j]) ** 2))
-        ss_tot = float(np.sum((val_true[:, j] - val_true[:, j].mean()) ** 2))
-        r2 = float(1.0 - ss_res / ss_tot) if ss_tot > 1e-8 else 1.0
-        tr_mae = float(np.mean(np.abs(tr_pred[:, j] - tr_true[:, j])))
-        metrics_per_target[name] = {
-            "train_mae": round(tr_mae, 4),
-            "val_mae": round(mae, 4),
-            "val_rmse": round(rmse, 4),
-            "val_r2": round(r2, 4),
-            "val_mean_true": round(float(val_true[:, j].mean()), 4),
-        }
+    metrics_per_target = _per_target_metrics(tr_true, tr_pred, val_true, val_pred)
 
     peak_vram_mib = float(torch.cuda.max_memory_allocated(dev) / (1024**2)) if dev.type == "cuda" else 0.0
     ckpt_path = out / "neural_guide.pt"

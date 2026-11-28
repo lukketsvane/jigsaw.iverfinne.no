@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="184" viewBox="0 0 780 184" role="img" aria-labelledby="title desc">
+  <title id="title">From one cut path to two matching wooden pieces</title>
+  <desc id="desc">Three views show the same rectangular board. The first shows the blank outline. The second adds a blue tab-shaped vector path across the board. The last shows the two pieces separated slightly. Their matching blue edges follow the original line, and the shaded vertical faces show the thickness of the wood.</desc>
+  <defs>
+    <style>
+      .heading { fill: #1a1a1a; font: 600 18px "Segoe UI", Arial, sans-serif; }
+      .label { fill: #343434; font: 14px "Segoe UI", Arial, sans-serif; }
+      .outline { fill: #fff; stroke: #202020; stroke-width: 1.35; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+      .side { fill: #dededc; stroke: #202020; stroke-width: 1.1; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+      .cut { fill: none; stroke: #214fb5; stroke-width: 2.25; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+    </style>
+    <path id="edge" class="cut" d="M 56 0 L 56 23 C 56 30 59 32 64 28 C 72 21 81 26 81 36 C 81 45 73 51 65 45 C 59 40 56 42 56 49 L 56 80"/>
+    <path id="edge-wall" class="side" d="M 56 0 L 56 23 C 56 30 59 32 64 28 C 72 21 81 26 81 36 C 81 45 73 51 65 45 C 59 40 56 42 56 49 L 56 80 L 62 95 L 62 64 C 62 57 65 55 71 60 C 79 66 87 60 87 51 C 87 41 78 36 70 43 C 65 47 62 45 62 38 L 62 15 Z"/>
+    <path id="right-wall" class="side" d="M124 0 L130 15 V95 L124 80 Z"/>
+    <g id="board">
+      <path class="side" d="M0 80 H124 L130 95 H6 Z"/>
+      <use href="#right-wall"/>
+      <path class="outline" d="M0 0 H124 V80 H0 Z"/>
+    </g>
+    <g id="left-piece">
+      <use href="#edge-wall"/>
+      <path class="side" d="M0 80 H56 L62 95 H6 Z"/>
+      <path class="outline" d="M 56 0 L 56 23 C 56 30 59 32 64 28 C 72 21 81 26 81 36 C 81 45 73 51 65 45 C 59 40 56 42 56 49 L 56 80 H0 V0 Z"/>
+      <use href="#edge"/>
+    </g>
+    <g id="right-piece">
+      <use href="#edge-wall"/>
+      <path class="side" d="M56 80 H124 L130 95 H62 Z"/>
+      <use href="#right-wall"/>
+      <path class="outline" d="M 56 0 L 56 23 C 56 30 59 32 64 28 C 72 21 81 26 81 36 C 81 45 73 51 65 45 C 59 40 56 42 56 49 L 56 80 H124 V0 Z"/>
+      <use href="#edge"/>
+    </g>
+    <marker id="arrow" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0 L7 4 L0 8 Z" fill="#202020"/>
+    </marker>
+  </defs>
+  <rect width="780" height="184" fill="#fff"/>
+  <g class="heading" text-anchor="middle">
+    <text x="130" y="30">Board outline</text>
+    <text x="390" y="30">Vector cut path</text>
+    <text x="650" y="30">Separated pieces</text>
+  </g>
+  <g fill="none" stroke="#202020" stroke-width="1.4" marker-end="url(#arrow)">
+    <path d="M228 100 H278"/>
+    <path d="M487 100 H536"/>
+  </g>
+  <g transform="matrix(1 .11 -.4 .60 85 62)">
+    <use href="#board"/>
+  </g>
+  <g transform="matrix(1 .11 -.4 .60 345 62)">
+    <use href="#board"/>
+    <use href="#edge"/>
+  </g>
+  <g transform="matrix(1 .11 -.4 .60 605 62)">
+    <use href="#left-piece" transform="translate(-18 0)"/>
+    <use href="#right-piece" transform="translate(18 0)"/>
+  </g>
+  <g stroke="#214fb5" stroke-width="2.25"><path d="M351 155 H372"/></g>
+  <text class="label" x="380" y="160">Shared seam</text>
+  <path d="M683 130 V146 H694" fill="none" stroke="#3e3e3e" stroke-width="1"/>
+  <text class="label" x="698" y="151">Thickness</text>
+</svg>

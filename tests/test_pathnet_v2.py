@@ -66,18 +66,68 @@ def test_cut_rules_on_the_traced_logo_and_a_thin_bar():
     assert float(pn) > 0 and float(dn) * t2.SIZE_MM < 2.2
 
 
+@pytest.mark.parametrize(("classes", "limit"), [([1, 2], 2), ([0, 1], 0)])
+def test_training_batch_without_selected_logos_uses_only_fidelity(classes, limit):
+    controls = torch.ones(2, t2.N, 2, requires_grad=True)
+    fidelity = controls.square().mean()
+    penalty = t2.logo_rule_penalty(controls, torch.tensor(classes), limit)
+    assert penalty.item() == 0
+    (fidelity + penalty).backward()
+    torch.testing.assert_close(controls.grad, 2 * controls.detach() / controls.numel())
+
+
+def test_mixed_training_batch_preserves_selected_logo_penalty(fam):
+    controls = torch.stack([fam.P[1], .4 * fam.P[0], fam.P[0]]).requires_grad_()
+    classes = torch.tensor([1, 0, 0])
+    penalty = t2.logo_rule_penalty(controls, classes, limit=1)
+    neck, contact, _, _ = t2.cut_rules(controls[1:2])
+    expected = neck + contact
+    expected = (expected / (1 + expected / 1e-4)).mean()
+    assert expected.item() > 0
+    torch.testing.assert_close(penalty, expected)
+    penalty.backward()
+    assert torch.isfinite(controls.grad).all()
+    assert controls.grad[1].abs().sum() > 0
+    assert controls.grad[[0, 2]].count_nonzero() == 0
+
+
 def test_board_code_defaults_to_v1_bit_identical():
     """without PATHNET_CKPT, generate.sample draws exactly what the pre-v2 sampler drew"""
     code = r'''
-import numpy as np, generate as g
+import numpy as np
+import torch
+from shapely.geometry import Polygon
+import generate as g
+from train import ROOT, Model, flatten
+
+checkpoint_path = ROOT / 'pathnet.pt'
+checkpoint = torch.load(checkpoint_path, map_location='cpu', weights_only=True)
+legacy_model = Model(len(checkpoint['names']))
+legacy_model.load_state_dict(checkpoint['state'])
+legacy_model.eval()
+
+@torch.inference_mode()
 def old(rng, k):
+    limit = .28 if k == 0 else 1.
     for _ in range(60):
-        z = rng.uniform(-.28, .28, g.Z) if k == 0 else rng.uniform(-1, 1, g.Z); q = g.decode(k, z); p = g.Polygon(g.flatten(q, 6))
-        if p.is_valid and p.area > .035 and (k != 0 or p.intersection(g.ref).area / p.union(g.ref).area >= .85): return q, p, z
-r1, r2 = np.random.default_rng(22), np.random.default_rng(22)
-a = [g.sample(r1, k)[2] for k in (0, 0, 0, 4)]; b = [old(r2, k)[2] for k in (0, 0, 0, 4)]
-assert g.CKPT.name == 'pathnet.pt' and g.Z == 6 and g.REF_IOU == .85
-assert all(np.array_equal(x, y) for x, y in zip(a, b)); print('ok')
+        z = rng.uniform(-limit, limit, 6)
+        q = legacy_model(torch.tensor([k]), torch.tensor(z[None], dtype=torch.float32))[0].numpy()
+        p = Polygon(flatten(q, 6))
+        if p.is_valid and p.area > .035 and (k != 0 or p.intersection(g.ref).area / p.union(g.ref).area >= .85):
+            return q, z
+    raise AssertionError('Legacy sampler accepted no shape')
+
+assert g.CKPT.resolve() == checkpoint_path and g.Z == 6 and g.REF_IOU == .85
+current_rng, old_rng = np.random.default_rng(22), np.random.default_rng(22)
+for index, k in enumerate((0, 0, 0, 4)):
+    controls, polygon, latent = g.sample(current_rng, k)
+    old_controls, old_latent = old(old_rng, k)
+    np.testing.assert_array_equal(latent, old_latent)
+    np.testing.assert_array_equal(controls, old_controls)
+    if index == 0:
+        iou = polygon.intersection(g.ref).area / polygon.union(g.ref).area
+        np.testing.assert_allclose([polygon.area, iou], [.301794, .928741], rtol=0, atol=3e-6)
+print('ok')
 '''
     env = {k: v for k, v in os.environ.items() if k != 'PATHNET_CKPT'}; env['CUDA_VISIBLE_DEVICES'] = ''
     r = subprocess.run([sys.executable, '-c', code], cwd=ROOT, env=env, capture_output=True, text=True, timeout=300)

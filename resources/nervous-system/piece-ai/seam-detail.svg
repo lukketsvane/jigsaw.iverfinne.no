@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1200" height="380" viewBox="0 0 1200 380" role="img" aria-labelledby="title desc">
+  <title id="title">How one foreleg makes two puzzle boundaries</title>
+  <desc id="desc">A jade lizard and its pale orange neighbor share a coral curved edge between junctions P and Q. An enlargement labels the two junctions. Piece A follows the edge from P to Q; piece B follows exactly the same edge from Q to P. The laser uses a single centerline.</desc>
+  <defs>
+    <path id="edge" d="M99 61 C102 70 106 76 111 77 C117 78 121 69 128 65 C133 62 139 62 144 65 C151 68 156 75 152 80 C149 84 144 82 141 78 C137 74 133 74 130 79 L121 97 C118 103 114 107 108 108 C104 109 103 113 105 119 C107 125 107 129 105 135"/>
+    <path id="lizard" d="M99 61 C102 70 106 76 111 77 C117 78 121 69 128 65 C133 62 139 62 144 65 C151 68 156 75 152 80 C149 84 144 82 141 78 C137 74 133 74 130 79 L121 97 C118 103 114 107 108 108 C104 109 103 113 105 119 C107 125 107 129 105 135 C104 141 111 145 119 147 L131 150 C137 152 139 143 145 141 C149 139 153 141 153 145 C153 148 151 149 150 151 C157 149 161 152 161 156 C161 160 157 162 151 161 C154 165 152 169 148 169 C141 170 136 165 132 161 C126 159 122 166 114 167 C107 168 101 165 96 163 C93 166 90 176 87 184 C79 204 66 216 49 216 C33 216 22 209 20 198 C18 188 24 179 31 179 C37 178 39 183 34 186 C28 189 28 196 32 200 C38 207 47 206 56 200 C66 193 70 180 71 168 C72 160 72 154 70 149 C64 151 59 150 54 147 C49 144 45 138 40 139 C35 140 31 146 25 144 C21 144 19 140 21 137 L27 134 C21 135 16 133 16 130 C16 126 22 124 29 125 C22 121 23 117 27 116 C31 114 35 117 41 120 C48 124 55 127 62 126 C69 125 71 122 72 116 C74 108 74 101 71 96 C68 93 62 91 58 88 L45 78 C41 76 37 77 32 78 C27 79 24 75 27 72 C29 69 34 68 39 68 C34 65 33 62 36 59 C40 56 46 61 49 64 C48 58 50 55 54 56 C58 57 58 63 59 69 C61 76 66 79 71 79 C76 78 77 73 75 68 C73 62 69 58 67 54 C62 43 66 29 75 20 C80 14 85 9 91 10 C98 11 107 20 110 32 C113 46 105 54 99 61 Z"/>
+    <path id="neighbor" d="M99 61 C102 70 106 76 111 77 C117 78 121 69 128 65 C133 62 139 62 144 65 C151 68 156 75 152 80 C149 84 144 82 141 78 C137 74 133 74 130 79 L121 97 C118 103 114 107 108 108 C104 109 103 113 105 119 C107 125 107 129 105 135 C119 138 128 126 142 127 C159 129 166 145 183 139 L183 46 C169 49 160 46 151 52 C134 63 117 46 99 61 Z"/>
+    <clipPath id="zoom"><rect x="420" y="78" width="346" height="222" rx="3"/></clipPath>
+    <style>
+      text{font-family:'DM Sans',Arial,sans-serif;fill:#202d29}
+      .heading{font-size:25px;font-weight:650;letter-spacing:-.6px}
+      .label{font-size:17px;font-weight:600}
+      .copy{font-size:17px}
+      .notation{font-family:'IBM Plex Mono',Consolas,monospace;font-size:19px}
+      .ink{stroke:#273934;stroke-linecap:round;stroke-linejoin:round}
+    </style>
+  </defs>
+
+  <rect width="1200" height="380" fill="#faf7ee"/>
+  <path d="M398 23V355 M790 23V355" fill="none" stroke="#d0d2c8"/>
+  <text class="heading" x="24" y="43">The animal silhouette</text>
+  <text class="heading" x="420" y="43">One stored edge</text>
+  <text class="heading" x="813" y="43">Two contour walks</text>
+
+  <g transform="translate(58 63) scale(1.08)" stroke-linecap="round" stroke-linejoin="round">
+    <use xlink:href="#neighbor" fill="#f4d8ba" stroke="#715541" stroke-width="1.45"/>
+    <use xlink:href="#lizard" fill="#a3c9ab" stroke="#254d3d" stroke-width="1.7"/>
+    <path d="M87 55 C79 78 96 95 89 123 C88 129 87 136 88 144 M78 159 C80 175 71 192 64 199" stroke="#57866a" fill="none" stroke-width="1.2"/>
+    <path d="M81 25 Q87 19 94 21" stroke="#5a8068" fill="none" stroke-width="1.2"/>
+    <ellipse cx="74" cy="34" rx="2.5" ry="3.6" fill="#263a2e" transform="rotate(23 74 34)"/>
+    <ellipse cx="103" cy="33" rx="2.5" ry="3.6" fill="#263a2e" transform="rotate(-26 103 33)"/>
+    <use xlink:href="#edge" fill="none" stroke="#b94732" stroke-width="3"/>
+    <g fill="#faf7ee" stroke="#b94732" stroke-width="1.8"><circle cx="99" cy="61" r="2.7"/><circle cx="105" cy="135" r="2.7"/></g>
+  </g>
+  <path d="M145 183 H96 L79 171 H44" class="ink" fill="none" stroke-width="1.15"/>
+  <text class="label" x="33" y="164" style="fill:#176953">A</text>
+  <path d="M231 171 H269 L281 156 H308" class="ink" fill="none" stroke-width="1.15"/>
+  <text class="label" x="284" y="148" style="fill:#7b5130">B</text>
+  <text class="copy" x="24" y="335">The foreleg of A fits into B.</text>
+
+  <g clip-path="url(#zoom)">
+    <rect x="420" y="78" width="346" height="222" fill="#f2f1e8"/>
+    <g transform="translate(291 -52) scale(2.48)" stroke-linejoin="round" stroke-linecap="round">
+      <use xlink:href="#neighbor" fill="#f4d8ba" stroke="#ba9d7f" stroke-width=".65"/>
+      <use xlink:href="#lizard" fill="#bbd5ba" stroke="#7c9e80" stroke-width=".65"/>
+      <use xlink:href="#edge" stroke="#b94732" fill="none" stroke-width="1.75"/>
+      <g fill="#faf7ee" stroke="#783328" stroke-width="1.05"><circle cx="99" cy="61" r="2.15"/><circle cx="105" cy="135" r="2.15"/></g>
+    </g>
+    <g fill="none" class="ink" stroke-width="1.15"><path d="M531 100 H504"/><path d="M545 283 H516"/></g>
+    <text class="notation" x="487" y="106">P</text><text class="notation" x="498" y="289">Q</text>
+  </g>
+  <text class="copy" x="420" y="335">P and Q are junctions in the cut graph.</text>
+
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <g transform="translate(688 -6) scale(1.58)" stroke="#176953">
+      <use xlink:href="#edge" stroke-width="2.45"/>
+      <path d="M124 91 l.5 -7.4 5.5 2.7 Z" fill="#176953" stroke-width=".8"/>
+      <circle cx="99" cy="61" r="2.55" fill="#faf7ee" stroke-width="1.65"/>
+      <circle cx="105" cy="135" r="2.55" fill="#faf7ee" stroke-width="1.65"/>
+    </g>
+    <g transform="translate(868 -6) scale(1.58)" stroke="#b94732">
+      <use xlink:href="#edge" stroke-width="2.45"/>
+      <path d="M126 87 l-.5 7.4 -5.5 -2.7 Z" fill="#b94732" stroke-width=".8"/>
+      <circle cx="99" cy="61" r="2.55" fill="#faf7ee" stroke-width="1.65"/>
+      <circle cx="105" cy="135" r="2.55" fill="#faf7ee" stroke-width="1.65"/>
+    </g>
+  </g>
+  <g class="notation"><text x="824" y="95">P</text><text x="832" y="214">Q</text>
+    <text x="1004" y="95">P</text><text x="1012" y="214">Q</text></g>
+  <g class="label"><text x="828" y="265" style="fill:#176953">A walks P → Q</text>
+    <text x="1008" y="265" style="fill:#9d392b">B walks Q → P</text></g>
+  <text class="copy" x="813" y="335">Both faces reuse the same laser centerline.</text>
+</svg>

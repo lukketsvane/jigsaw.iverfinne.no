@@ -1,0 +1,196 @@
+% Compile with python build.py. The build stages the vector figures in plates/.
+\documentclass[11pt,a4paper]{article}
+\usepackage[inner=25mm,outer=25mm,top=23mm,bottom=23mm,headheight=13pt,headsep=6mm]{geometry}
+\usepackage{lmodern,amsmath,amssymb,graphicx,booktabs,array,xcolor,caption,fancyhdr}
+\usepackage{microtype}
+\usepackage{hyperref}
+\graphicspath{{plates/}}
+\newcommand{\plate}[2]{\includegraphics[width=#2\linewidth]{plates/#1.pdf}}
+\definecolor{ink}{HTML}{191B1B}
+\definecolor{quiet}{HTML}{515555}
+\definecolor{rulegray}{HTML}{A5AAA6}
+\definecolor{linkblue}{HTML}{233C83}
+\hypersetup{pdftitle={How a puzzle grows},pdfauthor={Formverk Studio research notes},
+ pdfsubject={An illustrated technical companion to the Nervous System puzzle paper},
+ colorlinks=true,linkcolor=ink,citecolor=linkblue,urlcolor=linkblue,bookmarksnumbered=true}
+\captionsetup{font=small,labelfont=bf,labelsep=period,justification=raggedright,singlelinecheck=false,skip=6pt}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt plus 1pt minus 1pt}
+\setlength{\textfloatsep}{9pt plus 2pt minus 2pt}
+\setlength{\intextsep}{10pt plus 2pt minus 2pt}
+\renewcommand{\topfraction}{.98}
+\renewcommand{\bottomfraction}{.95}
+\renewcommand{\textfraction}{.03}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small\scshape Formverk Studio\enspace/\enspace Research notes}
+\fancyhead[R]{\small\itshape Generative jigsaw geometry}
+\fancyfoot[L]{\footnotesize\color{quiet}How a puzzle grows}
+\fancyfoot[R]{\small\thepage}
+\renewcommand{\headrulewidth}{.35pt}
+\newcommand{\rubric}[1]{{\small\sffamily\bfseries\color{quiet}#1}}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\raggedbottom
+\begin{document}
+\rubric{ILLUSTRATED TECHNICAL COMPANION}\hfill{\small 28 November 2026}
+\par\vspace{3pt}
+{\fontsize{32}{34}\selectfont\bfseries How a puzzle grows\par}
+{\Large Shared boundaries in generative wooden jigsaws\par}
+\vspace{2pt}
+{\small A reading of the 2012 model by Jesse Louis-Rosenberg, Alec Resnick and
+Jessica Rosenkrantz, with a comparison to the independent Formverk implementation.}
+\par\vspace{3pt}\hrule\vspace{4pt}
+\textbf{Abstract.}
+One cut through a sheet of plywood makes two complementary edges. The design
+problem is to choose their shared curve so that neighboring pieces interlock
+and narrow wooden features survive fabrication. We follow a photograph and a
+cut plan through production, examine the phase and temperature fields of the
+published Dendrite model, and compare six constructions of a single seam.
+A final implementation study traces how Formverk recovers, exports and checks
+the geometry. The diagrams distinguish published mechanisms, local measurements
+and illustrative constructions.
+\par\smallskip
+{\small\textit{Keywords}\enspace Phase-field model, elastic rods, planar partition,
+laser cutting, computational fabrication.}
+\section{Two paths from image to object}
+\label{sec:overview}
+A customer supplies artwork, chooses a size, outline and cut style, and can
+place recognizable figure pieces called \emph{whimsies}~\cite{configurator}.
+In its original series the studio mounted a print on plywood. A later series
+used direct UV printing on maple~\cite{puzzleproject,wave}. The chosen board
+and fixed figures constrain the construction of a planar partition. At the
+laser, the paths meet physically (Fig.~\ref{fig:route}).\par
+\begin{figure}[!ht]\centering
+\plate{production-route}{1}
+\caption{Material and geometry in the studio's documented workflow.
+The upper branch carries the artwork on wood. The lower branch carries a board
+boundary and internal cut paths. Arrows identify what passes between stages.}
+\label{fig:route}\end{figure}\par
+\textbf{Evidence and scope.} The primary mathematical source is the authors'
+technical draft~\cite{puzzle2012}. The studio also publishes a fabrication
+account and descriptions of all six cuts~\cite{puzzleproject,cutguide}.
+The deployed service layout, current parameter sets and dimensional clearance
+thresholds remain undocumented in these sources. Formverk is examined separately
+through its own source code~\cite{formverk}.
+
+\clearpage
+\input{dendrite}
+\clearpage
+\input{cuts}
+\clearpage
+\input{fabrication}
+\clearpage
+\section{An independent implementation}
+\label{sec:local}
+Formverk Studio and the command line call the same puzzle generator.
+The request specifies an outline, dimensions in millimetres, a target count,
+a random seed and any fixed figures. The selected style determines the geometry
+that the exporter receives (Fig.~\ref{fig:engine})~\cite{formverk}.\par
+\begin{figure}[!ht]\centering
+\plate{local-engine}{1}
+\caption{Eight local cut styles use four solver families. All return polygon
+faces and shared cut paths to one exporter. Reopening the written SVG tests
+the geometry that downstream readers receive.}
+\label{fig:engine}\end{figure}\par
+\paragraph{How the four families construct a seam.}
+Dendrite, Amoeba, Linear and Grid grow a raster partition. After phase and
+temperature evolve, the solver repairs labels and traces their shared boundaries.
+Maze and Wave grow elastic rods along shared edges. Wave also applies a curl
+field. The studio credited PositionBasedDynamics for its rod simulations in
+2017~\cite{maze,rods2016}. Formverk's Coral searches for chains of tangent
+circular arcs that clear nearby cuts. Matrix grows connected groups of mesh
+cells, then exchanges boundary cells between neighbors to improve interlock.
+\paragraph{One output boundary.}
+All families share the millimetre-scale cut and artwork exporter. It reloads
+\texttt{cut.svg}, rebuilds faces, and records coverage, duplicate segments,
+kerf and neck checks in \texttt{audit.json}. It estimates interlock by sampling
+360 translation directions in the plane. The player receives outlines and
+neighbors in \texttt{puzzle.json}. These tests measure planar geometry.
+Physical holding strength requires measurements on fabricated pieces.\par
+\begin{table}[!ht]\centering\small
+\caption{Evidence for three checks. IoU denotes intersection over union of
+thresholded foreground sets. Each conclusion is limited to the stated specimen.}
+\label{tab:checks}
+\begin{tabular}{@{}L{.21\linewidth}@{\hspace{.025\linewidth}}L{.35\linewidth}@{\hspace{.025\linewidth}}L{.36\linewidth}@{}}
+\toprule
+\textbf{Check} & \textbf{Data and observation} & \textbf{Interpretation}\\
+\midrule
+Single crystal & $40\times40$ cells, ten time steps. All cells passed the
+upstream comparison. & Reproduces the independent FiPy reference case~\cite{fipy}.\\[3pt]
+Photo mask & One upstream example, threshold 128. Full-model IoU 0.99916,
+compact-model IoU 0.97213. & Measures agreement with the distributed reference
+mask (Fig.~\ref{fig:production-studies}a).\\[3pt]
+Exported geometry & Reconstruct faces from the SVG actually written to disk. &
+Tests the exported partition, neck connectivity and planar interlock.\\
+\bottomrule
+\end{tabular}\end{table}\par
+\textbf{Reading the rod measurements.} For the 14-piece Wave board
+(seed~42), the closest eligible segments are 3.050\,mm apart on the accepted
+rod centerlines snapped to a 0.01\,mm grid. The last retained collision sweep
+recorded 2.723\,mm before a pair's repulsion correction. Both measurements
+come from the solver. The SVG audit independently reconstructs the cut.
+\clearpage
+\section{Eight cuts on a common board}
+\label{sec:export-comparison}
+Formverk generated each style on the same $200\times160$\,mm rectangle,
+with a target of 14 pieces and seed~42. Phase fields ran for 240 CPU steps
+on a 0.8\,mm grid. Rods ran for 45 growth steps, with a fixed border for
+Maze. Coral and Matrix used their default arc and mesh settings. Every run
+used a 3.0\,mm minimum neck setting and a 0.15\,mm kerf.\par
+\begin{figure}[!ht]\centering
+\plate{cut-comparison}{1}
+\caption{Interior cuts and perimeters read from the eight exported SVGs at
+a common scale. Every style produced 14 recovered pieces and passed the
+SVG audit for this seed.}
+\label{fig:export-comparison}\end{figure}
+\input{cut-comparison-table.tex}
+\begin{table}[!ht]\centering\small
+\caption{Measurements from independent SVG readback. Cut length includes the
+perimeter and interior seams. A pass means that all mandatory geometric checks passed.}
+\label{tab:cut-exports}
+\begin{tabular}{@{}lrrrl@{}}\toprule
+\textbf{Style} & \textbf{Pieces} & \textbf{Cut length (mm)} &
+\textbf{Lock margin (mm)} & \textbf{Audit}\\\midrule
+\cutcomparisonrows
+\bottomrule\end{tabular}
+\end{table}\par
+For this seed, Dendrite, Amoeba and Linear differed in total cut length by
+only 8.45\,mm across roughly 2.4\,m of cuts. Their planar lock margins
+ranged from 0.891\,mm (Linear) to 3.141\,mm (Amoeba). The audit tests
+360 translation directions and searches up to 12\,mm. Below that ceiling,
+the search stops within a bracket of 0.0625\,mm.
+\par\smallskip
+\textbf{Reproduce the plate.} Run
+\href{../../local/technical/compare_cuts.py}{\texttt{local/technical/compare\_cuts.py}}
+from the repository. The accompanying
+\href{../../local/technical/cut-comparison.csv}{\texttt{cut-comparison.csv}}
+records the measurements and SHA-256 of each cut file.
+\clearpage
+\section{Discussion of adjacency and interlock}
+\label{sec:interpretation}
+Before any seam branches or bends, a seed construction can explain which
+regions share a boundary. Consider seeds $\mathbf{s}_i$ in a planar board
+$\Omega$. The ordinary Euclidean Voronoi cell of seed $i$ is
+\begin{equation}
+V_i=\{\mathbf{x}\in\Omega:\ \|\mathbf{x}-\mathbf{s}_i\|
+\leq \|\mathbf{x}-\mathbf{s}_j\| \text{ for every }j\}.
+\label{eq:voronoi}
+\end{equation}
+Along an interior edge shared by $V_A$ and $V_B$, the two distances are equal.
+The corresponding line is the perpendicular bisector of segment $AB$.
+A third seed limits how much of that line belongs to the shared edge.\par
+\begin{figure}[!ht]\centering
+\plate{bisector}{.33}
+\caption{A point $P$ on the boundary has $PA=PB$. The dotted segments
+are equal lengths. Moving either seed changes the bisector.}
+\label{fig:bisect}\end{figure}\par
+This construction explains adjacency and supplies a baseline for the diagrams.
+The Dendrite paper uses reaction--diffusion initialization, and Wave begins
+with an anisotropic layout. In either case, the initial territory and the
+finished interlock answer different questions. The first determines which
+pieces meet. Subsequent growth or optimization determines how they hold together.
+\smallskip
+\begingroup\small
+\bibliographystyle{unsrt}
+\bibliography{references}
+\endgroup
+\end{document}

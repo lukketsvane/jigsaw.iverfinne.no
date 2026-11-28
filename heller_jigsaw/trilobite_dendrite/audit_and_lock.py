@@ -273,18 +273,20 @@ def sparse_translation_audit(
     cols_out: List[int] = []
     hits_list: List[np.ndarray] = []
 
-    with ThreadPoolExecutor(max_workers=max_workers) as pool:
-        for res in pool.map(_eval_pair, pairs):
-            if res is None:
-                continue
-            a, b, cum_ab = res
-            cum_ba = np.roll(cum_ab, ndir // 2, axis=0)
-            rows_out.append(a)
-            cols_out.append(b)
-            hits_list.append(cum_ab)
-            rows_out.append(b)
-            cols_out.append(a)
-            hits_list.append(cum_ba)
+    # Sequential with prepared polygons + progressive active-direction skipping avoids GEOS
+    # PreparedPolygon multithreading races while staying fast and 100% deterministic.
+    for ab in pairs:
+        res = _eval_pair(ab)
+        if res is None:
+            continue
+        a, b, cum_ab = res
+        cum_ba = np.roll(cum_ab, ndir // 2, axis=0)
+        rows_out.append(a)
+        cols_out.append(b)
+        hits_list.append(cum_ab)
+        rows_out.append(b)
+        cols_out.append(a)
+        hits_list.append(cum_ba)
 
     rows_arr = np.asarray(rows_out, dtype=np.int32)
     cols_arr = np.asarray(cols_out, dtype=np.int32)
@@ -378,8 +380,8 @@ def sparse_rigid_motion_audit(
             "translation_3mm_paths": int((trans >= 2.99).sum()),
         }
 
-    with ThreadPoolExecutor(max_workers=max_workers) as pool:
-        reports = list(pool.map(_eval_piece, range(len(pieces))))
+    # Sequential with local prepared `others` avoids GEOS PreparedPolygon thread-safety races
+    reports = [_eval_piece(i) for i in range(len(pieces))]
 
     return {
         "kerf_mm": kerf,

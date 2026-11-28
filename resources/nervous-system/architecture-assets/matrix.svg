@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 150" width="720" height="150" role="img" aria-labelledby="title desc">
+  <title id="title">Matrix seam development</title>
+  <desc id="desc">Conceptual three-stage schematic. Two adjoining tile groups start with a straight boundary. Exchanging a few tiles yields a stepped edge whose turns improve interlocking.</desc>
+  <defs>
+    <style>.label{font:17px Arial,Helvetica,sans-serif;fill:#202020;text-anchor:middle}.edge,.fine,.branch,.active,.construction,.grid,.aux,.candidate,.motion,.arrow,.vortex{fill:none;stroke-linecap:round;stroke-linejoin:round}.edge{stroke:#202020;stroke-width:2}.fine{stroke:#666;stroke-width:1.25}.branch{stroke:#b72a2a;stroke-width:1.8}.active{stroke:#223fad;stroke-width:2.2}.construction{stroke:#b3b4b2;stroke-width:1}.grid{stroke:#cbccca;stroke-width:.85}.aux{stroke:#a7a8a6;stroke-width:1.1;stroke-dasharray:3 3}.candidate{stroke:#8d8e8c;stroke-width:1.15;stroke-dasharray:4 3}.motion,.vortex{stroke:#b72a2a;stroke-width:1.35}.vortex{marker-end:url(#arrow)}.arrow{stroke:#434343;stroke-width:1.45}</style>
+    <marker id="arrow" viewBox="0 0 6 6" refX="5" refY="3" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 5.4 3 0 6 1.8 3z" fill="#b72a2a"/></marker>
+  </defs>
+  <rect width="720" height="150" fill="white"/>
+  <g transform="translate(18 8)">
+    <path d="M5 49 H185 L181 92 H9 Z" fill="#f2f2f0"/><path class="grid" d="M15 9 V89 M25 9 V89 M35 9 V89 M45 9 V89 M55 9 V89 M65 9 V89 M75 9 V89 M85 9 V89 M95 9 V89 M105 9 V89 M115 9 V89 M125 9 V89 M135 9 V89 M145 9 V89 M155 9 V89 M165 9 V89 M175 9 V89 M5 9 H185 M5 19 H185 M5 29 H185 M5 39 H185 M5 49 H185 M5 59 H185 M5 69 H185 M5 79 H185 M5 89 H185"/><path class="edge" d="M5 49 H185"/>
+    <text class="label" x="95" y="125">Neighboring groups</text>
+  </g>
+  <g transform="translate(263 8)">
+    <path d="M5 49 H35 V39 H55 V49 H85 V59 H105 V49 H145 V39 H165 V49 H185 L181 92 H9 Z" fill="#f2f2f0"/><path class="grid" d="M15 9 V89 M25 9 V89 M35 9 V89 M45 9 V89 M55 9 V89 M65 9 V89 M75 9 V89 M85 9 V89 M95 9 V89 M105 9 V89 M115 9 V89 M125 9 V89 M135 9 V89 M145 9 V89 M155 9 V89 M165 9 V89 M175 9 V89 M5 9 H185 M5 19 H185 M5 29 H185 M5 39 H185 M5 49 H185 M5 59 H185 M5 69 H185 M5 79 H185 M5 89 H185"/><path d="M35 39h20v10H35z M85 49h20v10H85z" fill="#c8d2f3" stroke="#223fad" stroke-width="1"/><path d="M45 30 V41" class="motion" marker-end="url(#arrow)"/><path d="M95 68 V56" class="motion" marker-end="url(#arrow)"/><path class="edge" d="M5 49 H35 V39 H55 V49 H85 V59 H105 V49 H145 V39 H165 V49 H185"/>
+    <text class="label" x="95" y="125">Cell exchanges</text>
+  </g>
+  <g transform="translate(508 8)">
+    <path d="M5 49 H25 V29 H55 V39 H35 V49 H65 V69 H95 V59 H75 V49 H105 V29 H135 V39 H115 V49 H145 V69 H165 V59 H155 V49 H185 L181 92 H9 Z" fill="#f2f2f0"/><path class="grid" d="M15 9 V89 M25 9 V89 M35 9 V89 M45 9 V89 M55 9 V89 M65 9 V89 M75 9 V89 M85 9 V89 M95 9 V89 M105 9 V89 M115 9 V89 M125 9 V89 M135 9 V89 M145 9 V89 M155 9 V89 M165 9 V89 M175 9 V89 M5 9 H185 M5 19 H185 M5 29 H185 M5 39 H185 M5 49 H185 M5 59 H185 M5 69 H185 M5 79 H185 M5 89 H185"/><path class="edge" d="M5 49 H25 V29 H55 V39 H35 V49 H65 V69 H95 V59 H75 V49 H105 V29 H135 V39 H115 V49 H145 V69 H165 V59 H155 V49 H185"/>
+    <text class="label" x="95" y="125">Interlocking steps</text>
+  </g>
+  <g transform="translate(227 57)"><path d="M-2 0 H16 M10 -5 L16 0 10 5" class="arrow"/></g>
+  <g transform="translate(472 57)"><path d="M-2 0 H16 M10 -5 L16 0 10 5" class="arrow"/></g>
+</svg>

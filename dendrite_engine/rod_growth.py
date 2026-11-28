@@ -32,6 +32,9 @@ from shapely.ops import linemerge, polygonize
 
 from .whimsies import WhimsyPlacement
 
+ROD_SNAP_MM = 0.01
+MIN_ROD_LENGTH_MM = 0.05
+
 try:
     from numba import njit
     _HAS_NUMBA = True
@@ -73,7 +76,12 @@ class RodConfig:
 
 @dataclass
 class RodResult:
-    """Outputs of the 2D Cosserat rod puzzle solver."""
+    """Outputs of the 2D Cosserat rod puzzle solver.
+
+    Clearance is measured on the retained, snapped centerlines. The sweep
+    minimum records the distances seen before individual collision corrections
+    in the retained step. Either value can be absent if no pair was measured.
+    """
 
     faces: List[Polygon]
     interior_lines: List[LineString]
@@ -82,9 +90,10 @@ class RodResult:
     expected_outline: Optional[Polygon]
     num_nodes: int
     num_segments: int
-    min_nonadjacent_clearance_mm: float
+    min_nonadjacent_clearance_mm: Optional[float]
     elapsed_sec: float
     config: RodConfig
+    last_collision_sweep_min_mm: Optional[float] = None
 
 
 # ---------------------------------------------------------------------------
@@ -120,7 +129,7 @@ def _pbd_cosserat_step_numba(
     n_bends = len(bend_e0)
     cell_size = max(d_col * 1.15, 1.0)
     inv_cell = 1.0 / cell_size
-    min_clear = 1e9
+    min_clear = math.inf
 
     for sub in range(substeps):
         # 1. Cosserat Stretch-Shear Constraint (Eq. 37, PositionBasedElasticRods.cpp lines 15-40)
@@ -178,7 +187,7 @@ def _pbd_cosserat_step_numba(
             theta[e0] += wq0 * lam
             theta[e1] -= wq1 * lam
 
-        # 3. Spatial-hash node-to-nonadjacent-segment clearance constraint (enforces wood thickness >= d_col)
+        # 3. Repel nearby nonadjacent segments toward the requested centerline spacing.
         # Build uniform grid hash over segment bounding boxes
         min_x = pos[0, 0]
         max_x = pos[0, 0]
@@ -708,11 +717,82 @@ def _pack_rod_arrays(
     )
 
 
+def _snapped_rod_clearance(
+    pos: np.ndarray,
+    rods: Sequence[Dict[str, Any]],
+    inv_mass: np.ndarray,
+    search_radius_mm: float,
+) -> Optional[float]:
+    """Minimum settled centerline spacing among collision-eligible segments, in mm.
+
+    Measure before noding and merging, while the rod and junction identities still
+    exist. Positive spacing and an unintended contact (zero) are both meaningful.
+    A board with no eligible pair has no minimum.
+    """
+    snapped = np.round(pos / ROD_SNAP_MM) * ROD_SNAP_MM
+    endpoints = []
+    owners = []
+    local_indices = []
+    loop_sizes = np.zeros(len(rods), dtype=np.intp)
+    for rod_id, rod in enumerate(rods):
+        nodes = np.asarray(rod["nodes"], dtype=np.intp)
+        if len(nodes) < 2 or LineString(snapped[nodes]).length < MIN_ROD_LENGTH_MM:
+            continue  # Same short-chain filter as polygonization.
+        edges = np.column_stack((nodes[:-1], nodes[1:]))
+        edges = edges[np.any(snapped[edges[:, 0]] != snapped[edges[:, 1]], axis=1)]
+        endpoints.extend(edges)
+        owners.extend([rod_id] * len(edges))
+        local_indices.extend(range(len(edges)))
+        if nodes[0] == nodes[-1]:
+            loop_sizes[rod_id] = len(edges)
+
+    if len(endpoints) < 2:
+        return None
+    start, end = np.asarray(endpoints).T
+    fixed = (inv_mass[start] == 0) & (inv_mass[end] == 0)
+    if fixed.all():
+        return None
+    collar = (inv_mass[start] < 0.2) | (inv_mass[end] < 0.2)
+    owner = np.asarray(owners)
+    index = np.asarray(local_indices)
+    segments = shapely.linestrings(snapped[np.asarray(endpoints)])
+    tree = shapely.STRtree(segments)
+    diameter = math.hypot(*np.ptp(snapped, axis=0))
+    radius = min(max(ROD_SNAP_MM, search_radius_mm), diameter)
+
+    # Once any eligible pair lies inside the radius, more distant pairs cannot
+    # lower the minimum. Batching bounds the temporary pair arrays on large boards.
+    while True:
+        minimum = math.inf
+        for first in range(0, len(segments), 256):
+            a, b = tree.query(segments[first:first + 256], predicate="dwithin", distance=radius)
+            a += first
+            gap = np.abs(index[a] - index[b])
+            loop = loop_sizes[owner[a]]
+            near = (gap <= 2) | ((loop > 0) & (loop - gap <= 2))
+            eligible = (
+                (a < b) & ((owner[a] != owner[b]) | ~near)
+                & (start[a] != start[b]) & (start[a] != end[b])
+                & (end[a] != start[b]) & (end[a] != end[b])
+                & ~(fixed[a] & collar[b]) & ~(fixed[b] & collar[a])
+            )
+            if eligible.any():
+                distances = shapely.distance(segments[a[eligible]], segments[b[eligible]])
+                minimum = min(minimum, float(np.min(distances)))
+                if minimum == 0:
+                    return 0.0
+        if math.isfinite(minimum):
+            return minimum
+        if radius >= diameter:
+            return None
+        radius = min(radius * 2, diameter)
+
+
 def _rods_to_geometry(
     pos: np.ndarray,
     rods: List[Dict[str, Any]],
     expected_pieces: int,
-    snap_mm: float = 0.01,
+    snap_mm: float = ROD_SNAP_MM,
 ) -> Optional[Tuple[List[Polygon], List[LineString], List[LineString]]]:
     """Convert evolved rod chains into noded interior/exterior LineStrings and closed Polygons."""
     int_raw: List[LineString] = []
@@ -722,7 +802,7 @@ def _rods_to_geometry(
         if len(pts) < 2:
             continue
         ls = LineString(pts)
-        if ls.length < 0.05:
+        if ls.length < MIN_ROD_LENGTH_MM:
             continue
         if rod["is_exterior"]:
             ext_raw.append(ls)
@@ -831,7 +911,7 @@ def run_rod_growth(
                     pos[nid, 1] += ny * bump
 
     # Keep last verified crossing-free & fabrication-safe snapshot
-    best_snapshot = (pos.copy(), [dict(r, nodes=list(r["nodes"])) for r in rods], d_col)
+    best_snapshot = (pos.copy(), [dict(r, nodes=list(r["nodes"])) for r in rods], math.inf)
     # Track which mobile nodes are directly adjacent to a pinned boundary node so bounded wall repulsion doesn't pinch corners
     near_pinned = set()
     for rod in rods:
@@ -846,7 +926,6 @@ def run_rod_growth(
         inner_outline = outline
     whimsy_polys = [w.polygon for w in whimsies]
 
-    min_clear = d_col
     for step in range(config.growth_steps):
         # 1. Grow rest lengths of active rods up to max_length_factor
         for r_i, rod in enumerate(rods):
@@ -1024,6 +1103,7 @@ def run_rod_growth(
         raise RuntimeError("Cosserat rod solver could not extract valid non-crossing polygons")
 
     faces, interior_lines, exterior_lines = geom
+    clearance = _snapped_rod_clearance(polished_pos, best_rods, inv_mass, d_col)
     n_segs_total = sum(max(0, len(r["nodes"]) - 1) for r in best_rods)
     elapsed = time.perf_counter() - t0
     return RodResult(
@@ -1034,7 +1114,8 @@ def run_rod_growth(
         expected_outline=None if borderless else outline,
         num_nodes=len(polished_pos),
         num_segments=n_segs_total,
-        min_nonadjacent_clearance_mm=round(float(best_clear), 3),
+        min_nonadjacent_clearance_mm=round(clearance, 3) if clearance is not None else None,
+        last_collision_sweep_min_mm=round(best_clear, 3) if math.isfinite(best_clear) else None,
         elapsed_sec=elapsed,
         config=config,
     )

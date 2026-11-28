@@ -1,0 +1,9 @@
+style,family,seed,width_mm,height_mm,requested_pieces,pieces,kerf_mm,min_neck_mm,phase_steps,growth_steps,phase_grid_mm,cut_length_mm,coverage_error_mm2,duplicate_segments,heller_neck_failures,assembly_lock_margin_mm,all_hard_gates_passed,cut_sha256
+dendrite,phase_field,42,200,160,14,14,0.15,3.0,240,,0.8,2407.66,0.0,0,0,2.578,True,68fdb24443c3bdc0824da408eaad4574ca2b879f061fd0e8487a3448147bff65
+amoeba,phase_field,42,200,160,14,14,0.15,3.0,240,,0.8,2402.29,0.0,0,0,3.141,True,1503fc3db40bd46316d877b686e9958314ca35f99352212f3ce7d054db24a8a0
+linear,phase_field,42,200,160,14,14,0.15,3.0,240,,0.8,2399.21,0.0,0,0,0.891,True,0614467b60efc3d999d7fe9c2d03ad9f9acd74967e7c68fc86bb6008747112da
+grid,phase_field,42,200,160,14,14,0.15,3.0,240,,0.8,2481.75,0.0,0,0,3.094,True,4f50b409f5e1daade5497ffa44463c1a02163bbcc6ab4f129dd230f02ede81c3
+maze,elastic_rods,42,200,160,14,14,0.15,3.0,,45,,2061.99,0.0,0,0,0.891,True,4b11dc06cefbd429696e890260ab1d925ced039662d92ec98c8d4faf998f3bc9
+wave,elastic_rods,42,200,160,14,14,0.15,3.0,,45,,2525.25,0.0,0,0,6.703,True,858e78bae3e8cd99d657ca3f04cd22f7b8ed6a13e07bd78caf0319f0e53b7564
+coral,circular_arcs,42,200,160,14,14,0.15,3.0,,,,2494.82,0.0,0,0,4.828,True,0e5180ef551bc4d87190b4ad4c2654da1fe2791ece0fc4f56c7ff34706e5a6b1
+matrix,quadrilateral_exchange,42,200,160,14,14,0.15,3.0,,,,2663.23,0.0,0,0,0.094,True,129df9b01476287fc6da1314c46ac2e7ecf3605cbe594414d872fe30e2935f18

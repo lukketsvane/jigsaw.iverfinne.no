@@ -1,0 +1,69 @@
+\section{Dendritic solidification}
+\label{sec:dendrite}
+
+The 2012 Dendrite model starts with the whole puzzle already divided into
+cells. Seeds expand by reaction and diffusion until neighboring regions meet.
+A fixed figure reflects the diffusing fields, so a cell can wrap around its
+outline. Two sinusoidal perturbations, one coarse and one fine, ripple the
+initial seams. Their wavelengths and amplitudes help determine where branches
+form \cite{puzzle2012}.
+
+\paragraph{Why a ripple grows.}
+Let \(p(\mathbf{x},t)\) be a local phase value between zero and one and
+\(T(\mathbf{x},t)\) the dimensionless temperature at position \(\mathbf{x}\)
+and time \(t\). The authors print the isotropic two-phase model in the form
+\cite[Eqs.~5--7]{puzzle2012}
+\begin{equation}
+\begin{aligned}
+  \tau\,\partial_t p
+    &= \epsilon^2\nabla^2p+p(1-p)\bigl(p-\tfrac12+m(T)\bigr),\\
+  \partial_t T
+    &= \nabla^2 T+K\,\partial_t p,
+    & m(T)&=\frac{\alpha}{\pi}\arctan\!\bigl(\gamma(T-T_e)\bigr).
+\end{aligned}
+\label{eq:dendrite-thermal}
+\end{equation}
+Here \(\epsilon\) sets the width of the diffuse interface, \(\tau\) its
+relaxation time, and \(K\) the latent-heat coupling. The constants
+\(\alpha\) and \(\gamma\) set the strength and temperature sensitivity of the
+bias \(m\). The authors use \(T_e=0\) for equilibrium. At a growing tip,
+heat diffuses sideways faster than the seam advances. The flanks warm
+while the tip continues into colder material, amplifying the initial ripple
+(Fig.~\ref{fig:thermal}).
+
+\begin{figure}[!ht]\centering
+\plate{thermal-feedback}{0.76}
+\caption{Thermal feedback at an advancing tip. A protrusion reaches colder
+material ahead. Heat from solidification spreads sideways and slows growth on
+the flanks. The signs mark reinforcement and inhibition.}
+\label{fig:thermal}
+\end{figure}
+
+\textit{Reading the sign convention.} The draft labels $p=0$ solid and
+$p=1$ liquid, yet its positive $K\,\partial_t p$ term supplies heat as $p$
+increases. Its Fig.~2 describes heat release on solidification. Equation~\eqref{eq:dendrite-thermal}
+preserves the printed signs. A numerical reconstruction must choose a
+consistent phase and heat convention~\cite[\S3.1]{puzzle2012}.
+
+\paragraph{How neighboring pieces share a seam.}
+A single solid--liquid front has only two sides. At a junction of three
+pieces, each region needs a distinct identity. The model assigns each
+active label \(i\) a phase fraction \(p_i\) and its own temperature \(T_i\),
+with \(\sum_i p_i=1\). The draft combines interactions between pairs
+\cite[Eqs.~8--10]{puzzle2012}. In compact notation,
+\begin{equation}
+  m_{ij}=\tfrac12\bigl[m(T_i)+m(T_j)\bigr],
+  \qquad
+  R_i=\sum_{j\ne i}p_i p_j\bigl(p_i-p_j+m_{ij}\bigr).
+\label{eq:dendrite-pairwise}
+\end{equation}
+Here \(R_i\) denotes the summed local reaction for label \(i\). The factor
+\(p_i p_j\) localizes each term to places where two phases overlap. With the
+printed symmetric bias, the two ordered reactions for a pair sum to
+$2p_i p_j m_{ij}$. An implementation must therefore also account for the
+stated constraint $\sum_i p_i=1$. For
+production-scale layouts the authors reused five labels across nonadjacent
+pieces. Heat can then travel between pieces sharing a label and soften fine
+branches in long runs. After growth, the studio traced the phase grid into
+cut paths and smoothed tight folds to protect narrow wooden necks
+\cite{puzzle2012,puzzleproject}.

@@ -66,11 +66,8 @@ def build_edition(
     overwrite: bool = False,
 ) -> dict:
     out_dir = Path(out_dir)
-    if out_dir.exists():
-        if overwrite:
-            shutil.rmtree(out_dir)
-        else:
-            raise FileExistsError(f"Output directory already exists: {out_dir}")
+    if out_dir.exists() and not overwrite:
+        raise FileExistsError(f"Output directory already exists: {out_dir}")
     out_dir.mkdir(parents=True, exist_ok=True)
 
     # 1. Build clean catalog with explicit commercial_ok=False provenance

@@ -13,22 +13,26 @@ Serves:
 from __future__ import annotations
 
 import base64
+import io
 import json
 import mimetypes
-import time
+import tempfile
+import uuid
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 from urllib.parse import unquote, urlparse
 
-import cv2
 import numpy as np
 import torch
 
+from .artwork import read_artwork
+from .design_art import ART_PATTERNS, suggest_outline
+from .styles import CUT_FAMILIES
 from .cli import generate_puzzle_run
 from .neural_guide import DEFAULT_CHECKPOINT, auto_tune_parameters
-from .phase_field import STYLE_PRESETS, build_outline_polygon
+from .phase_field import build_outline_polygon
 from .whimsies import (
     WhimsyPlacement,
     build_whimsy_geometry,
@@ -41,6 +45,7 @@ from .whimsies import (
 REPO_ROOT = Path(__file__).resolve().parents[1]
 WEB_DIR = REPO_ROOT / "web" / "formverk"
 RUNS_DIR = REPO_ROOT / "runs" / "dendrite-engine"
+EDITION_DIR = REPO_ROOT / "runs" / "formverk-catalog"
 
 
 def _decode_data_url_image(data_url: str) -> Optional[np.ndarray]:
@@ -48,12 +53,7 @@ def _decode_data_url_image(data_url: str) -> Optional[np.ndarray]:
         return None
     if "," in data_url:
         data_url = data_url.split(",", 1)[1]
-    raw = base64.b64decode(data_url)
-    arr = np.frombuffer(raw, dtype=np.uint8)
-    bgr = cv2.imdecode(arr, cv2.IMREAD_COLOR)
-    if bgr is None:
-        return None
-    return cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB)
+    return read_artwork(io.BytesIO(base64.b64decode(data_url, validate=True)))
 
 
 def _whimsy_catalog_payload() -> Dict[str, Any]:
@@ -96,11 +96,19 @@ def _list_showcases() -> List[Dict[str, Any]]:
                         "artwork_svg_url": f"/runs/{sub.name}/artwork.svg",
                         "preview_png_url": f"/runs/{sub.name}/preview.png",
                         "audit_url": f"/runs/{sub.name}/audit.json",
+                        **_optional_urls(sub),
                     }
                 )
             except Exception:
                 continue
     return out
+
+
+def _optional_urls(directory):
+    return {key: f"/runs/{directory.name}/{filename}"
+            for key, filename in [("back_svg_url","back.svg"), ("photo_url","photo.png"),
+                                  ("puzzle_url","puzzle.json"), ("sheet_url","pieces_sheet.png")]
+            if (directory / filename).is_file()}
 
 
 class FormverkRequestHandler(BaseHTTPRequestHandler):
@@ -139,9 +147,12 @@ class FormverkRequestHandler(BaseHTTPRequestHandler):
 
     def _read_json_body(self) -> Dict[str, Any]:
         length = int(self.headers.get("Content-Length", "0"))
-        if length <= 0 or length > 25 * 1024 * 1024:
-            return {}
-        return json.loads(self.rfile.read(length).decode("utf-8"))
+        if not 0 < length <= 100 * 1024 * 1024:
+            raise ValueError("Missing body or request exceeds 100 MiB.")
+        body = json.loads(self.rfile.read(length).decode("utf-8"))
+        if not isinstance(body, dict):
+            raise ValueError("Expected a JSON object.")
+        return body
 
     def do_GET(self) -> None:
         parsed = urlparse(self.path)
@@ -157,13 +168,21 @@ class FormverkRequestHandler(BaseHTTPRequestHandler):
                     "cuda_available": cuda_ok,
                     "gpu_name": torch.cuda.get_device_name(0) if cuda_ok else "cpu",
                     "neural_guide_ready": ckpt.is_file(),
-                    "styles": sorted([*STYLE_PRESETS.keys(), "maze", "wave"]),
+                    "styles": sorted(CUT_FAMILIES), "cut_families": CUT_FAMILIES, "artwork_patterns": ART_PATTERNS,
                 }
             )
             return
 
         if path == "/api/whimsies":
             self._send_json(_whimsy_catalog_payload())
+            return
+
+        if path == "/api/editions":
+            from .editions import catalog
+            self._send_json(catalog(EDITION_DIR))
+            return
+        if path.startswith("/edition-files/"):
+            self._send_file(EDITION_DIR, path[len("/edition-files/"):])
             return
 
         if path == "/api/presets":
@@ -186,6 +205,29 @@ class FormverkRequestHandler(BaseHTTPRequestHandler):
             self._send_json({"error": f"Invalid JSON body: {exc}"}, status=HTTPStatus.BAD_REQUEST)
             return
 
+        if path == "/api/edition":
+            from .editions import generate_edition
+            try:
+                self._send_json(generate_edition(EDITION_DIR, body.get("family"), body.get("seed",42)))
+            except (ValueError, RuntimeError, OSError, TypeError) as exc:
+                self._send_json({"error":str(exc)}, status=HTTPStatus.BAD_REQUEST)
+            return
+        if path == "/api/outline":
+            try:
+                if body.get("outline") in ("rect", "circle", "organic", "spiral"):
+                    poly = build_outline_polygon(body["outline"], float(body["width_mm"]), float(body["height_mm"]), int(body.get("seed",42)))
+                    x0,y0,x1,y1 = poly.bounds
+                    suggestion = {"mode":"outline", "points":[[(x-x0)/(x1-x0),(y-y0)/(y1-y0)] for x,y in list(poly.exterior.coords)[:-1]]}
+                else:
+                    image = _decode_data_url_image(body.get("artwork_data_url") or "")
+                    if image is None:
+                        raise ValueError("Choose a photo first.")
+                    suggestion = suggest_outline(image)
+                self._send_json(suggestion)
+            except (ValueError, OSError, TypeError, KeyError) as exc:
+                self._send_json({"error": str(exc)}, status=HTTPStatus.BAD_REQUEST)
+            return
+
         if path == "/api/autotune":
             try:
                 res = auto_tune_parameters(
@@ -202,6 +244,7 @@ class FormverkRequestHandler(BaseHTTPRequestHandler):
             return
 
         if path == "/api/generate":
+            staging = None
             try:
                 style = str(body.get("style", "dendrite")).lower()
                 outline_kind = str(body.get("outline", "rect")).lower()
@@ -221,9 +264,12 @@ class FormverkRequestHandler(BaseHTTPRequestHandler):
 
                 # Handle optional custom outline SVG string
                 outline_svg_path = None
-                run_id = f"web_{style}_{int(time.time() * 1000)}"
-                out_dir = RUNS_DIR / run_id
-                out_dir.mkdir(parents=True, exist_ok=True)
+                if style not in CUT_FAMILIES or outline_kind not in ("rect","rectangle","circle","organic","stone","spiral","svg"):
+                    raise ValueError("Select a supported style and board outline.")
+                run_id = f"web_{style}_{uuid.uuid4().hex}"
+                staging = tempfile.TemporaryDirectory(prefix=".creating-", dir=RUNS_DIR)
+                out_dir = Path(staging.name) / run_id
+                out_dir.mkdir()
                 if body.get("outline_svg"):
                     outline_svg_path = out_dir / "custom_outline.svg"
                     outline_svg_path.write_text(str(body["outline_svg"]), encoding="utf-8")
@@ -249,8 +295,14 @@ class FormverkRequestHandler(BaseHTTPRequestHandler):
                         spec = get_builtin_whimsy(wname)
                     whimsies.append(build_whimsy_geometry(spec, (cx, cy), sz, angle_deg=ang))
 
-                art_img = _decode_data_url_image(str(body.get("artwork_data_url", "")))
+                try:
+                    art_img = _decode_data_url_image(body.get("artwork_data_url") or "")
+                except (ValueError, OSError, TypeError) as exc:
+                    self._send_json({"error": f"Cannot read uploaded artwork: {exc}"}, status=HTTPStatus.BAD_REQUEST)
+                    return
                 overrides: Dict[str, Any] = {}
+                if body.get("guide_curves") is not None:
+                    overrides["guide_curves"] = body["guide_curves"]
                 for key in ("gamma", "eps", "T0", "lambda1_mm", "lambda2_mm", "U1_mm", "U2_mm", "steps", "growth_steps", "vortex_strength"):
                     if body.get(key) is not None:
                         overrides[key] = float(body[key]) if key not in ("steps", "growth_steps") else int(body[key])
@@ -276,8 +328,19 @@ class FormverkRequestHandler(BaseHTTPRequestHandler):
                     kerf_mm=kerf_mm,
                     outline_svg=outline_svg_path,
                     overrides=overrides,
+                    title=str(body.get("title") or ""), reverse_text=body.get("reverse_text") or None,
+                    artwork_pattern=body.get("artwork_pattern") or "wood",
+                    auto_place_whimsies=bool(body.get("auto_place_whimsies", False)), board_outline=outline,
+                    regions=body.get("regions"),
+                    back_artwork=_decode_data_url_image(body.get("back_artwork_data_url") or ""),
                 )
                 puzzle_json = json.loads((out_dir / "puzzle.json").read_text(encoding="utf-8"))
+                final_dir = RUNS_DIR / run_id
+                res.audit["cut_svg"] = str(final_dir / "cut.svg")
+                puzzle_json["audit_summary"]["cut_svg"] = res.audit["cut_svg"]
+                (out_dir / "audit.json").write_text(json.dumps(res.audit,indent=2), encoding="utf-8")
+                (out_dir / "puzzle.json").write_text(json.dumps(puzzle_json), encoding="utf-8")
+                out_dir.rename(final_dir)
                 self._send_json(
                     {
                         "run_id": run_id,
@@ -287,10 +350,16 @@ class FormverkRequestHandler(BaseHTTPRequestHandler):
                         "artwork_svg_url": f"/runs/{run_id}/artwork.svg",
                         "preview_png_url": f"/runs/{run_id}/preview.png",
                         "audit_url": f"/runs/{run_id}/audit.json",
+                        **_optional_urls(final_dir),
                     }
                 )
+            except (ValueError, OSError, TypeError, IndexError) as exc:
+                self._send_json({"error": str(exc)}, status=HTTPStatus.BAD_REQUEST)
             except Exception as exc:
                 self._send_json({"error": str(exc)}, status=HTTPStatus.INTERNAL_SERVER_ERROR)
+            finally:
+                if staging is not None:
+                    staging.cleanup()
             return
 
         self.send_error(HTTPStatus.NOT_FOUND, "Unknown API endpoint")

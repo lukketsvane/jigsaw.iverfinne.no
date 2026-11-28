@@ -164,6 +164,8 @@ def test_rod_growth_non_crossing_and_audit(tmp_path: Path, style: str, borderles
     assert audit["interlock"]["assembly_lock_margin_mm"] > 0.0
     assert audit["all_hard_gates_passed"] is True
     assert audit["metadata"]["min_nonadjacent_clearance_mm"] >= 2.8
+    assert audit["metadata"]["clearance_stage"] == "snapped_rod_centerlines"
+    assert audit["metadata"]["last_collision_sweep_min_mm"] is not None
 
 
 def test_dendrite_circle_svg_layers_and_audit_gates(tmp_path: Path):

@@ -1,0 +1,4 @@
+comparison_role,version,board_width_mm,board_height_mm,seed,logo_pieces,bay_rule_strength,silhouette_coverage_percent,lock_margin_required_mm,locked_neighbor_pairs,adjacent_pairs_tested,source_report_path,source_report_sha256
+documented,v1,368.0,368.0,22,183,32.0,68.51246316835538,1.0,88,506,../../../runs/aphex-logo-398/seed22/field-report.json,29d2222aa5ede1a34fb3fcc6496de47eb03f725389d20c1cc735857d586ed7f3
+documented,v2,368.0,368.0,22,183,64.0,77.38416985026255,1.0,57,505,../../../runs/aphex-logo-398-v2/seed22-m-L0r-bay64/field-report.json,4d23a2985b41471755502f421614fc9063f723e0421e72f27613be8226963c28
+matched_bay_check,v1,368.0,368.0,22,183,64.0,68.48316226680636,1.0,83,506,../../../runs/aphex-logo-398-v2/v1-seed22-L0-bay64r/field-report.json,1ae39afb66390f6fec86b940f882444b6a74e50b58ef2a9924e1850d74b5385a

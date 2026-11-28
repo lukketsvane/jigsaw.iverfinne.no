@@ -1,0 +1,87 @@
+\section{Six ways to construct a shared seam}
+\label{sec:seams}
+
+A cut between two pieces gives each the outline of its neighbor. The six styles
+in the custom maker differ in how they construct that line. For the first three,
+the starting regions already fill the board before the characteristic interlocks
+develop. Figure~\ref{fig:growing-seams} follows a single edge through that change.
+
+\begin{figure}[!ht]
+\centering
+\begin{minipage}{.98\linewidth}
+\textbf{(a) Dendrite.}
+Seeds spread until their territories meet. Small waves disturb the new boundary.
+The 2012 solver gives adjoining pieces different phase labels and reuses five
+labels across the board. Each phase carries a temperature field. As a tip advances,
+it releases heat that slows growth along its flanks. That feedback lets branches
+develop on either side of the seam. Over long runs, heat can spread between
+distant pieces sharing a label and soften the branches~\cite{puzzle2012}.
+\par\smallskip
+{\centering\plate{dendrite}{.89}\par}
+\medskip
+\textbf{(b) Amoeba.}
+The studio uses the same crystal-growth model with a different parameter set.
+The paper identifies seed spacing, ripple wavelength and amplitude, and
+supercooling as controls over the resulting shapes. The published description
+of Amoeba describes short, closely spaced projections and a higher piece density.
+Its numerical preset remains unpublished~\cite{puzzle2012,cutguide}.
+\par\smallskip
+{\centering\plate{amoeba}{.89}\par}
+\medskip
+\textbf{(c) Maze.}
+Seed regions first expand around the outline and fixed figures. Their shared
+edges become elastic rods. Each rod tends to straighten, but its length increases
+inside a confined area. The edges buckle, collide and push one another into the
+long folds visible in the finished wood~\cite{maze}.
+\par\smallskip
+{\centering\plate{maze}{.89}\par}
+\end{minipage}
+\caption{Three routes from initial territory to an interlocking edge. The first two
+rows share the studio's phase-field mechanism. The third illustrates the excess
+length accommodated by a growing rod. The drawings are conceptual.}
+\label{fig:growing-seams}
+\end{figure}
+
+\clearpage
+\subsection{Curling a rod, joining arcs and trading cells}
+
+Wave adds a force to the elastic edges of Maze. Coral and Matrix instead compare
+candidate arrangements and score the interlock they create. The unit of change
+in Figure~\ref{fig:constructed-seams} is, respectively, a growing rod, an arc
+chain or a grid cell.
+
+\begin{figure}[!ht]
+\centering
+\begin{minipage}{.98\linewidth}
+\textbf{(a) Wave.}
+A directional Voronoi layout elongates the initial pieces along a flow field.
+Each edge receives vortices according to its length. They move with the edge as
+the rod lengthens, drawing it into the spirals and hammerhead-shaped hooks
+characteristic of this cut~\cite{wave,cutguide}.
+\par\smallskip
+{\centering\plate{wave}{.89}\par}
+\medskip
+\textbf{(b) Coral.}
+Jules Khan's generator starts with neighboring cells and proposes replacement
+edges made of joined circular arcs. Random walks yield several routes between
+the same endpoints. The search scores arc chains for length and interlock,
+avoids self-crossings and leaves enough material in narrow parts of a piece
+for it to hold together~\cite{coral,cutguide}.
+\par\smallskip
+{\centering\plate{coral}{.89}\par}
+\medskip
+\textbf{(c) Matrix.}
+The outline, fixed figures and guide curves orient a mesh of mostly quadrilateral
+cells. The initial pieces each take roughly the same number of cells. The
+optimizer looks several cell swaps ahead as it balances size and interlock. To
+score a shared edge, it maps its tangent directions onto a circle. The studio
+treats coverage beyond \(180^\circ\) as evidence of interlock. A range approaching
+\(360^\circ\) indicates a stronger grip~\cite{matrix,cutguide}.
+\par\smallskip
+{\centering\plate{matrix}{.89}\par}
+\end{minipage}
+\caption{Three constructions at edge scale. The red marks in (a) represent
+vortices. In (b), gray arcs trace alternative routes and blue marks the selected
+seam. In (c), the highlighted cells change ownership across the boundary.}
+\label{fig:constructed-seams}
+\end{figure}

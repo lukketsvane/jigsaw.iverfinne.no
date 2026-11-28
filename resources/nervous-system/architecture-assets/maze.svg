@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 150" width="720" height="150" role="img" aria-labelledby="title desc">
+  <title id="title">Maze seam development</title>
+  <desc id="desc">Conceptual three-stage schematic. A straight elastic edge buckles as it lengthens, then folds back on itself within the space between neighboring edges.</desc>
+  <defs>
+    <style>.label{font:17px Arial,Helvetica,sans-serif;fill:#202020;text-anchor:middle}.edge,.fine,.branch,.active,.construction,.grid,.aux,.candidate,.motion,.arrow,.vortex{fill:none;stroke-linecap:round;stroke-linejoin:round}.edge{stroke:#202020;stroke-width:2}.fine{stroke:#666;stroke-width:1.25}.branch{stroke:#b72a2a;stroke-width:1.8}.active{stroke:#223fad;stroke-width:2.2}.construction{stroke:#b3b4b2;stroke-width:1}.grid{stroke:#cbccca;stroke-width:.85}.aux{stroke:#a7a8a6;stroke-width:1.1;stroke-dasharray:3 3}.candidate{stroke:#8d8e8c;stroke-width:1.15;stroke-dasharray:4 3}.motion,.vortex{stroke:#b72a2a;stroke-width:1.35}.vortex{marker-end:url(#arrow)}.arrow{stroke:#434343;stroke-width:1.45}</style>
+    <marker id="arrow" viewBox="0 0 6 6" refX="5" refY="3" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 5.4 3 0 6 1.8 3z" fill="#b72a2a"/></marker>
+  </defs>
+  <rect width="720" height="150" fill="white"/>
+  <g transform="translate(18 8)">
+    <path d="M9 49 L181 49 L181 92 H9 Z" fill="#f2f2f0"/><path class="construction" d="M9 49 1 34 M9 49 0 65 M181 49 189 33 M181 49 190 64"/><path d="M83 37 H60" class="motion" marker-end="url(#arrow)"/><path d="M107 37 H130" class="motion" marker-end="url(#arrow)"/><path class="edge" d="M9 49 L181 49"/>
+    <text class="label" x="95" y="125">Elastic edge</text>
+  </g>
+  <g transform="translate(263 8)">
+    <path d="M9 49 C33 48 35 20 55 22 C77 24 59 70 83 75 C104 79 109 31 130 28 C151 25 156 57 181 49 L181 92 H9 Z" fill="#f2f2f0"/><path class="construction" d="M9 49 1 34 M9 49 0 65 M181 49 189 33 M181 49 190 64"/><path class="aux" d="M9 49 L181 49"/><path class="edge" d="M9 49 C33 48 35 20 55 22 C77 24 59 70 83 75 C104 79 109 31 130 28 C151 25 156 57 181 49"/>
+    <text class="label" x="95" y="125">Buckling</text>
+  </g>
+  <g transform="translate(508 8)">
+    <path d="M9 49 C22 46 31 27 49 22 C72 15 76 28 59 36 C42 44 28 53 27 65 C26 80 42 83 57 70 C73 55 79 29 94 24 C111 17 122 27 108 44 C96 59 86 73 99 78 C112 82 130 63 138 47 C146 31 158 23 168 28 C180 34 164 48 154 62 C146 75 157 79 168 66 C174 59 176 53 181 49 L181 92 H9 Z" fill="#f2f2f0"/><path class="construction" d="M9 49 1 34 M9 49 0 65 M181 49 189 33 M181 49 190 64"/><path class="aux" d="M13 26 Q30 5 55 8 M71 81 Q58 99 43 91 M123 20 Q135 4 155 9 M127 72 Q114 94 103 89"/><path class="edge" d="M9 49 C22 46 31 27 49 22 C72 15 76 28 59 36 C42 44 28 53 27 65 C26 80 42 83 57 70 C73 55 79 29 94 24 C111 17 122 27 108 44 C96 59 86 73 99 78 C112 82 130 63 138 47 C146 31 158 23 168 28 C180 34 164 48 154 62 C146 75 157 79 168 66 C174 59 176 53 181 49"/>
+    <text class="label" x="95" y="125">Confined folds</text>
+  </g>
+  <g transform="translate(227 57)"><path d="M-2 0 H16 M10 -5 L16 0 10 5" class="arrow"/></g>
+  <g transform="translate(472 57)"><path d="M-2 0 H16 M10 -5 L16 0 10 5" class="arrow"/></g>
+</svg>

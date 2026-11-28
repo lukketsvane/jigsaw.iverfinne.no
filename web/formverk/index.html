@@ -3,186 +3,153 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Formverk Studio — Dendritic &amp; Cosserat Rod Puzzle Generator</title>
+  <title>Formverk — Custom jigsaw studio</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header class="topbar">
-    <div class="brand">
-      <h1>Formverk</h1>
-      <span class="subtitle">Dendritic Solidification · Cosserat Rods · Neural Guide</span>
-    </div>
+    <div class="brand"><h1>Formverk</h1><span class="subtitle">Custom jigsaw studio</span></div>
     <div class="topbar-actions">
-      <div class="gpu-pill" id="gpuPill">Connecting...</div>
-      <label class="showcase-picker">
-        <span>Showcase</span>
-        <select id="showcaseSelect">
-          <option value="">— Load generated run —</option>
-        </select>
-      </label>
-      <div class="view-tabs" role="tablist">
-        <button class="tab active" data-view="design" role="tab">Design</button>
-        <button class="tab" data-view="cut" role="tab">Cut Layers</button>
-        <button class="tab" data-view="play" role="tab">Play Test</button>
-      </div>
+      <a href="editions.html">Puzzle editions</a>
+      <span class="gpu-pill" id="gpuPill">Connecting…</span>
+      <label class="showcase-picker"><span>Saved boards</span><select id="showcaseSelect"><option value="">Open a board…</option></select></label>
+      <nav class="view-tabs" aria-label="Workspace view">
+        <button class="tab active" data-view="design" aria-pressed="true">Design</button>
+        <button class="tab" data-view="cut" aria-pressed="false">Cut layers</button>
+        <button class="tab" data-view="play" aria-pressed="false">Play test</button>
+      </nav>
     </div>
   </header>
-
   <div class="workspace">
-    <aside class="sidebar">
+    <form class="sidebar" id="designForm">
       <section class="panel">
-        <h2>1. Style &amp; Outline</h2>
-        <div class="style-grid" id="styleGrid">
-          <button class="style-btn active" data-style="dendrite"><strong>Dendrite</strong><span>Crystal PDE</span></button>
-          <button class="style-btn" data-style="amoeba"><strong>Amoeba</strong><span>Fine lobes</span></button>
-          <button class="style-btn" data-style="maze"><strong>Maze</strong><span>Cosserat rods</span></button>
-          <button class="style-btn" data-style="wave"><strong>Wave</strong><span>Vortex curl</span></button>
-          <button class="style-btn" data-style="linear"><strong>Linear</strong><span>Oriented</span></button>
-          <button class="style-btn" data-style="grid"><strong>Grid</strong><span>Regular seeds</span></button>
-        </div>
-
-        <label class="checkbox-row" id="borderlessRow" hidden>
-          <input type="checkbox" id="borderlessCheck" checked>
-          <span>Borderless organic perimeter (Maze)</span>
+        <h2>Artwork &amp; outline</h2>
+        <label>Artwork
+          <select id="artPattern">
+            <option value="wood">Natural wood</option><option value="photo">Your photograph</option>
+            <option value="geode">Geode</option><option value="agate">Agate</option>
+            <option value="radial">Radial</option><option value="marbling">Marbling</option>
+            <option value="turing">Turing patterns</option><option value="bismuth">Bismuth terraces</option>
+            <option value="comb_marbling">Combed marbling</option>
+          </select>
         </label>
-
+        <div id="photoRow" hidden>
+          <label>Photograph <input type="file" id="artworkInput" accept="image/jpeg,image/png"></label>
+          <div id="photoInfo" class="hint" aria-live="polite"></div>
+          <button class="btn tiny" type="button" id="suggestOutline" disabled>Trace photo subject</button>
+          <button class="btn tiny" type="button" id="clearArtBtn" hidden>Remove photo</button>
+        </div>
         <div class="row-2">
           <label>Outline
             <select id="outlineSelect">
-              <option value="rect">Rectangle</option>
-              <option value="circle">Circle</option>
-              <option value="organic">Organic Stone</option>
-              <option value="svg">Custom SVG</option>
+              <option value="rect">Rectangle</option><option value="circle">Circle</option>
+              <option value="organic">Organic stone</option><option value="spiral">Spiral</option><option value="svg">Import silhouette</option>
+              <option value="draw">Draw outline</option><option value="photo" id="photoOutlineOption" disabled>Photo subject</option>
             </select>
           </label>
-          <label>Wood Finish
-            <select id="themeSelect">
-              <option value="birch">Birch Plywood</option>
-              <option value="walnut">Dark Walnut</option>
-            </select>
-          </label>
+          <label>Wood finish<select id="themeSelect"><option value="birch">Birch plywood</option><option value="walnut">Dark walnut</option></select></label>
         </div>
-
-        <div id="customSvgRow" class="file-row" hidden>
-          <label>Upload Outline SVG
-            <input type="file" id="outlineSvgInput" accept=".svg">
-          </label>
+        <div id="customSvgRow" hidden><label>Silhouette file<input type="file" id="outlineSvgInput" accept=".svg,image/png,image/jpeg"></label><span class="hint">Use a filled SVG, a transparent shape, or a two-tone mask.</span></div>
+        <div id="drawRow" hidden>
+          <span class="hint">Click around the subject on the board, then close the outline.</span>
+          <div class="button-row"><button type="button" class="btn tiny" id="undoPoint">Undo point</button><button type="button" class="btn tiny" id="applyDraw">Close outline</button><button type="button" class="btn tiny" id="resetDraw">Redraw</button></div>
         </div>
-
-        <div class="row-3">
-          <label>Width (mm)
-            <input type="number" id="widthInput" value="260" min="90" max="600" step="10">
-          </label>
-          <label>Height (mm)
-            <input type="number" id="heightInput" value="190" min="90" max="600" step="10">
-          </label>
-          <label>Pieces
-            <input type="number" id="piecesInput" value="32" min="6" max="160" step="1">
-          </label>
-        </div>
-
+        <div id="outlineStatus" class="hint" aria-live="polite"></div>
         <div class="row-2">
-          <label>Seed
-            <input type="number" id="seedInput" value="42" min="0" max="999999">
-          </label>
-          <label>Min Neck (mm)
-            <input type="number" id="neckInput" value="3.0" min="2.0" max="6.0" step="0.25">
-          </label>
+          <label>Width (mm)<input type="number" id="widthInput" value="260" min="80" max="650" step="any" required></label>
+          <label>Height (mm)<input type="number" id="heightInput" value="190" min="80" max="650" step="any" required></label>
         </div>
       </section>
-
       <section class="panel">
-        <div class="panel-head">
-          <h2>2. Physics &amp; Neural Guide</h2>
-          <button class="btn small accent" id="autoTuneBtn" type="button">Neural Auto-Tune</button>
+        <h2>Cut pattern</h2>
+        <div class="style-grid" id="styleGrid" role="group" aria-label="Cut family">
+          <button type="button" class="style-btn active" data-style="dendrite"><strong>Dendrite</strong><span>Branching crystals</span></button>
+          <button type="button" class="style-btn" data-style="amoeba"><strong>Amoeba</strong><span>Fine lobes</span></button>
+          <button type="button" class="style-btn" data-style="maze"><strong>Maze</strong><span>Growing rods</span></button>
+          <button type="button" class="style-btn" data-style="wave"><strong>Wave</strong><span>Vortex curls</span></button>
+          <button type="button" class="style-btn" data-style="coral"><strong>Coral</strong><span>Joined arcs</span></button>
+          <button type="button" class="style-btn" data-style="matrix"><strong>Matrix</strong><span>Cell exchanges</span></button>
+          <button type="button" class="style-btn" data-style="linear"><strong>Linear</strong><span>Oriented seeds</span></button>
+          <button type="button" class="style-btn" data-style="grid"><strong>Grid</strong><span>Regular seeds</span></button>
         </div>
-        <div id="neuralStatus" class="hint">Trained RTX A4500 surrogate optimizes interlock + 3 mm wood strength.</div>
-
-        <label class="slider-row">
-          <span>Supercooling &gamma; <strong id="gammaVal">35</strong></span>
-          <input type="range" id="gammaSlider" min="22" max="48" step="0.5" value="35">
-        </label>
-        <label class="slider-row">
-          <span>Growth Steps <strong id="stepsVal">380</strong></span>
-          <input type="range" id="stepsSlider" min="160" max="560" step="10" value="380">
-        </label>
-        <label class="slider-row">
-          <span>Laser Kerf (mm) <strong id="kerfVal">0.15</strong></span>
-          <input type="range" id="kerfSlider" min="0.10" max="0.25" step="0.01" value="0.15">
-        </label>
+        <label class="checkbox-row" id="borderlessRow" hidden><input type="checkbox" id="borderlessCheck" checked>Grow an organic perimeter</label>
+        <div class="row-2">
+          <label>Target pieces<input type="number" id="piecesInput" value="32" min="4" max="240" required></label>
+          <label>Random seed<input type="number" id="seedInput" value="42" min="0" max="999999" required></label>
+        </div>
+        <details><summary>Solver &amp; cutting settings</summary><div class="settings">
+          <div id="phaseControls" class="settings">
+            <div class="panel-head"><span class="hint">Phase-field simulation</span><button class="btn tiny" id="autoTuneBtn" type="button">Auto-tune</button></div>
+            <div id="neuralStatus" class="hint" aria-live="polite"></div>
+            <label class="slider-row"><span>Supercooling γ <strong id="gammaVal">35</strong></span><input type="range" id="gammaSlider" min="22" max="48" step="0.5" value="35"></label>
+            <label class="slider-row"><span>Growth steps <strong id="stepsVal">420</strong></span><input type="range" id="stepsSlider" min="160" max="560" step="10" value="420"></label>
+          </div>
+          <label>Minimum neck (mm)<input type="number" id="neckInput" value="3.0" min="2" max="6" step="0.25" required></label>
+          <label class="slider-row"><span>Laser kerf (mm) <strong id="kerfVal">0.15</strong></span><input type="range" id="kerfSlider" min="0.10" max="0.25" step="0.01" value="0.15"></label>
+        </div></details>
+        <details><summary>Use different cuts by region</summary><div class="settings">
+          <label>Region plan (JSON)<input type="file" id="regionFile" accept=".json,application/json"></label>
+          <span class="hint">Assign a cut family and piece count to each polygon. Coordinates run from 0 to 1 across the board.</span>
+          <div class="button-row"><button type="button" class="btn tiny" id="exampleRegions">Download example</button><button type="button" class="btn tiny" id="clearRegions" hidden>Clear plan</button></div>
+          <span class="hint" id="regionStatus" aria-live="polite"></span>
+        </div></details>
       </section>
-
       <section class="panel">
-        <h2>3. Whimsies &amp; Engraving</h2>
+        <h2>Special pieces</h2>
         <div class="whimsy-palette" id="whimsyPalette"></div>
-        <div class="placed-list" id="placedWhimsies">
-          <div class="hint">Click a figure above to add it, then drag on the board.</div>
-        </div>
-        <label>Engraved Inscription (separate laser layer)
-          <input type="text" id="engraveInput" placeholder="e.g. FORMVERK EDITION 01">
-        </label>
-        <div class="file-row">
-          <label>Artwork Overlay / Saliency Guide (optional)
-            <input type="file" id="artworkInput" accept="image/*">
-          </label>
-          <button class="btn tiny" id="clearArtBtn" type="button" hidden>Clear Art</button>
-        </div>
+        <div id="glyphRow" class="file-row" hidden><label>Letter or number<select id="glyphSelect"></select></label><button type="button" class="btn small" id="addGlyph">Add piece</button></div>
+        <label class="checkbox-row"><input type="checkbox" id="autoPlace">Arrange special pieces automatically</label>
+        <div class="placed-list" id="placedWhimsies"></div>
       </section>
-
+      <section class="panel">
+        <h2>Finishing</h2>
+        <label>Puzzle title<input type="text" id="titleInput" maxlength="100"></label>
+        <label>Back engraving<input type="text" id="reverseInput" maxlength="100"></label>
+        <div class="file-row"><label>Back artwork (optional)<input type="file" id="backArtwork" accept="image/png,image/jpeg"></label><button type="button" class="btn tiny" id="clearBack" hidden>Remove</button></div>
+        <details><summary>Front engraving</summary><label>Inscription<input type="text" id="engraveInput" maxlength="100"></label></details>
+      </section>
       <div class="generate-bar">
-        <button class="btn primary full" id="generateBtn" type="button">Generate Puzzle on GPU</button>
-        <div class="progress-msg" id="progressMsg">Ready.</div>
+        <button class="btn primary full" id="generateBtn" type="submit">Generate puzzle</button>
+        <div class="progress-msg" id="progressMsg" role="status">Ready.</div>
       </div>
-    </aside>
-
+    </form>
     <main class="stage-wrap">
       <div class="stage-toolbar">
         <div id="layerToggles" class="layer-toggles" hidden>
-          <label><input type="checkbox" id="showInt" checked><span class="swatch red"></span>Interior Cut</label>
-          <label><input type="checkbox" id="showExt" checked><span class="swatch blue"></span>Exterior Cut</label>
-          <label><input type="checkbox" id="showEng" checked><span class="swatch green"></span>Engrave</label>
+          <label><input type="checkbox" id="showInt" checked><span class="swatch red"></span>Interior</label>
+          <label><input type="checkbox" id="showExt" checked><span class="swatch blue"></span>Perimeter</label>
+          <label><input type="checkbox" id="showEng" checked><span class="swatch green"></span>Front engraving</label>
         </div>
         <div id="playControls" class="play-controls" hidden>
           <button class="btn small" id="scatterFewBtn" type="button">Scatter 8</button>
-          <button class="btn small" id="scatterAllBtn" type="button">Scatter All</button>
+          <button class="btn small" id="scatterAllBtn" type="button">Scatter all</button>
           <button class="btn small" id="solvePlayBtn" type="button">Assemble</button>
-          <span class="play-score" id="playScore">0 / 0 snapped</span>
+          <span class="play-score" id="playScore"></span>
         </div>
         <div class="downloads">
-          <a class="btn small disabled" id="dlCutSvg" download="cut.svg">cut.svg (1:1 mm)</a>
-          <a class="btn small disabled" id="dlArtSvg" download="artwork.svg">artwork.svg</a>
-          <a class="btn small disabled" id="dlAuditJson" download="audit.json">audit.json</a>
+          <a class="btn small disabled" id="dlCutSvg" download="cut.svg">Cut SVG</a>
+          <a class="btn small disabled" id="dlArtSvg" download="artwork.svg">Artwork SVG</a>
+          <a class="btn small" id="dlBackSvg" download="back.svg" hidden>Back SVG</a>
+          <a class="btn small disabled" id="dlAuditJson" download="audit.json">Audit JSON</a>
         </div>
       </div>
-
       <div class="canvas-area" id="canvasArea">
-        <svg id="stageSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 190">
-          <defs>
-            <clipPath id="boardClip"></clipPath>
-          </defs>
-          <g id="stageCamera">
-            <g id="artworkLayer"></g>
-            <g id="pieceLayer"></g>
-            <g id="cutLayer"></g>
-            <g id="engraveLayer"></g>
-            <g id="whimsyEditLayer"></g>
-          </g>
+        <svg id="stageSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 190" aria-label="Jigsaw board preview">
+          <defs><pattern id="pieceArt" patternUnits="userSpaceOnUse" patternContentUnits="userSpaceOnUse"></pattern></defs>
+          <g id="stageCamera"><g id="artworkLayer"></g><g id="pieceLayer"></g><g id="cutLayer"></g><g id="engraveLayer"></g><g id="whimsyEditLayer"></g><g id="drawingLayer"></g></g>
         </svg>
       </div>
-
       <footer class="audit-bar" id="auditBar">
-        <div class="metric"><span class="label">Status</span><strong id="mStatus">—</strong></div>
+        <div class="metric"><span class="label">Audit</span><strong id="mStatus">—</strong></div>
         <div class="metric"><span class="label">Pieces</span><strong id="mPieces">—</strong></div>
-        <div class="metric"><span class="label">Lock Margin</span><strong id="mLock">—</strong></div>
-        <div class="metric"><span class="label">Kerf 0.10–0.25</span><strong id="mKerf">—</strong></div>
-        <div class="metric"><span class="label">Neck 3.0 mm</span><strong id="mNeck">—</strong></div>
-        <div class="metric"><span class="label">Duplicates / Gap</span><strong id="mGeom">—</strong></div>
-        <div class="metric"><span class="label">Cut Length</span><strong id="mLen">—</strong></div>
+        <div class="metric"><span class="label">Lock margin</span><strong id="mLock">—</strong></div>
+        <div class="metric"><span class="label">Kerf sweep</span><strong id="mKerf">—</strong></div>
+        <div class="metric"><span class="label">Thin necks</span><strong id="mNeck">—</strong></div>
+        <div class="metric"><span class="label">Dupes / gap</span><strong id="mGeom">—</strong></div>
+        <div class="metric"><span class="label">Cut length</span><strong id="mLen">—</strong></div>
       </footer>
     </main>
   </div>
-
-  <script src="player.js"></script>
-  <script src="app.js"></script>
+  <script src="player.js"></script><script src="artwork.js"></script><script src="app.js"></script>
 </body>
 </html>

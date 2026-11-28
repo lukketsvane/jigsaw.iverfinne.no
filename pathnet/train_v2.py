@@ -232,6 +232,17 @@ def polygon_metrics(q, t, ref, k):
 
 # ---------------------------------------------------------------- training
 
+def logo_rule_penalty(controls, classes, limit):
+    """Penalize logo cuts only. Glyph strokes can be thinner by design."""
+    logos = controls[classes == 0][:limit]
+    if len(logos) == 0:
+        return controls.new_zeros(())
+    neck, contact, _, _ = cut_rules(logos)
+    penalty = neck + contact
+    # Bound the loss on a tangled outline so its fidelity gradient can still untangle it.
+    return (penalty / (1 + penalty / 1e-4)).mean()
+
+
 def train(a):
     torch.backends.cuda.matmul.allow_tf32 = True; torch.backends.cudnn.allow_tf32 = True; torch.manual_seed(a.seed)
     out = RUNS / a.name; out.mkdir(parents=True, exist_ok=True)
@@ -248,10 +259,9 @@ def train(a):
         for gp in opt.param_groups: gp['lr'] = lr
         k, z = draw(a.batch, K, gen, a.logo_share, a.corners, zdim=zd); t = fam(k, z); q = model(k, z); diff = q - t
         mse = diff.square().mean(); loss = mse + 1.2 * (diff - diff.roll(1, 1)).square().mean()
-        if a.rules > 0:                    # logo only: glyph strokes are thinner than the logo's rule by design
-            pn, pc, _, _ = cut_rules(q[k == 0][:a.rule_batch]); r = pn + pc
-            r = r / (1 + r / 1e-4)           # soft cap: a tangled outline must not drown the fidelity term that untangles it
-            loss = loss + a.rules * min(1., max(0., frac - .05) / .1) * r.mean()
+        if a.rules > 0:
+            rule_weight = a.rules * min(1., max(0., frac - .05) / .1)
+            loss = loss + rule_weight * logo_rule_penalty(q, k, a.rule_batch)
         opt.zero_grad(set_to_none=True); loss.backward()
         if a.clip: torch.nn.utils.clip_grad_norm_(model.parameters(), a.clip)
         opt.step(); step += 1; seen += a.batch

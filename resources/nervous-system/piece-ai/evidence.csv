@@ -1,0 +1,31 @@
+case,seed,measurement,value,unit,scope,source
+large_lizard,387,repeat_width,500,mm,horizontal period,runs/lizards-387/quality.json
+large_lizard,387,reimported_faces,216,pieces,one board,runs/lizards-387/quality.json
+large_lizard,387,paired_periodic_seams,648,seams,one board,runs/lizards-387/quality.json
+large_lizard,387,strict_3mm_neck_failures,0,pieces,one board,runs/lizards-387/quality.json
+large_lizard,387,minimum_wood_width,3.0642,mm,digital screen,runs/lizards-387/quality.json
+reference_size_lizard,387,outer_width,298.45,mm,external assembled envelope,runs/lizards-387/reference-size/quality.json
+reference_size_lizard,387,outer_height,236.22,mm,external assembled envelope,runs/lizards-387/reference-size/quality.json
+reference_size_lizard,387,reimported_faces,216,pieces,one board,runs/lizards-387/reference-size/quality.json
+reference_size_lizard,387,intact_at_0.25mm_kerf,216,pieces,geometric offset,runs/lizards-387/reference-size/quality.json
+reference_size_lizard,387,strict_3mm_neck_failures,216,pieces,1.5mm erosion splits face or leaves empty core,runs/lizards-387/reference-size/quality.json
+periodic_cohort,356-419,number_of_seeds,64,seeds,500mm repeat width,runs/lizards-387/seed-audit.json
+periodic_cohort,356-419,reimported_faces,13824,pieces,summed over cohort,runs/lizards-387/seed-audit.json
+elastic_cnn,,training_sheets,35200,sheets,synthetic equilibrium supervision,runs/lizards-387/quality.json
+elastic_cnn,,held_out_sheets,256,sheets,synthetic equilibrium supervision,runs/lizards-387/quality.json
+elastic_cnn,,held_out_network_rmse,0.0311656129,grid_units,displacement error,runs/lizards-387/quality.json
+elastic_cnn,,held_out_raw_handles_rmse,0.1289750487,grid_units,displacement error,runs/lizards-387/quality.json
+logo_v1,22,silhouette_coverage,68.48316227,percent,183 pieces / 368mm / bay64,resources/nervous-system/visual-atlas/06-board-tradeoff.csv
+logo_v1,22,locked_adjacent_pairs_at_1mm,83,pairs,506 tested,resources/nervous-system/visual-atlas/06-board-tradeoff.csv
+logo_v2_m_15min,22,silhouette_coverage,77.38416985,percent,183 pieces / 368mm / bay64,resources/nervous-system/visual-atlas/06-board-tradeoff.csv
+logo_v2_m_15min,22,locked_adjacent_pairs_at_1mm,57,pairs,505 tested,resources/nervous-system/visual-atlas/06-board-tradeoff.csv
+pathnet_fixed_bay,22,projected_group_lock_margin,4.78,mm,32-logo 300x220mm board and 360 translation directions,pathnet/README.md
+pathnet_trained_bay,22,projected_group_lock_margin,6.00,mm,same layout after resumed field training,pathnet/README.md
+pathnet_fixed_bay,22,mean_contour_within_2mm,0.70,fraction,same 32-logo layout,pathnet/README.md
+pathnet_trained_bay,22,mean_contour_within_2mm,0.70,fraction,same 32-logo layout,pathnet/README.md
+heller_unguided,42,mean_aligned_silhouette_iou,0.6062,fraction,6 animals / upgraded solver,runs/bench_nordic_animals_upgraded_s42/quality.json
+heller_unguided,43,mean_aligned_silhouette_iou,0.6205,fraction,6 animals / upgraded solver,runs/bench_nordic_animals_upgraded_s43/quality.json
+heller_unguided,44,mean_aligned_silhouette_iou,0.6249,fraction,6 animals / upgraded solver,runs/bench_nordic_animals_upgraded_s44/quality.json
+heller_guided,42,mean_aligned_silhouette_iou,0.5552,fraction,6 animals / recognizer on,runs/bench_nordic_animals_guided_s42/quality.json
+heller_guided,43,mean_aligned_silhouette_iou,0.6210,fraction,6 animals / recognizer on,runs/bench_nordic_animals_guided_s43/quality.json
+heller_guided,44,mean_aligned_silhouette_iou,0.6270,fraction,6 animals / recognizer on,runs/bench_nordic_animals_guided_s44/quality.json

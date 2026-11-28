@@ -11,6 +11,7 @@ Guarantees:
 
 from __future__ import annotations
 
+import base64
 import json
 import math
 import re
@@ -30,9 +31,10 @@ from scipy.sparse.csgraph import connected_components
 from shapely import get_parts, union_all
 from shapely.geometry import LineString, Polygon
 from shapely.geometry.polygon import orient
-from shapely.ops import linemerge, polygonize
+from shapely.ops import linemerge, polygonize, substring
 
-from .whimsies import WhimsyPlacement
+from .artwork import photo_descriptor, photo_image, sample_photo
+from .whimsies import WhimsyPlacement, make_engrave_text_paths
 
 SVG_NS = "http://www.w3.org/2000/svg"
 ET.register_namespace("", SVG_NS)
@@ -216,6 +218,25 @@ def _smooth_polyline(xy: np.ndarray, sigma_mm: float, loop: bool = False) -> np.
     return out
 
 
+def _fixed_ring_arc(ring, samples):
+    """Return the directed arc of the original figure between two shared junctions."""
+    distances = np.array([ring.project(shapely.Point(p)) for p in samples])
+    perimeter = ring.length
+    # Consecutive raster samples are close on the ring, including across its origin.
+    steps = (np.diff(distances) + perimeter / 2) % perimeter - perimeter / 2
+    backwards = steps.sum() < 0
+    start, end = distances[[0, -1]]
+    if backwards:
+        start, end = end, start
+    if end > start or (end == start and abs(steps.sum()) < perimeter / 2):
+        xy = np.array(substring(ring, start, end).coords)
+    else:
+        before = np.array(substring(ring, start, perimeter).coords)
+        after = np.array(substring(ring, 0, end).coords)
+        xy = np.concatenate([before, after[1:]])
+    return xy[::-1] if backwards else xy
+
+
 def extract_shared_seams_from_labels(
     labels: np.ndarray,
     bounds_mm: Tuple[float, float, float, float],
@@ -226,7 +247,7 @@ def extract_shared_seams_from_labels(
     whimsies: Sequence[WhimsyPlacement] = (),
     smooth_sigma_mm: float = 0.65,
     simplify_tol_mm: float = 0.08,
-    snap_mm: float = 0.01,
+    snap_mm: float = 0.001,
 ) -> Tuple[List[Polygon], List[LineString], List[LineString], Dict[str, Any]]:
     """Trace every seam ONCE between junction nodes, smooth cleanly, snap, and polygonize.
 
@@ -326,6 +347,7 @@ def extract_shared_seams_from_labels(
 
     pos = np.stack([x0 + nc * px, y0 + nr * py], axis=1).astype(np.float64)
     interior = pair[:, 0] >= 0
+    whimsy_by_pid = {int(pid): wh.polygon for pid, wh in zip(fixed_piece_ids, whimsies)}
     for n_i in np.nonzero(stop & ~corner)[0]:
         e_list = inc[start[n_i] : start[n_i + 1]]
         # Exterior junctions project neatly onto exact target outline boundary!
@@ -336,6 +358,13 @@ def extract_shared_seams_from_labels(
             pos[n_i] = [proj.x, proj.y]
         else:
             pos[n_i] = pts[e_list].mean(axis=0)
+            fixed_ids = fixed_set.intersection(pair[e_list].ravel())
+            if len(fixed_ids) == 1:
+                polygon = whimsy_by_pid.get(next(iter(fixed_ids)))
+                if polygon is not None:
+                    # All three incident seams need this same exact endpoint.
+                    ring = polygon.exterior
+                    pos[n_i] = ring.interpolate(ring.project(shapely.Point(pos[n_i]))).coords[0]
 
     # Walk maximal chains between stop nodes
     used = np.zeros(len(ends_idx), dtype=bool)
@@ -364,11 +393,6 @@ def extract_shared_seams_from_labels(
             arcs.append({"walk": _walk(int(ends_idx[e_i, 0]), int(e_i)), "pair": (int(pair[e_i, 0]), int(pair[e_i, 1]))})
 
     # Try progressive smoothing fallbacks so topology always reproduces exact N faces
-    ext_ring = outline.exterior
-    whimsy_by_pid: Dict[int, Polygon] = {}
-    for pid, wh in zip(fixed_piece_ids, whimsies):
-        whimsy_by_pid[int(pid)] = wh.polygon
-
     for sg in (smooth_sigma_mm, smooth_sigma_mm * 0.6, smooth_sigma_mm * 0.3, 0.15, 0.0):
         int_lines_raw: List[LineString] = []
         for arc in arcs:
@@ -378,24 +402,21 @@ def extract_shared_seams_from_labels(
             n0, n1, path, loop = arc["walk"]
             xy = pts[path] if loop else np.vstack([pos[n0], pts[path], pos[n1]])
 
-            # If arc borders a fixed whimsy, project interior vertices gently onto exact whimsy polygon!
+            # Keep the figure's original vertices at the cut precision. Only the
+            # surrounding free seams are smoothed and simplified.
             wh_poly = whimsy_by_pid.get(a_id) or whimsy_by_pid.get(b_id)
-            if wh_poly is not None and not loop and len(xy) >= 3:
-                wh_ring = wh_poly.exterior
-                for vi in range(1, len(xy) - 1):
-                    qp = shapely.Point(float(xy[vi, 0]), float(xy[vi, 1]))
-                    if wh_ring.distance(qp) < max(px, py) * 2.5:
-                        pp = wh_ring.interpolate(wh_ring.project(qp))
-                        xy[vi] = [pp.x, pp.y]
-                xy = _smooth_polyline(xy, min(sg, 0.25), loop=False)
-            elif wh_poly is not None and loop:
-                xy = np.asarray(wh_poly.exterior.coords, dtype=np.float64)
+            if wh_poly is not None:
+                xy = np.asarray(wh_poly.exterior.coords) if loop else _fixed_ring_arc(wh_poly.exterior, xy)
             else:
                 xy = _smooth_polyline(xy, sg, loop=loop)
                 if loop:
                     xy = np.vstack([xy, xy[:1]])
 
-            ls = LineString(np.round(xy, 4)).simplify(simplify_tol_mm, preserve_topology=False)
+            if len(xy) < 2:
+                continue
+            ls = LineString(np.round(xy, 4))
+            if wh_poly is None:
+                ls = ls.simplify(simplify_tol_mm, preserve_topology=False)
             if ls.length > 0.05:
                 # Clip cleanly to outline so smoothed interior seams never overshoot curved outlines
                 clipped = ls.intersection(outline)
@@ -403,9 +424,11 @@ def extract_shared_seams_from_labels(
                     if part.geom_type == "LineString" and part.length > 0.05:
                         int_lines_raw.append(LineString(np.round(np.asarray(part.coords) / snap_mm) * snap_mm))
 
-        ext_snapped = LineString(np.round(np.asarray(ext_ring.coords) / snap_mm) * snap_mm)
+        ext_snapped = shapely.set_precision(outline.boundary, snap_mm)
+        endpoints = shapely.multipoints([xy for line in int_lines_raw for xy in (line.coords[0], line.coords[-1])])
+        ext_snapped = shapely.snap(ext_snapped, endpoints, snap_mm * 2)
         all_cut = union_all([*int_lines_raw, ext_snapped], grid_size=snap_mm)
-        faces_raw = [orient(p, 1.0) for p in polygonize(all_cut) if p.is_valid and p.area > 1.0]
+        faces_raw = [orient(p, 1.0) for p in polygonize(all_cut) if p.is_valid and p.area > 1.0 and outline.covers(p.representative_point())]
         if len(faces_raw) != n_expected:
             continue
 
@@ -419,9 +442,11 @@ def extract_shared_seams_from_labels(
         if sorted(owners) != expected_ids:
             continue
 
-        # Split noded network strictly into exterior_lines (on outline boundary) vs interior_lines
-        noded_parts = [l for l in get_parts(all_cut) if l.geom_type == "LineString" and l.length > 1e-4]
-        ext_buf = ext_snapped.buffer(max(0.08, snap_mm * 4.0))
+        # Extract exact clean shared edges directly from the verified closed faces (eliminates dangling stubs
+        # while preserving any interior hole rings and exact curved outline geometry!)
+        clean_net = union_all([f.boundary for f in faces_raw])
+        noded_parts = [l for l in get_parts(clean_net) if l.geom_type == "LineString" and l.length > 1e-4]
+        ext_buf = ext_snapped.buffer(max(0.03, snap_mm * 2.5))
         ext_edges = [l for l in noded_parts if ext_buf.covers(l)]
         int_edges = [l for l in noded_parts if not ext_buf.covers(l)]
         ext_merged = [l for l in get_parts(linemerge(ext_edges)) if l.geom_type == "LineString" and l.length > 1e-4]
@@ -615,7 +640,17 @@ def audit_cut_svg(
     duplicate_segments = len(segs) - len(set(segs))
 
     noded = union_all(lines)
-    pieces = [orient(p, 1.0) for p in polygonize(noded) if p.is_valid and p.area > 0.1]
+    if expected_outline is None:
+        # Named exterior cuts encode intentional openings, including between nested groups.
+        root = ET.parse(svg_path).getroot()
+        if root.find(".//{*}g[@id='exterior_cut']") is not None:
+            ext, *_ = _parse_svg_paths(svg_path, exclude_groups=("engrave","interior_cut"))
+            domain = shapely.build_area(union_all(ext))
+            if not domain.is_empty:
+                expected_outline = domain
+    apertures = [Polygon(ring) for part in get_parts(expected_outline) for ring in part.interiors] if expected_outline is not None else []
+    pieces = [orient(p, 1.0) for p in polygonize(noded) if p.is_valid and p.area > 0.1
+              and not any(hole.covers(p.representative_point()) for hole in apertures)]
     pieces.sort(key=lambda p: (round(p.centroid.y / 15.0), p.centroid.x))
 
     cover = union_all(pieces) if pieces else Polygon()
@@ -748,6 +783,44 @@ def _hex_to_bgr(hx: str) -> Tuple[int, int, int]:
     return (b, g, r)
 
 
+def _add_registered_image(root, descriptor, board):
+    """Embed the board-registered bitmap so the print SVG travels as a single file."""
+    defs = ET.SubElement(root, f"{{{SVG_NS}}}defs")
+    clip = ET.SubElement(defs, f"{{{SVG_NS}}}clipPath", {"id": "board-mask", "clipPathUnits": "userSpaceOnUse"})
+    for polygon in get_parts(board):
+        rings = (polygon.exterior, *polygon.interiors)
+        d = " ".join(_line_to_d(ring) + " Z" for ring in rings)
+        ET.SubElement(clip, f"{{{SVG_NS}}}path", {"d": d, "clip-rule": "evenodd"})
+    attrs = {key: str(value) for key, value in descriptor.items()}
+    ET.SubElement(root, f"{{{SVG_NS}}}image", {**attrs, "clip-path": "url(#board-mask)"})
+
+
+def _write_reverse(path, board, width, height, text, image):
+    """The workpiece flips about the vertical axis. Print and type face the viewer."""
+    reverse = shapely.affinity.scale(board, xfact=-1, yfact=1, origin=(width/2, height/2))
+    root = ET.Element(f"{{{SVG_NS}}}svg", {"width": f"{width:.4f}mm", "height": f"{height:.4f}mm",
+                                           "viewBox": f"0 0 {width:.4f} {height:.4f}"})
+    if image is not None:
+        descriptor = photo_descriptor(photo_image(image), width, height)
+        descriptor["preserveAspectRatio"] = "none"
+        _add_registered_image(root, descriptor, reverse)
+    if text and text.strip():
+        from shapely.ops import polylabel
+        anchor = polylabel(reverse, tolerance=.5)
+        # Fit in the largest inscribed disk, including on concave custom boards.
+        lines = make_engrave_text_paths(text, (0,0), height_mm=5.5)
+        if not lines or any(ch not in "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-./ \n\r" for ch in text.upper()):
+            raise ValueError("Reverse engraving supports A-Z, 0-9, spaces, periods, slashes and hyphens.")
+        radius = max(math.hypot(x,y) for line in lines for x,y in line)
+        factor = min(1., .95 * anchor.distance(reverse.boundary) / max(radius, .01))
+        group = ET.SubElement(root, f"{{{SVG_NS}}}g", {"id": "back_engrave", "fill": "none",
+                              "stroke": "#00AA00", "stroke-width": "0.2", "stroke-linecap": "round"})
+        for line in lines:
+            path_line = LineString([(anchor.x+x*factor, anchor.y+y*factor) for x,y in line])
+            ET.SubElement(group, f"{{{SVG_NS}}}path", {"d": _line_to_d(path_line)})
+    ET.ElementTree(root).write(path, encoding="utf-8", xml_declaration=True)
+
+
 def _render_wood_preview(
     path: Path,
     faces: Sequence[Polygon],
@@ -759,6 +832,7 @@ def _render_wood_preview(
     whimsy_indices: set[int],
     theme: str = "birch",
     max_dim_px: int = 1800,
+    photo=None,
 ) -> None:
     x0, y0, x1, y1 = bounds_mm
     pad_mm = max(8.0, 0.04 * max(x1 - x0, y1 - y0))
@@ -815,6 +889,12 @@ def _render_wood_preview(
         plane[board_mask] = np.clip(plane[board_mask] + grain[board_mask], 0, 255)
         img[:, :, ch] = plane.astype(np.uint8)
 
+    if photo is not None:
+        # Sample in board coordinates, including the padding around the cut-line preview.
+        view = (-pad_mm, -pad_mm, img_w / scale - pad_mm, img_h / scale - pad_mm)
+        patch = sample_photo(photo, (x1-x0, y1-y0), view, (img_w, img_h))
+        img[board_mask] = patch[:, :, ::-1][board_mask]
+
     # Subtle laser char along cuts (warm amber halo + crisp dark kerf)
     if theme == "birch":
         char_mask = np.zeros((img_h, img_w), dtype=np.uint8)
@@ -848,6 +928,8 @@ def _render_piece_sheet(
     whimsy_indices: set[int],
     theme: str = "birch",
     cell: int = 210,
+    photo=None,
+    board_size_mm: Optional[Tuple[float, float]] = None,
 ) -> None:
     n = len(faces)
     cols = max(4, min(10, int(math.ceil(math.sqrt(n * 1.4)))))
@@ -866,7 +948,16 @@ def _render_piece_sheet(
         mx, my = 0.5 * (x0 + x1), 0.5 * (y0 + y1)
         xy = np.asarray(f.exterior.coords, dtype=np.float64)
         pts = np.round(np.stack([(xy[:, 0] - mx) * k + cx, (xy[:, 1] - my) * k + cy], axis=1) * 16.0).astype(np.int32)
-        cv2.fillPoly(img, [pts], fill_whimsy if i in whimsy_indices else fill_base, lineType=cv2.LINE_AA, shift=4)
+        if photo is None:
+            cv2.fillPoly(img, [pts], fill_whimsy if i in whimsy_indices else fill_base, lineType=cv2.LINE_AA, shift=4)
+        else:
+            half = cell / (2 * k)
+            patch = sample_photo(photo, board_size_mm, (mx-half, my-half, mx+half, my+half), (cell, cell))
+            mask = np.zeros((cell, cell), dtype=np.uint8)
+            offset = np.array([c * cell * 16, r * cell * 16], dtype=np.int32)
+            cv2.fillPoly(mask, [pts - offset], 255, shift=4)
+            tile = img[r*cell:(r+1)*cell, c*cell:(c+1)*cell]
+            tile[mask != 0] = patch[:, :, ::-1][mask != 0]
         cv2.polylines(img, [pts], True, (30, 34, 40), 1, cv2.LINE_AA, shift=4)
         label = f"W{i}" if i in whimsy_indices else f"{i}"
         cv2.putText(img, label, (int(c * cell + 8), int(r * cell + 20)), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (110, 110, 110), 1, cv2.LINE_AA)
@@ -886,6 +977,9 @@ def export_puzzle(
     min_neck_mm: float = 3.0,
     theme: str = "birch",
     metadata: Optional[Dict[str, Any]] = None,
+    artwork_image: Optional[np.ndarray] = None,
+    reverse_text: Optional[str] = None,
+    back_artwork: Optional[np.ndarray] = None,
 ) -> ExportResult:
     """Write 1:1 mm `cut.svg`, `artwork.svg`, `preview.png`, `pieces_sheet.png`, `puzzle.json`, and `audit.json`."""
     out = Path(out_dir)
@@ -977,7 +1071,23 @@ def export_puzzle(
             "version": "1.1",
         },
     )
+    files_extra = {}
+    board = outline_s if outline_s is not None else union_all(faces_s)
+    metadata = dict(metadata or {})
+    photo = photo_image(artwork_image) if artwork_image is not None else None
+    if photo is not None:
+        artwork = photo_descriptor(photo, w_mm, h_mm)
+        _add_registered_image(art_root, artwork, board)
+        (out / "photo.png").write_bytes(base64.b64decode(artwork["href"].split(",", 1)[1]))
+        metadata["artwork_file"] = "photo.png"
+        files_extra["photo"] = str(out / "photo.png")
+    if reverse_text or back_artwork is not None:
+        _write_reverse(out / "back.svg", board, w_mm, h_mm, reverse_text, back_artwork)
+        metadata["back_file"] = "back.svg"
+        files_extra["back_svg"] = str(out / "back.svg")
     g_pieces = ET.SubElement(art_root, f"{{{SVG_NS}}}g", {"id": "pieces"})
+    if artwork_image is not None:
+        g_pieces.set("display", "none")
     for i, f in enumerate(faces_s):
         fill = ("#DFB987" if theme == "birch" else "#766A61") if i in wh_set else palette[tones[i] % len(palette)]
         ET.SubElement(
@@ -992,7 +1102,7 @@ def export_puzzle(
                 "stroke-linejoin": "round",
             },
         )
-    if eng_s:
+    if eng_s and photo is None:
         g_art_eng = ET.SubElement(
             art_root,
             f"{{{SVG_NS}}}g",
@@ -1006,6 +1116,8 @@ def export_puzzle(
 
     # 3. Independent re-parse audit of cut.svg
     audit = audit_cut_svg(cut_path, expected_outline=outline_s, min_neck_mm=min_neck_mm)
+    audit["piece_count_matches_export"] = audit["pieces"] == len(faces_s)
+    audit["all_hard_gates_passed"] &= audit["piece_count_matches_export"]
     if metadata:
         audit["metadata"] = metadata
     audit_path = out / "audit.json"
@@ -1024,8 +1136,9 @@ def export_puzzle(
         palette=palette,
         whimsy_indices=wh_set,
         theme=theme,
+        photo=photo,
     )
-    _render_piece_sheet(sheet_path, faces_s, wh_set, theme=theme)
+    _render_piece_sheet(sheet_path, faces_s, wh_set, theme=theme, photo=photo, board_size_mm=(w_mm, h_mm))
 
     # 5. Export portable JSON for Formverk Studio & interactive player
     piece_records = []
@@ -1073,6 +1186,8 @@ def export_puzzle(
         "exterior_cuts": [[[round(float(x), 3), round(float(y), 3)] for x, y in ln.coords] for ln in ext_s],
         "engrave_paths": [[[round(float(x), 3), round(float(y), 3)] for x, y in ln.coords] for ln in eng_s],
     }
+    if photo is not None:
+        puzzle_payload["artwork"] = artwork
     puzzle_json_path = out / "puzzle.json"
     puzzle_json_path.write_text(json.dumps(puzzle_payload), encoding="utf-8")
 
@@ -1085,6 +1200,7 @@ def export_puzzle(
         audit=audit,
         out_dir=out,
         files={
+            **files_extra,
             "cut_svg": str(cut_path),
             "artwork_svg": str(art_path),
             "preview_png": str(preview_path),

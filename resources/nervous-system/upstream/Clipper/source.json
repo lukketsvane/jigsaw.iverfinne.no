@@ -1,0 +1,56 @@
+{
+  "checked_on": "2026-11-28",
+  "author": "Angus Johnson",
+  "version": "6.4.2",
+  "svn_revision": 512,
+  "release_date": "2017-02-27",
+  "upstream_files": "https://sourceforge.net/projects/polyclipping/files/",
+  "upstream_release": "https://sourceforge.net/projects/polyclipping/files/clipper_ver6.4.2.zip/download",
+  "upstream_code": "https://sourceforge.net/p/polyclipping/code/512/tree/trunk/",
+  "author_documentation": "https://angusj.com/delphi/clipper/documentation/Docs/Overview/_Body.htm",
+  "studio_source": "https://n-e-r-v-o-u-s.com/blog/?p=7821",
+  "studio_post_date": "2017-10-24",
+  "documented_use": "The studio credits Clipper for polygon Boolean operations. Its article names the library without specifying the release, language binding or individual call sites.",
+  "revision_selection": "This original release predates the studio article. The archive changelog identifies SVN revision 512.",
+  "archive": "clipper_ver6.4.2.zip",
+  "download": "https://downloads.sourceforge.net/project/polyclipping/clipper_ver6.4.2.zip",
+  "byte_size": 2535706,
+  "sha256": "a14320d82194807c4480ce59c98aa71cd4175a5156645c4e2b3edd330b930627",
+  "checksum_source": "https://sourceforge.net/projects/polyclipping/files/",
+  "archive_files": 273,
+  "contents": "Original release ZIP with C++, C# and Delphi library sources, examples, documentation and third-party material.",
+  "primary_library_license": "Boost Software License 1.0. See License.txt in the archive; bundled third-party components retain their notices.",
+  "core_files": [
+    {
+      "path": "cpp/clipper.cpp",
+      "byte_size": 142184,
+      "sha256": "5c642a3668311701f72572443aa42c1a981edb037298efc015166d9d90be0755"
+    },
+    {
+      "path": "cpp/clipper.hpp",
+      "byte_size": 15423,
+      "sha256": "734eba9dc9d399089b2b467017074bd24728a1b9e64c7429e827806ed10e54cc"
+    },
+    {
+      "path": "C#/clipper_library/clipper.cs",
+      "byte_size": 172895,
+      "sha256": "7706bc0005fbc3ccb152d21ff9429ff4ed3cb0897df0e1bf0406fc52c91f0bd2"
+    },
+    {
+      "path": "Delphi/clipper.pas",
+      "byte_size": 178110,
+      "sha256": "64cd17b074b50f82af014268a8096bcaeb6dba434384b612267b612799bf2a12"
+    },
+    {
+      "path": "License.txt",
+      "byte_size": 1397,
+      "sha256": "e3cc0380cc5eb9aedf5a7616fe9fde3710891bced21fd6a20a19194ccd4c1c88"
+    },
+    {
+      "path": "README",
+      "byte_size": 16465,
+      "sha256": "734f2e7e1a4d2c825a93361ee3810282c242eef9b2bbdbb015e201056e88081e"
+    }
+  ],
+  "verification": "Archive SHA-256 matched the SourceForge file listing. Checked every ZIP member CRC, then compiled the archived C# library and intersected two 10 by 10 squares offset by 5 in each axis. The result contained one polygon with area 25."
+}

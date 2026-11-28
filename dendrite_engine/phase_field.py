@@ -194,6 +194,20 @@ def build_outline_polygon(
         return circle(min(width_mm, height_mm))
     if k in ("organic", "stone"):
         return organic_stone(width_mm, height_mm, seed=seed)
+    if k == "spiral":
+        from shapely.geometry import LineString
+        from shapely.affinity import affine_transform
+        from heller_jigsaw.geometry.outline import snap_polygon
+        rng = np.random.default_rng(seed)
+        turns = rng.uniform(1.45,1.85)
+        t = np.linspace(0,turns*2*np.pi,360)
+        phase = rng.uniform(0,2*np.pi)
+        radius = .24 + t/(2*np.pi)
+        spine = LineString(np.column_stack((radius*np.cos(t+phase),radius*np.sin(t+phase))))
+        coil = spine.buffer(.45, quad_segs=12)
+        x0,y0,x1,y1 = coil.bounds
+        sx,sy = width_mm/(x1-x0),height_mm/(y1-y0)
+        return snap_polygon(affine_transform(coil,[sx,0,0,sy,-x0*sx,-y0*sy]))
     if k == "svg" or (svg_path is not None):
         if svg_path is None:
             raise ValueError("svg_path is required when outline kind='svg'")
