@@ -706,7 +706,7 @@ new ResizeObserver(widths).observe(svg);
 svg.setAttribute('role', 'button');
 svg.setAttribute('tabindex', '0');
 svg.setAttribute('aria-label', 'Generate a new cut and play the next chord');
-svg.setAttribute('aria-describedby', 'cut-help');
+svg.setAttribute('aria-description', 'Drag sideways to reshape the cut.');
 svg.setAttribute('data-interactive', '');
 svg.dataset.state = 'idle';
 visible.observe(svg);

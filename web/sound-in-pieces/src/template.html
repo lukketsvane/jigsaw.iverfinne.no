@@ -64,8 +64,6 @@ section:last-child{padding-bottom:calc(clamp(64px,8vw,120px) + env(safe-area-ins
 #board{width:100%;aspect-ratio:1;touch-action:pan-y pinch-zoom;user-select:none;-webkit-user-select:none}
 #board[data-interactive]{cursor:crosshair}
 #board:focus-visible{outline:2px solid var(--lime);outline-offset:4px}
-.live-cut figcaption{visibility:hidden;margin-top:12px;color:var(--dim)}
-#board[data-interactive]+figcaption{visibility:visible}
 #board image{transition:opacity 1.2s ease}
 #board.dev image{opacity:.22}
 #board g{fill:none;stroke-linecap:round;stroke-linejoin:round;transition:opacity .7s ease}
@@ -135,12 +133,6 @@ body::after{content:"";position:fixed;z-index:10;inset:-120px;pointer-events:non
 </section>
 
 <section id="surface">
-  <figure class="pl live-cut">
-    <svg id="board" data-inline viewBox="0 0 368 368" role="img" aria-label="A puzzle cut generated from the Aphex logo model.">
-      <image id="print" href="img/print-1600.webp" width="368" height="368"/>
-    </svg>
-    <figcaption id="cut-help">Tap for a new cut · Drag sideways to reshape</figcaption>
-  </figure>
   <figure class="pl bleed">{{img surface | 100vw | The printed face crossed by hairline cuts.}}</figure>
 </section>
 
@@ -164,6 +156,14 @@ body::after{content:"";position:fixed;z-index:10;inset:-120px;pointer-events:non
       {{img seed-3 | (max-width: 700px) 100vw, min(80vh, 1100px) | Seed 22, cut: 183 pieces with shared seams. | nofade}}
     </div>
   </div>
+</section>
+
+<section id="live-cut" aria-label="Interactive puzzle cut">
+  <figure class="pl live-cut">
+    <svg id="board" data-inline viewBox="0 0 368 368" role="img" aria-label="A puzzle cut generated from the Aphex logo model.">
+      <image id="print" href="img/print-1600.webp" width="368" height="368"/>
+    </svg>
+  </figure>
 </section>
 
 <section id="cut-field">
