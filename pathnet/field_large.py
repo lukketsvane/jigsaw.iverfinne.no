@@ -139,7 +139,7 @@ def partition(polys, W, H, px=.25, bay=0., margin=48., sigma=.35, reach=16.):
 def refine(k, z0, c, th, size, W, H, s_lo, s_hi, steps=260, px=1.25, lam=(150., 3000.), chunk=40, log=None):
     """field.refine, with the distance evaluations of `chunk` pieces at a time recomputed in the backward pass"""
     n = len(k); w = round(W / px); h = round(H / px); win = 2 * int(math.ceil((.58 * s_hi + 8) / px)); off = torch.arange(-win // 2, win // 2, device=DEV)
-    oy, ox = torch.meshgrid(off, off, indexing='ij'); zlim = torch.where(k == 0, .28, 1.)[:, None]
+    oy, ox = torch.meshgrid(off, off, indexing='ij'); zlim = fl.ZLIM.to(k.device)[k][:, None]
     c = c.clone().requires_grad_(True); th = th.clone().requires_grad_(True); a = torch.logit(((size - s_lo) / (s_hi - s_lo)).clamp(.02, .98)).requires_grad_(True)
     zeta = torch.atanh((z0 / zlim).clamp(-.97, .97)).requires_grad_(True)
     opt = torch.optim.Adam([{'params': [c], 'lr': .06}, {'params': [th], 'lr': .0015}, {'params': [a], 'lr': .006}, {'params': [zeta], 'lr': .02}])
@@ -550,7 +550,7 @@ def compose(seed=22, W=570., H=390., n=300, restarts=4, min_size=34., px=.25, ba
             c, th, size, z = refine(k, z0, c0, th0, size0, W, H, s_lo, s_hi, log=log); rv = 0
             for i in range(n):          # a refined latent must still decode to a logo that passes the sampler's own test
                 p = Polygon(flatten(fl.net(k[i:i + 1], z[i:i + 1])[0].cpu().numpy().astype(float), 6))
-                if not (p.is_valid and p.area > .035 and p.intersection(ref).area / p.union(ref).area >= .85): z[i] = z0[i]; rv += 1
+                if not (p.is_valid and p.area > .035 and p.intersection(ref).area / p.union(ref).area >= fl.REF_IOU): z[i] = z0[i]; rv += 1
             if out is not None:         # keep every refined layout, so it can be cut again with --resume
                 out.mkdir(parents=True, exist_ok=True)
                 torch.save({'seed': seed, 'k': k.cpu(), 'z': z.cpu(), 'c': c.cpu(), 'th': th.cpu(), 'size': size.cpu(), 'W': W, 'H': H, 'bay': bay,

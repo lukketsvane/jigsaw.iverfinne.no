@@ -1,4 +1,4 @@
-import argparse, json, math
+import argparse, json, math, os
 from pathlib import Path
 import numpy as np, torch
 from shapely.geometry import Polygon, LineString, box, Point
@@ -8,15 +8,25 @@ from scipy.spatial import Delaunay
 from train import ROOT, Model, N, Z, path, flatten
 
 torch.set_num_threads(1)
-ck=torch.load(ROOT/'pathnet.pt',weights_only=True,map_location='cpu'); names=ck['names']; model=Model(len(names)); model.load_state_dict(ck['state']); model.eval()
+# PATHNET_CKPT=<file> loads another decoder, e.g. a PathNet v2 checkpoint from train_v2.py; unset, it is v1's pathnet.pt.
+# ZLIM is the latent range per class that sample() draws from and field.refine may use; REF_IOU the IoU with the traced
+# logo a logo latent must keep (v2's latent cube is calibrated to stay recognisable, so its threshold only catches failures).
+CKPT=Path(os.environ.get('PATHNET_CKPT') or ROOT/'pathnet.pt')
+ck=torch.load(CKPT,weights_only=True,map_location='cpu'); names=ck['names']
+if ck.get('arch')=='pathnet-v2':
+    from train_v2 import build
+    model=build(ck); Z=ck['latent']; ZLIM_F=[float(v) for v in ck['zlim']]; REF_IOU=ck.get('ref_iou_min',.45)
+else:
+    model=Model(len(names)); model.load_state_dict(ck['state']); model.eval(); ZLIM_F=[.28]+[1.]*(len(names)-1); REF_IOU=.85
+ZLIM=torch.tensor(ZLIM_F,dtype=torch.float32)          # what field.refine scales its tanh latents by
 ref=Polygon(flatten(np.array(json.loads((ROOT/'reference.json').read_text())['logo_control_points']),8))
 
 def decode(k,z):
     with torch.no_grad(): return model(torch.tensor([k]),torch.tensor(np.asarray(z)[None],dtype=torch.float32))[0].numpy()
 def sample(rng,k):
     for _ in range(60):
-        z=rng.uniform(-.28,.28,Z) if k==0 else rng.uniform(-1,1,Z); q=decode(k,z); p=Polygon(flatten(q,6))
-        if p.is_valid and p.area>.035 and (k!=0 or p.intersection(ref).area/p.union(ref).area>=.85): return q,p,z
+        lim=ZLIM_F[k]; z=rng.uniform(-lim,lim,Z); q=decode(k,z); p=Polygon(flatten(q,6))
+        if p.is_valid and p.area>.035 and (k!=0 or p.intersection(ref).area/p.union(ref).area>=REF_IOU): return q,p,z
     raise ValueError('no valid sample')
 def points_svg(coords):
     return 'M'+' L'.join(f'{x:.5f} {y:.5f}' for x,y in coords)

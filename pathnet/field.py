@@ -18,7 +18,7 @@ from shapely import union_all, get_parts
 from shapely.geometry import Polygon, LineString, Point, box
 from shapely.ops import polygonize
 from train import flatten, Z
-from generate import ROOT, names, model, ref, sample, outsvg, points_svg, poly_svg
+from generate import ROOT, names, model, ref, sample, outsvg, points_svg, poly_svg, ZLIM, REF_IOU
 
 torch.set_num_threads(max(1, min(8, (os.cpu_count() or 2) - 2)))   # generate.py pins torch to one thread
 DEV = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -348,7 +348,7 @@ def refine(k, z0, c, th, size, W, H, s_lo, s_hi, steps=260, px=1.25, lam=(150., 
     """Joint stage with the PathNet decoder inside the loop: poses, sizes and latents of every piece descend the
     gap/overlap energy together, on exact distance fields of the decoded silhouettes."""
     n = len(k); w = round(W / px); h = round(H / px); win = 2 * int(math.ceil((.58 * s_hi + 8) / px)); off = torch.arange(-win // 2, win // 2, device=DEV)
-    oy, ox = torch.meshgrid(off, off, indexing='ij'); zlim = torch.where(k == 0, .28, 1.)[:, None]      # latent ranges generate.sample draws from
+    oy, ox = torch.meshgrid(off, off, indexing='ij'); zlim = ZLIM.to(k.device)[k][:, None]      # latent ranges generate.sample draws from
     c = c.clone().requires_grad_(True); th = th.clone().requires_grad_(True); a = torch.logit(((size - s_lo) / (s_hi - s_lo)).clamp(.02, .98)).requires_grad_(True)
     zeta = torch.atanh((z0 / zlim).clamp(-.97, .97)).requires_grad_(True)
     opt = torch.optim.Adam([{'params': [c], 'lr': .06}, {'params': [th], 'lr': .0015}, {'params': [a], 'lr': .006}, {'params': [zeta], 'lr': .02}])
@@ -703,7 +703,7 @@ def compose(seed=22, W=300., H=220., n=32, logo_share=1., restarts=6, field_step
             c, th, size, z = refine(k, z0, c0, th0, size0, W, H, s_lo, s_hi, log=log); reverted = 0; m = None
             for i in range(n):      # a refined latent must still decode to a valid shape that passes the sampler's own test
                 p = Polygon(flatten(net(k[i:i + 1], z[i:i + 1])[0].cpu().numpy().astype(float), 6))
-                if not (p.is_valid and p.area > .035 and (ks[i] != 0 or p.intersection(ref).area / p.union(ref).area >= .85)): z[i] = z0[i]; reverted += 1
+                if not (p.is_valid and p.area > .035 and (ks[i] != 0 or p.intersection(ref).area / p.union(ref).area >= REF_IOU)): z[i] = z0[i]; reverted += 1
             if bay and layouts > 1:                    # a quick, coarser cut of this layout: unusable (-1) or its lock margin
                 try: faces = partition(outlines(k, z, c, th, size), W, H, 2 * px, bay=bay)['faces']; m = -1. if any(flag(f) for f in faces) else lock_margin(faces)
                 except ValueError: m = -1.
