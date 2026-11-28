@@ -184,6 +184,10 @@ def test_eu_norway_safety_and_packaging_docs():
         "14+",
         "DO NOT print CE mark",
         "rights-inventory.csv",
+        "product-studies/01/README.md",
+        "product-studies/02/README.md",
+        "product-studies/03/README.md",
+        "product-studies/04/README.md",
     ):
         assert token in p_txt, f"Missing packaging token {token!r} in packaging alignment"
 
@@ -429,6 +433,8 @@ def test_packaging_sync_and_seam_sample_extractor_on_fixture(tmp_path):
         assert "PROVISIONAL (awaiting" not in pkg_md
         assert "- [x] Sync final locked assembled dimensions" in pkg_md
         assert "84.0 × 84.0 mm" in pkg_md
+        for study_id in ("01", "02", "03", "04"):
+            assert f"product-studies/{study_id}/README.md" in pkg_md
 
         # 2. Verify seam-sample extractor on fixture
         manifest = bcp.build_real_seam_samples(puzzle_run_dir=run_dir, n_samples=3)

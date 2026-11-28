@@ -21,7 +21,7 @@ from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import connected_components
 from shapely.geometry import LineString, Point, Polygon
 from shapely.geometry.polygon import orient
-from shapely.ops import nearest_points, substring, unary_union
+from shapely.ops import linemerge, nearest_points, substring, unary_union
 from shapely.strtree import STRtree
 
 from ..geometry.outline import SNAP, snap_polygon
@@ -97,6 +97,28 @@ def _safe_tip(poly: Polygon) -> float:
         return float(measure(poly)["max_tip_loss_mm"])
     except (ValueError, shapely.GEOSException):
         return 999.0
+
+
+def _tip_over_stats(poly: Polygon, tip_thr: float) -> Tuple[int, float]:
+    """Count disjoint kerf-eroded weak regions whose tip reach exceeds ``tip_thr`` and sum their area."""
+    kp = poly.buffer(-0.125, quad_segs=10)
+    if kp.geom_type != "Polygon" or not kp.is_valid:
+        return 999, 1e9
+    cr = kp.buffer(-1.5, quad_segs=10)
+    if cr.is_empty:
+        return 999, float(kp.area)
+    op = cr.buffer(1.5, quad_segs=10).intersection(kp)
+    lt = kp.difference(op) if not op.is_empty else kp
+    n_over = 0
+    area_over = 0.0
+    for g in shapely.get_parts(lt):
+        if g.geom_type != "Polygon" or g.area <= 0.05:
+            continue
+        pts_g = shapely.points(shapely.get_coordinates(shapely.segmentize(g.boundary, 0.85)))
+        if float(shapely.distance(pts_g, op).max()) > tip_thr:
+            n_over += 1
+            area_over += float(g.area)
+    return n_over, area_over
 
 
 def _fab_ok(poly: Polygon, min_neck_mm: float = 3.0, all_widths: bool = True) -> bool:
@@ -815,6 +837,56 @@ def _oriented_pair_margin(poly_a: Polygon, poly_b: Polygon, a: int, b: int) -> f
     return pair_margin_fast(oriented_edges, a, b)
 
 
+def _boundary_comp_counts(poly_a: Polygon, poly_b: Polygon) -> Tuple[int, int]:
+    """Return ``(n_line_components, n_isolated_points)`` of the shared boundary between two polygons."""
+    inter = poly_a.boundary.intersection(poly_b.boundary)
+    if inter.is_empty:
+        return 0, 0
+    lines = []
+    n_pts = 0
+    for g in shapely.get_parts(inter):
+        if g.geom_type == "LineString" and g.length > 1e-4:
+            lines.append(g)
+        elif g.geom_type == "Point":
+            n_pts += 1
+    if not lines:
+        return 0, n_pts
+    merged = linemerge(lines)
+    n_lines = len([g for g in shapely.get_parts(merged) if g.geom_type == "LineString" and g.length > 1e-4])
+    return n_lines, n_pts
+
+
+def _pair_topology_clean(
+    p: Polygon,
+    pj: Polygon,
+    qi: Polygon,
+    qj: Polygon,
+    third_polys: Sequence[Polygon],
+) -> bool:
+    """Fast local planar-topology screen rejecting pinch points or split shared seams (prevents Euler != 1)."""
+    orig_ij_l, _ = _boundary_comp_counts(p, pj)
+    new_ij_l, new_ij_p = _boundary_comp_counts(qi, qj)
+    if new_ij_p > 0 or new_ij_l > max(1, orig_ij_l):
+        return False
+    delta = qi.symmetric_difference(p).buffer(0.05)
+    for pk in third_polys:
+        if not pk.intersects(delta):
+            continue
+        oi_l, oi_p = _boundary_comp_counts(p, pk)
+        ni_l, ni_p = _boundary_comp_counts(qi, pk)
+        if ni_l > max(1, oi_l) or (ni_l > 0 and ni_p > oi_p) or (ni_l == 0 and ni_p > max(1, oi_p)):
+            return False
+        if oi_l == 0 and oi_p == 0 and ni_l == 0 and ni_p > 0:
+            return False
+        oj_l, oj_p = _boundary_comp_counts(pj, pk)
+        nj_l, nj_p = _boundary_comp_counts(qj, pk)
+        if nj_l > max(1, oj_l) or (nj_l > 0 and nj_p > oj_p) or (nj_l == 0 and nj_p > max(1, oj_p)):
+            return False
+        if oj_l == 0 and oj_p == 0 and nj_l == 0 and nj_p > 0:
+            return False
+    return True
+
+
 def repair_necks_and_tips(
     part: PlanarPartition,
     placed_targets: Sequence[Polygon],
@@ -860,7 +932,7 @@ def repair_necks_and_tips(
 
         tree = STRtree(polys)
         polys_pass_start = list(polys)
-        pass_edits: List[Tuple[Dict[int, Polygon], Dict[str, Any]]] = []
+        pass_edits: List[Tuple[Dict[int, Polygon], Dict[str, Any], List[Tuple[Dict[int, Polygon], Dict[str, Any]]]]] = []
         fixed_this_pass = 0
         touched_faces: set[int] = set()
 
@@ -878,10 +950,14 @@ def repair_necks_and_tips(
             core = kerf_p.buffer(-1.5, quad_segs=10)
             opened = core.buffer(1.5, quad_segs=10).intersection(kerf_p) if not core.is_empty else Polygon()
             lost = kerf_p.difference(opened) if not opened.is_empty else kerf_p
-            weak_geoms = [
-                g for g in shapely.get_parts(lost)
-                if g.geom_type == "Polygon" and g.area > 0.05
-            ]
+            weak_geoms = sorted(
+                [
+                    g for g in shapely.get_parts(lost)
+                    if g.geom_type == "Polygon" and g.area > 0.05
+                ],
+                key=lambda g: g.area,
+                reverse=True,
+            )
             bridges: List[LineString] = []
             for k_check in (0.25, 0.10):
                 c_k = p.buffer(-(min_neck_mm + k_check) * 0.5, quad_segs=10)
@@ -900,6 +976,17 @@ def repair_necks_and_tips(
             if not weak_geoms:
                 continue
             weak_union = unary_union(weak_geoms)
+            cur_over_n, cur_over_area = _tip_over_stats(p, max_tip_mm) if cur_tip > max_tip_mm else (0, 0.0)
+
+            def _tip_progress_ok(cand_q: Polygon, cand_tip: float) -> bool:
+                if cand_tip <= max_tip_mm or cand_tip < cur_tip - 0.8:
+                    return True
+                if cur_over_n >= 2 and cand_tip <= cur_tip - 0.02:
+                    qn, qarea = _tip_over_stats(cand_q, max_tip_mm)
+                    return qn < cur_over_n or (
+                        qn == cur_over_n and qarea < cur_over_area * 0.70 and cand_tip < cur_tip - 0.15
+                    )
+                return False
 
             cand_nbrs = [int(j) for j in tree.query(p.buffer(0.2)) if int(j) != i]
             touching = sorted(
@@ -964,7 +1051,7 @@ def repair_necks_and_tips(
                                     if not _fab_ok(q, min_neck_mm=min_neck_mm, all_widths=True):
                                         continue
                                     qt = _safe_tip(q)
-                                    if qt > max_tip_mm and qt > cur_tip - 0.8:
+                                    if qt > max_tip_mm and not _tip_progress_ok(q, qt):
                                         continue
                                     sc = qt + 0.05 * q.symmetric_difference(p).area - 2.0 * _iou(q, placed_targets[i])
                                     if best_ext is None or sc < best_ext[0]:
@@ -984,6 +1071,7 @@ def repair_necks_and_tips(
                         (
                             {i: q_win},
                             dict(piece=i + 1, mode=f"exterior-{mode_win}", width=w_win, tip_before=round(cur_tip, 2), tip_after=round(qt_win, 2)),
+                            [],
                         )
                     )
                     repaired = True
@@ -1033,7 +1121,7 @@ def repair_necks_and_tips(
                             if not _fab_ok(cand_q, min_neck_mm=min_neck_mm, all_widths=True):
                                 continue
                             qt = _safe_tip(cand_q)
-                            if qt > max_tip_mm and qt > cur_tip - 0.8:
+                            if qt > max_tip_mm and not _tip_progress_ok(cand_q, qt):
                                 continue
                             sc = qt + 0.05 * cand_q.symmetric_difference(p).area - 2.0 * _iou(cand_q, placed_targets[i])
                             if best_poly_ext is None or sc < best_poly_ext[0]:
@@ -1068,6 +1156,7 @@ def repair_necks_and_tips(
                             (
                                 {i: q_win},
                                 dict(piece=i + 1, mode=f"exterior-poly-{mode_win}", width=w_win, tip_before=round(cur_tip, 2), tip_after=round(qt_win, 2)),
+                                [],
                             )
                         )
                         repaired = True
@@ -1078,6 +1167,7 @@ def repair_necks_and_tips(
 
             # Strategy 2: Interior neighbor widening or excess-spike trim
             best_int = None
+            top_int: List[Tuple[float, int, Polygon, Polygon, float, str, float]] = []
             wt_pt_cur: Optional[Point] = None
             if cur_tip > max_tip_mm:
                 try:
@@ -1099,15 +1189,16 @@ def repair_necks_and_tips(
                     continue
                 pj_tip0 = _safe_tip(pj)
                 orig_margin_ij = _oriented_pair_margin(p, pj, i, j) if preserve_lock_mm > 0.0 else 0.0
+                third_nbrs = [
+                    int(k)
+                    for k in tree.query(union_ij.buffer(0.2))
+                    if int(k) not in (i, j)
+                ]
+                third_polys = [polys[k] for k in third_nbrs]
                 # Collect any third neighbors touching i or j to guard their locked seams in post-lock repair
                 third_orig_i: Dict[int, float] = {}
                 third_orig_j: Dict[int, float] = {}
                 if preserve_lock_mm > 0.0:
-                    third_nbrs = [
-                        int(k)
-                        for k in tree.query(union_ij.buffer(0.2))
-                        if int(k) not in (i, j)
-                    ]
                     for k in third_nbrs:
                         if p.boundary.intersection(polys[k].boundary).length > 0.2:
                             m_ik = _oriented_pair_margin(p, polys[k], i, k)
@@ -1117,6 +1208,8 @@ def repair_necks_and_tips(
                             m_jk = _oriented_pair_margin(pj, polys[k], j, k)
                             if m_jk >= preserve_lock_mm:
                                 third_orig_j[k] = m_jk
+                min_area_i = min(260.0, p.area - 1.0)
+                min_area_j = min(260.0, pj.area - 1.0)
                 opts: List[Tuple[str, float, Polygon, Polygon]] = []
                 # Dedicated neck-bridge widening (absorbs any small severed bay peninsula cleanly)
                 for br in bridges:
@@ -1177,13 +1270,17 @@ def repair_necks_and_tips(
                     nonlocal best_int
                     for mode, w_buf, qi, qj in cand_list:
                         try:
-                            if any(q.geom_type != "Polygon" or q.interiors or not q.is_valid or q.area < 180.0 for q in (qi, qj)):
+                            if any(q.geom_type != "Polygon" or q.interiors or not q.is_valid for q in (qi, qj)):
+                                continue
+                            if qi.area < min_area_i or qj.area < min_area_j:
                                 continue
                             qi_sn = snap_polygon(qi, snap=SNAP)
                             qj_sn = snap_polygon(qj, snap=SNAP)
                             if any(q.geom_type != "Polygon" or q.interiors or not q.is_valid for q in (qi_sn, qj_sn)):
                                 continue
                             if qi.intersection(qj).area > 0.002 or _safe_union([qi, qj]).symmetric_difference(union_ij).area > 0.01:
+                                continue
+                            if not _pair_topology_clean(p, pj, qi, qj, third_polys):
                                 continue
                         except (ValueError, shapely.GEOSException):
                             continue
@@ -1194,7 +1291,8 @@ def repair_necks_and_tips(
                         if cur_fab_ok:
                             if not _fast_neck_ok(qi, min_neck_mm=min_neck_mm):
                                 continue
-                            if _fast_tip_loss(qi) > max(max_tip_mm + 0.35, cur_tip - 0.55):
+                            tip_step_fast = 0.02 if cur_over_n >= 2 else 0.55
+                            if _fast_tip_loss(qi) > max(max_tip_mm + 0.35, cur_tip - tip_step_fast):
                                 continue
                         if not _fab_ok(qj, min_neck_mm=min_neck_mm, all_widths=True):
                             continue
@@ -1210,7 +1308,7 @@ def repair_necks_and_tips(
                             k_ok, sec_lobe = _kerf_all_pass_and_lobe(qi, min_neck_mm=min_neck_mm)
                             if not k_ok or sec_lobe > cur_sec_lobe + 0.5:
                                 continue
-                        if (not cur_fab_ok and qi_fab_ok) or ti <= max_tip_mm or ti < cur_tip - 0.8:
+                        if (not cur_fab_ok and qi_fab_ok) or _tip_progress_ok(qi, ti):
                             if tj > max(max_tip_mm, pj_tip0 + 0.3):
                                 continue
                             if preserve_lock_mm > 0.0:
@@ -1235,11 +1333,13 @@ def repair_necks_and_tips(
                             )
                             fab_pen = 0.0 if qi_fab_ok else 50.0
                             sc = fab_pen + ti + 0.4 * tj + 3.0 * max(0.0, loss) + 0.02 * qi.symmetric_difference(p).area
+                            cand_t = (sc, j, qi, qj, ti, mode, w_buf)
+                            top_int.append(cand_t)
                             if best_int is None or sc < best_int[0]:
-                                best_int = (sc, j, qi, qj, ti, mode, w_buf)
+                                best_int = cand_t
 
                 _eval_int_opts(opts)
-                if best_int is None and wt_pt_cur is not None and pj.distance(wt_pt_cur) <= 2.5:
+                if (best_int is None or best_int[4] > max_tip_mm) and wt_pt_cur is not None and pj.distance(wt_pt_cur) <= 2.5:
                     try:
                         for r_cap in (1.8, 2.8, 3.8, 5.0, 6.2):
                             cap_d = p.intersection(wt_pt_cur.buffer(r_cap, quad_segs=6))
@@ -1261,7 +1361,23 @@ def repair_necks_and_tips(
                         pass
 
             if best_int is not None:
+                top_int.sort(key=lambda item: item[0])
                 _, j_win, qi_win, qj_win, ti_win, mode_win, w_win = best_int
+                alt_list: List[Tuple[Dict[int, Polygon], Dict[str, Any]]] = []
+                seen_keys = {(j_win, mode_win, w_win)}
+                for _, j_a, qi_a, qj_a, ti_a, mode_a, w_a in top_int:
+                    key_a = (j_a, mode_a, w_a)
+                    if key_a in seen_keys:
+                        continue
+                    seen_keys.add(key_a)
+                    alt_list.append(
+                        (
+                            {i: qi_a, j_a: qj_a},
+                            dict(piece=i + 1, neighbor=j_a + 1, mode=f"interior-{mode_a}", width=w_a, tip_before=round(cur_tip, 2), tip_after=round(ti_a, 2)),
+                        )
+                    )
+                    if len(alt_list) >= 3:
+                        break
                 polys[i] = qi_win
                 polys[j_win] = qj_win
                 touched_faces.add(i)
@@ -1272,6 +1388,7 @@ def repair_necks_and_tips(
                     (
                         {i: qi_win, j_win: qj_win},
                         dict(piece=i + 1, neighbor=j_win + 1, mode=f"interior-{mode_win}", width=w_win, tip_before=round(cur_tip, 2), tip_after=round(ti_win, 2)),
+                        alt_list,
                     )
                 )
                 fixed_this_pass += 1
@@ -1295,7 +1412,7 @@ def repair_necks_and_tips(
                                     ok_m = False
                                     break
                                 cand_i, qj = res_t
-                                if qj.geom_type != "Polygon" or qj.interiors or not qj.is_valid or qj.area < 180.0:
+                                if qj.geom_type != "Polygon" or qj.interiors or not qj.is_valid or qj.area < min(260.0, polys[j].area - 1.0):
                                     ok_m = False
                                     break
                                 if not _fast_neck_ok(qj, min_neck_mm=min_neck_mm):
@@ -1347,7 +1464,7 @@ def repair_necks_and_tips(
                         if not _fab_ok(qi, min_neck_mm=min_neck_mm, all_widths=True):
                             continue
                         ti = _safe_tip(qi)
-                        if cur_fab_ok and ti > max_tip_mm and ti > cur_tip - 0.6:
+                        if cur_fab_ok and ti > max_tip_mm and not _tip_progress_ok(qi, ti):
                             continue
                         if not all(_fab_ok(qj, min_neck_mm=min_neck_mm, all_widths=True) for qj in cand_nbrs.values()):
                             continue
@@ -1389,6 +1506,7 @@ def repair_necks_and_tips(
                             (
                                 {i: qi, **cand_nbrs},
                                 dict(piece=i + 1, neighbors=[j + 1 for j in cand_nbrs], mode=mode_m, width=w_m, tip_before=round(cur_tip, 2), tip_after=round(ti, 2)),
+                                [],
                             )
                         )
                         fixed_this_pass += 1
@@ -1427,22 +1545,24 @@ def repair_necks_and_tips(
             rebuilt = _try_commit(polys)
             if rebuilt is not None:
                 part = rebuilt
-                history.extend(rec for _, rec in pass_edits)
+                history.extend(rec for _, rec, _ in pass_edits)
             else:
-                # Incremental commit fallback: salvage every valid edit in this pass instead of dropping all
+                # Incremental commit fallback: salvage every valid edit (and try backup candidates if #1 fails)
                 cur_polys = list(polys_pass_start)
                 cur_part = part
                 committed = 0
-                for edit_map, rec in pass_edits:
-                    trial = list(cur_polys)
-                    for idx_k, poly_k in edit_map.items():
-                        trial[idx_k] = poly_k
-                    cand = _try_commit(trial)
-                    if cand is not None:
-                        cur_part = cand
-                        cur_polys = [f.polygon for f in cand.faces]
-                        history.append(rec)
-                        committed += 1
+                for edit_map, rec, alt_maps in pass_edits:
+                    for cand_map, cand_rec in [(edit_map, rec), *alt_maps]:
+                        trial = list(cur_polys)
+                        for idx_k, poly_k in cand_map.items():
+                            trial[idx_k] = poly_k
+                        cand = _try_commit(trial)
+                        if cand is not None:
+                            cur_part = cand
+                            cur_polys = [f.polygon for f in cand.faces]
+                            history.append(cand_rec)
+                            committed += 1
+                            break
                 if committed == 0:
                     polys = [f.polygon for f in part.faces]
                     break
@@ -1474,12 +1594,282 @@ def repair_necks_and_tips(
 
 
 # ---------------------------------------------------------------------------
+# Phase B2: Area-ratio balancing (keep max_area / min_area <= max_ratio)
+# ---------------------------------------------------------------------------
+
+def rebalance_area_ratio(
+    part: PlanarPartition,
+    placed_targets: Sequence[Polygon],
+    max_ratio: float = 3.85,
+    min_neck_mm: float = 3.0,
+    max_tip_mm: float = 6.0,
+    preserve_lock_mm: float = 3.10,
+    max_iters: int = 8,
+    log: Optional[Callable[[str], None]] = None,
+) -> Tuple[PlanarPartition, List[Dict[str, Any]]]:
+    """Gently rebalance extreme piece area outliers so ``max_area / min_area <= max_ratio``."""
+    history: List[Dict[str, Any]] = []
+    cur = part
+    n = len(cur.faces)
+
+    for _ in range(max_iters):
+        polys = [f.polygon for f in cur.faces]
+        metas = [f.metadata.copy() for f in cur.faces]
+        areas = [float(p.area) for p in polys]
+        i_min = int(np.argmin(areas))
+        i_max = int(np.argmax(areas))
+        ratio = areas[i_max] / max(areas[i_min], 1e-6)
+        if ratio <= max_ratio:
+            break
+
+        tree = STRtree(polys)
+        committed = False
+
+        # Try growing smallest piece i_min into its largest touching neighbors; else shrink i_max into smallest neighbors
+        attempts = [(i_min, "grow"), (i_max, "shrink")]
+        for i_piv, direction in attempts:
+            p = polys[i_piv]
+            cand_nbrs = [int(j) for j in tree.query(p.buffer(0.2)) if int(j) != i_piv]
+            touching = [
+                (p.boundary.intersection(polys[j].boundary).length, j)
+                for j in cand_nbrs
+            ]
+            touching = [(l, j) for l, j in touching if l > 2.0]
+            if direction == "grow":
+                touching.sort(key=lambda item: -polys[item[1]].area)
+            else:
+                touching.sort(key=lambda item: polys[item[1]].area)
+
+            best_move = None
+            for _, j in touching[:4]:
+                pj = polys[j]
+                union_ij = _safe_union([p, pj])
+                if union_ij.geom_type != "Polygon" or not union_ij.is_valid:
+                    continue
+                third_nbrs = [int(k) for k in tree.query(union_ij.buffer(0.2)) if int(k) not in (i_piv, j)]
+                third_polys = [polys[k] for k in third_nbrs]
+                orig_m_ij = _oriented_pair_margin(p, pj, i_piv, j) if preserve_lock_mm > 0.0 else 0.0
+                third_orig_i: Dict[int, float] = {}
+                third_orig_j: Dict[int, float] = {}
+                if preserve_lock_mm > 0.0:
+                    for k in third_nbrs:
+                        if p.boundary.intersection(polys[k].boundary).length > 0.2:
+                            m_ik = _oriented_pair_margin(p, polys[k], i_piv, k)
+                            if m_ik >= preserve_lock_mm:
+                                third_orig_i[k] = m_ik
+                        if pj.boundary.intersection(polys[k].boundary).length > 0.2:
+                            m_jk = _oriented_pair_margin(pj, polys[k], j, k)
+                            if m_jk >= preserve_lock_mm:
+                                third_orig_j[k] = m_jk
+
+                for w_mm in (0.8, 1.2, 1.6, 2.2, 2.8):
+                    try:
+                        if direction == "grow":
+                            grab = p.buffer(w_mm, quad_segs=6).intersection(pj)
+                            res = _split_clean_transfer(p, pj, union_ij, grab)
+                            if res is None:
+                                continue
+                            qi, qj = res
+                        else:
+                            grab = pj.buffer(w_mm, quad_segs=6).intersection(p)
+                            res = _split_clean_transfer(pj, p, union_ij, grab)
+                            if res is None:
+                                continue
+                            qj, qi = res
+                    except shapely.GEOSException:
+                        continue
+                    try:
+                        if any(q.geom_type != "Polygon" or q.interiors or not q.is_valid for q in (qi, qj)):
+                            continue
+                        if any(
+                            snap_polygon(q, snap=SNAP).interiors or not snap_polygon(q, snap=SNAP).is_valid
+                            for q in (qi, qj)
+                        ):
+                            continue
+                        if qi.intersection(qj).area > 0.002 or _safe_union([qi, qj]).symmetric_difference(union_ij).area > 0.01:
+                            continue
+                        if not _pair_topology_clean(p, pj, qi, qj, third_polys):
+                            continue
+                    except (ValueError, shapely.GEOSException):
+                        continue
+                    new_areas = list(areas)
+                    new_areas[i_piv] = float(qi.area)
+                    new_areas[j] = float(qj.area)
+                    new_ratio = max(new_areas) / max(min(new_areas), 1e-6)
+                    if new_ratio >= ratio - 0.05:
+                        continue
+                    if not (_fast_neck_ok(qi, min_neck_mm=min_neck_mm) and _fast_neck_ok(qj, min_neck_mm=min_neck_mm)):
+                        continue
+                    if not (_fab_ok(qi, min_neck_mm=min_neck_mm, all_widths=True) and _fab_ok(qj, min_neck_mm=min_neck_mm, all_widths=True)):
+                        continue
+                    if _safe_tip(qi) > max_tip_mm or _safe_tip(qj) > max_tip_mm:
+                        continue
+                    if preserve_lock_mm > 0.0:
+                        if orig_m_ij >= preserve_lock_mm and _oriented_pair_margin(qi, qj, i_piv, j) < preserve_lock_mm:
+                            continue
+                        dz = qi.symmetric_difference(p).buffer(0.05)
+                        if any(
+                            polys[k].intersects(dz) and _oriented_pair_margin(qi, polys[k], i_piv, k) < preserve_lock_mm
+                            for k in third_orig_i
+                        ) or any(
+                            polys[k].intersects(dz) and _oriented_pair_margin(qj, polys[k], j, k) < preserve_lock_mm
+                            for k in third_orig_j
+                        ):
+                            continue
+                    iou_loss = (_iou(p, placed_targets[i_piv]) + _iou(pj, placed_targets[j])) - (
+                        _iou(qi, placed_targets[i_piv]) + _iou(qj, placed_targets[j])
+                    )
+                    sc = max(0.0, new_ratio - max_ratio) * 10.0 + 2.0 * max(0.0, iou_loss) + 0.005 * abs(qi.area - p.area)
+                    if best_move is None or sc < best_move[0]:
+                        best_move = (sc, j, qi, qj, w_mm, new_ratio)
+
+            if best_move is not None:
+                _, j_win, qi_win, qj_win, w_win, new_ratio = best_move
+                trial = list(polys)
+                trial[i_piv] = qi_win
+                trial[j_win] = qj_win
+                for auto_n in (False, True):
+                    try:
+                        cand = _rebuild_partition(trial, metas, auto_node=auto_n)
+                        if (len(cand.vertices) - len(cand.edges) + len(cand.faces)) != 1:
+                            continue
+                        if any(not f.polygon.is_valid or f.polygon.interiors for f in cand.faces):
+                            continue
+                        if any(not ex.to_linestring().is_simple for ex in cand.edges):
+                            continue
+                        if preserve_lock_mm > 0.0:
+                            lc = lock_check_sparse([ex.to_dict() for ex in cand.edges], n)
+                            if lc["lock_margin_mm"] < preserve_lock_mm or lc["unlocked_directions_at_3mm"] > 0:
+                                continue
+                        cur = cand
+                        history.append(
+                            dict(
+                                piece=i_piv + 1,
+                                neighbor=j_win + 1,
+                                mode=f"area-{direction}",
+                                width=w_win,
+                                ratio_before=round(ratio, 3),
+                                ratio_after=round(new_ratio, 3),
+                            )
+                        )
+                        committed = True
+                        break
+                    except (ValueError, shapely.GEOSException):
+                        continue
+                if committed:
+                    break
+        if not committed:
+            break
+
+    if log:
+        final_areas = [float(f.polygon.area) for f in cur.faces]
+        final_ratio = max(final_areas) / max(min(final_areas), 1e-6)
+        log(f"Area-ratio rebalance: {len(history)} edits, ratio={final_ratio:.3f} (target <= {max_ratio})")
+    return cur, history
+
+
+# ---------------------------------------------------------------------------
 # Phase C: Micro-segment cleanup (min_segment_mm >= 0.05 mm)
 # ---------------------------------------------------------------------------
+
+def _collapse_short_edges(
+    part: PlanarPartition,
+    min_seg_mm: float = 0.05,
+    preserve_lock_mm: float = 0.0,
+    max_collapses: int = 16,
+) -> PlanarPartition:
+    """Collapse entire interior edges shorter than ``min_seg_mm`` (near-4-way vertices) to their midpoint."""
+    cur = part
+    n = len(cur.faces)
+    for _ in range(max_collapses):
+        d = cur.to_dict()
+        edges = d["edges"]
+        short_edges = []
+        for e in edges:
+            if e["is_exterior"]:
+                continue
+            cs = e["coords"]
+            tot = sum(math.hypot(cs[k + 1][0] - cs[k][0], cs[k + 1][1] - cs[k][1]) for k in range(len(cs) - 1))
+            if tot < min_seg_mm:
+                short_edges.append((tot, e))
+        if not short_edges:
+            break
+        short_edges.sort(key=lambda item: item[0])
+        collapsed_any = False
+        cur_ms = min_segment_length_mm(edges)
+        for _, e_short in short_edges:
+            v0 = (float(e_short["coords"][0][0]), float(e_short["coords"][0][1]))
+            v1 = (float(e_short["coords"][-1][0]), float(e_short["coords"][-1][1]))
+            vm = (round(0.5 * (v0[0] + v1[0]), 4), round(0.5 * (v0[1] + v1[1]), 4))
+            affected: set[int] = set()
+            for e in edges:
+                p_start = (float(e["coords"][0][0]), float(e["coords"][0][1]))
+                p_end = (float(e["coords"][-1][0]), float(e["coords"][-1][1]))
+                if (
+                    math.hypot(p_start[0] - v0[0], p_start[1] - v0[1]) < 1e-3
+                    or math.hypot(p_start[0] - v1[0], p_start[1] - v1[1]) < 1e-3
+                    or math.hypot(p_end[0] - v0[0], p_end[1] - v0[1]) < 1e-3
+                    or math.hypot(p_end[0] - v1[0], p_end[1] - v1[1]) < 1e-3
+                ):
+                    if int(e["left_face"]) >= 0:
+                        affected.add(int(e["left_face"]))
+                    if int(e["right_face"]) >= 0:
+                        affected.add(int(e["right_face"]))
+            if not affected:
+                continue
+            trial_polys = [f.polygon for f in cur.faces]
+            metas = [f.metadata.copy() for f in cur.faces]
+            ok_faces = True
+            for fid in affected:
+                ring = list(trial_polys[fid].exterior.coords)[:-1]
+                new_ring: List[Tuple[float, float]] = []
+                for x, y in ring:
+                    if math.hypot(x - v0[0], y - v0[1]) < 1e-3 or math.hypot(x - v1[0], y - v1[1]) < 1e-3:
+                        pt = vm
+                    else:
+                        pt = (float(x), float(y))
+                    if not new_ring or math.hypot(pt[0] - new_ring[-1][0], pt[1] - new_ring[-1][1]) > 1e-5:
+                        new_ring.append(pt)
+                if len(new_ring) >= 2 and math.hypot(new_ring[0][0] - new_ring[-1][0], new_ring[0][1] - new_ring[-1][1]) <= 1e-5:
+                    new_ring.pop()
+                if len(new_ring) < 3:
+                    ok_faces = False
+                    break
+                cand_p = Polygon(new_ring)
+                if not cand_p.is_valid or cand_p.interiors or cand_p.geom_type != "Polygon":
+                    ok_faces = False
+                    break
+                trial_polys[fid] = cand_p
+            if not ok_faces:
+                continue
+            try:
+                cand = _rebuild_partition(trial_polys, metas, auto_node=False)
+                if (len(cand.vertices) - len(cand.edges) + len(cand.faces)) != 1:
+                    continue
+                if any(not f.polygon.is_valid or f.polygon.interiors for f in cand.faces):
+                    continue
+                if any(not ex.to_linestring().is_simple for ex in cand.edges):
+                    continue
+                if preserve_lock_mm > 0.0:
+                    lc = lock_check_sparse([ex.to_dict() for ex in cand.edges], n)
+                    if lc["lock_margin_mm"] < preserve_lock_mm or lc["unlocked_directions_at_3mm"] > 0:
+                        continue
+                ms2 = min_segment_length_mm([ex.to_dict() for ex in cand.edges])
+                if ms2 > cur_ms + 1e-5:
+                    cur = cand
+                    collapsed_any = True
+                    break
+            except (ValueError, shapely.GEOSException):
+                continue
+        if not collapsed_any:
+            break
+    return cur
+
 
 def clean_micro_segments(
     part: PlanarPartition,
     min_seg_mm: float = 0.05,
+    preserve_lock_mm: float = 0.0,
     log: Optional[Callable[[str], None]] = None,
 ) -> PlanarPartition:
     """Eliminate all polyline segments shorter than ``min_seg_mm`` while preserving exact planar topology."""
@@ -1509,6 +1899,9 @@ def clean_micro_segments(
     polys = [face_from_edges(f, edges) for f in faces]
     cur = _rebuild_partition(polys, meta_list, auto_node=False)
     ms = min_segment_length_mm([e.to_dict() for e in cur.edges])
+    if ms < min_seg_mm:
+        cur = _collapse_short_edges(cur, min_seg_mm=min_seg_mm, preserve_lock_mm=preserve_lock_mm)
+        ms = min_segment_length_mm([e.to_dict() for e in cur.edges])
     if ms >= min_seg_mm:
         if log:
             log(f"Micro-segment cleanup: min_segment_mm={ms:.4f}mm (>= {min_seg_mm}mm)")

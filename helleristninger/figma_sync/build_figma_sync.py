@@ -191,6 +191,11 @@ function track(node) {
   return node;
 }
 
+function resolveColor(col, fallback) {
+  if (!col) return fallback;
+  return typeof col === "string" ? (C[col] || fallback) : col;
+}
+
 function addText(parent, str, opts = {}) {
   const {
     family = "IBM Plex Sans",
@@ -206,7 +211,7 @@ function addText(parent, str, opts = {}) {
   if (name) t.name = name;
   t.fontName = { family, style };
   t.fontSize = size;
-  t.fills = [{ type: "SOLID", color }];
+  t.fills = [{ type: "SOLID", color: resolveColor(color, C.ink) }];
   if (lh) t.lineHeight = lh;
   if (ls) t.letterSpacing = ls;
   parent.appendChild(t);
@@ -243,9 +248,9 @@ function makeCard(parent, name, opts = {}) {
   }));
   f.primaryAxisAlignItems = "MIN";
   f.counterAxisAlignItems = "MIN";
-  f.fills = [{ type: "SOLID", color: bg }];
+  f.fills = [{ type: "SOLID", color: resolveColor(bg, C.cardBg) }];
   if (border) {
-    f.strokes = [{ type: "SOLID", color: border }];
+    f.strokes = [{ type: "SOLID", color: resolveColor(border, C.border) }];
     f.strokeWeight = 1;
     f.strokeAlign = "INSIDE";
   }
@@ -263,6 +268,8 @@ function makeCard(parent, name, opts = {}) {
 }
 
 function makeBadge(parent, label, fgColor, bgColor) {
+  const fg = resolveColor(fgColor, C.ink);
+  const bg = resolveColor(bgColor, C.subtleBg);
   const b = track(figma.createAutoLayout("HORIZONTAL", {
     name: "Badge/" + label,
     paddingTop: 4,
@@ -273,7 +280,7 @@ function makeBadge(parent, label, fgColor, bgColor) {
   }));
   b.primaryAxisAlignItems = "CENTER";
   b.counterAxisAlignItems = "CENTER";
-  b.fills = [{ type: "SOLID", color: bgColor }];
+  b.fills = [{ type: "SOLID", color: bg }];
   b.cornerRadius = 999;
   parent.appendChild(b);
   b.layoutSizingHorizontal = "HUG";
@@ -282,7 +289,7 @@ function makeBadge(parent, label, fgColor, bgColor) {
     family: "IBM Plex Mono",
     style: "Medium",
     size: 11,
-    color: fgColor,
+    color: fg,
     lh: { value: 14, unit: "PIXELS" }
   });
   return b;
@@ -498,9 +505,9 @@ function addKeyValCard(parent, title, rows, colWidth, badge = null) {
 
 def build_overview_js(data: dict) -> str:
     payload = json.dumps(data, ensure_ascii=True)
-    body = f"""
-const DATA = {payload};
-const {{ section, root }} = createEditorialSection("Scientific Record — v2026.W48 Overview", 2650, -546, 1400);
+    body = r"""
+const DATA = __PAYLOAD__;
+const { section, root } = createEditorialSection("Scientific Record — v2026.W48 Overview", 2650, -546, 1400);
 
 addSectionHeader(
   root,
@@ -515,7 +522,7 @@ addSectionHeader(
 
 addKpiStrip(root, DATA.kpis);
 
-const midRow = track(figma.createAutoLayout("HORIZONTAL", {{ name: "MiddleGrid", itemSpacing: 20 }}));
+const midRow = track(figma.createAutoLayout("HORIZONTAL", { name: "MiddleGrid", itemSpacing: 20 }));
 midRow.fills = [];
 root.appendChild(midRow);
 midRow.layoutSizingHorizontal = "FILL";
@@ -524,8 +531,8 @@ midRow.layoutSizingVertical = "HUG";
 addKeyValCard(midRow, "Core Regions & Neighbouring Finds", DATA.region_rows, 642, ["CORPUS BREAKDOWN", "fjord", "fjordTint"]);
 addKeyValCard(midRow, "Dual-Trace QA & Licence Breakdown", DATA.qa_license_rows, 642, ["METHOD A vs B", "pine", "pineTint"]);
 
-const sciCard = makeCard(root, "Card/ScientificFindings", {{ pad: 24, gap: 16, width: 1304 }});
-const sciTop = track(figma.createAutoLayout("HORIZONTAL", {{ name: "SciHeader", itemSpacing: 12 }}));
+const sciCard = makeCard(root, "Card/ScientificFindings", { pad: 24, gap: 16, width: 1304 });
+const sciTop = track(figma.createAutoLayout("HORIZONTAL", { name: "SciHeader", itemSpacing: 12 }));
 sciTop.primaryAxisAlignItems = "SPACE_BETWEEN";
 sciTop.counterAxisAlignItems = "CENTER";
 sciTop.fills = [];
@@ -533,16 +540,16 @@ sciCard.appendChild(sciTop);
 sciTop.layoutSizingHorizontal = "FILL";
 sciTop.layoutSizingVertical = "HUG";
 
-addText(sciTop, "Quantitative Scientific Findings (v2026.W48)", {{
+addText(sciTop, "Quantitative Scientific Findings (v2026.W48)", {
   family: "Newsreader",
   style: "SemiBold",
   size: 22,
   color: C.ink,
-  lh: {{ value: 28, unit: "PIXELS" }}
-}});
+  lh: { value: 28, unit: "PIXELS" }
+});
 makeBadge(sciTop, DATA.findings_badge, "fjord", "fjordTint");
 
-const sciCols = track(figma.createAutoLayout("HORIZONTAL", {{ name: "SciCols", itemSpacing: 20 }}));
+const sciCols = track(figma.createAutoLayout("HORIZONTAL", { name: "SciCols", itemSpacing: 20 }));
 sciCols.fills = [];
 sciCard.appendChild(sciCols);
 sciCols.layoutSizingHorizontal = "FILL";
@@ -552,24 +559,24 @@ addKeyValCard(sciCols, "Morphometric: Veideristninger vs Jordbruksristninger", D
 addKeyValCard(sciCols, "Regional Diversity, Coverage & Limitations", DATA.regional_sci_rows, 618);
 
 section.resize(1400, Math.ceil(root.height));
-return {{
+return {
   success: true,
   sectionId: section.id,
   sectionName: section.name,
-  bounds: {{ x: section.x, y: section.y, width: section.width, height: section.height }},
+  bounds: { x: section.x, y: section.y, width: section.width, height: section.height },
   createdCount: createdNodeIds.length
-}};
-"""
+};
+""".replace("__PAYLOAD__", payload)
     return JS_PREAMBLE + body
 
 
 def build_specimens_shell_js(wave_label: str) -> str:
-    body = f"""
-const {{ section, root }} = createEditorialSection("True-Scale Multi-Layer Specimens (mm)", 4210, -546, 1400);
+    body = r"""
+const { section, root } = createEditorialSection("True-Scale Multi-Layer Specimens (mm)", 4210, -546, 1400);
 
 addSectionHeader(
   root,
-  "MULTI-LAYER VECTOR SPECIMENS · {wave_label}",
+  "MULTI-LAYER VECTOR SPECIMENS · __WAVE__",
   "True-Scale Multi-Layer Specimens (mm)",
   "Curated archival specimens imported directly from helleristninger/scientific_record/svg/ with preserved named layers (#figures, #cup_marks, #cracks, #uncertain dashed, #scale_bar) and complete archaeological provenance.",
   [
@@ -578,27 +585,27 @@ addSectionHeader(
   ]
 );
 
-const legendCard = makeCard(root, "LayerLegend", {{ dir: "HORIZONTAL", pad: 16, gap: 14, bg: C.cardBg, width: 1304 }});
+const legendCard = makeCard(root, "LayerLegend", { dir: "HORIZONTAL", pad: 16, gap: 14, bg: C.cardBg, width: 1304 });
 legendCard.primaryAxisAlignItems = "SPACE_BETWEEN";
 legendCard.counterAxisAlignItems = "CENTER";
-addText(legendCard, "SVG LAYER ARCHITECTURE:", {{
+addText(legendCard, "SVG LAYER ARCHITECTURE:", {
   family: "IBM Plex Mono",
   style: "SemiBold",
   size: 11,
   color: C.inkMuted,
-  lh: {{ value: 16, unit: "PIXELS" }}
-}});
+  lh: { value: 16, unit: "PIXELS" }
+});
 makeBadge(legendCard, "#figures · solid closed path", "ink", "subtleBg");
-makeBadge(legendCard, "#cup_marks · circular skålgroper", "ochre", "ochreTint");
+makeBadge(legendCard, "#cup_marks · circular skalgroper", "ochre", "ochreTint");
 makeBadge(legendCard, "#cracks · geological fissures", "crackRed", "ochreTint");
 makeBadge(legendCard, "#uncertain · dashed 2 2", "inkSec", "viewportBg");
 makeBadge(legendCard, "#scale_bar · when calibrated", "pine", "pineTint");
 
-const grid = track(figma.createAutoLayout("HORIZONTAL", {{
+const grid = track(figma.createAutoLayout("HORIZONTAL", {
   name: "SpecimenGrid",
   itemSpacing: 24,
   counterAxisSpacing: 24
-}}));
+}));
 grid.layoutWrap = "WRAP";
 grid.primaryAxisAlignItems = "MIN";
 grid.counterAxisAlignItems = "MIN";
@@ -609,21 +616,21 @@ grid.layoutSizingHorizontal = "FIXED";
 grid.layoutSizingVertical = "HUG";
 
 section.resize(1400, Math.ceil(root.height));
-return {{
+return {
   success: true,
   sectionId: section.id,
   rootId: root.id,
   gridId: grid.id,
-  bounds: {{ x: section.x, y: section.y, width: section.width, height: section.height }}
-}};
-"""
+  bounds: { x: section.x, y: section.y, width: section.width, height: section.height }
+};
+""".replace("__WAVE__", wave_label)
     return JS_PREAMBLE + body
 
 
 def build_specimens_batch_js(batch_specs: list[dict]) -> str:
     payload = json.dumps(batch_specs, ensure_ascii=True)
-    body = f"""
-const SPECS = {payload};
+    body = r"""
+const SPECS = __PAYLOAD__;
 const SECTION_NAME = "True-Scale Multi-Layer Specimens (mm)";
 const section = page.children.find(n => n.type === "SECTION" && n.name === SECTION_NAME && !PROTECTED_IDS.has(n.id));
 if (!section) throw new Error("Section not found: " + SECTION_NAME);
@@ -633,39 +640,39 @@ if (!root || !grid) throw new Error("SpecimenGrid or ContentRoot not found");
 
 const importedSummary = [];
 
-for (const s of SPECS) {{
-  const card = makeCard(grid, "Specimen/" + s.figure_id, {{ pad: 20, gap: 14, width: 640 }});
+for (const s of SPECS) {
+  const card = makeCard(grid, "Specimen/" + s.figure_id, { pad: 20, gap: 14, width: 640 });
 
-  const badgeRow = track(figma.createAutoLayout("HORIZONTAL", {{ name: "Badges", itemSpacing: 8 }}));
+  const badgeRow = track(figma.createAutoLayout("HORIZONTAL", { name: "Badges", itemSpacing: 8 }));
   badgeRow.fills = [];
   card.appendChild(badgeRow);
   badgeRow.layoutSizingHorizontal = "HUG";
   badgeRow.layoutSizingVertical = "HUG";
   makeBadge(badgeRow, s.region_label, "fjord", "fjordTint");
   makeBadge(badgeRow, s.period, "inkSec", "subtleBg");
-  if (s.iou !== null) {{
+  if (s.iou !== null) {
     const fg = s.iou >= 0.65 ? "pine" : "amber";
     const bg = s.iou >= 0.65 ? "pineTint" : "amberTint";
     makeBadge(badgeRow, "IoU " + s.iou.toFixed(3), fg, bg);
-  }}
+  }
   makeBadge(badgeRow, s.scale_calibrated ? "CALIBRATED mm" : "PIXEL SPACE", s.scale_calibrated ? "pine" : "amber", s.scale_calibrated ? "pineTint" : "amberTint");
 
-  addText(card, s.figure_id, {{
+  addText(card, s.figure_id, {
     family: "IBM Plex Mono",
     style: "SemiBold",
     size: 13,
     color: C.ochre,
-    lh: {{ value: 18, unit: "PIXELS" }},
+    lh: { value: 18, unit: "PIXELS" },
     width: 600
-  }});
-  addText(card, s.site, {{
+  });
+  addText(card, s.site, {
     family: "Newsreader",
     style: "SemiBold",
     size: 20,
     color: C.ink,
-    lh: {{ value: 26, unit: "PIXELS" }},
+    lh: { value: 26, unit: "PIXELS" },
     width: 600
-  }});
+  });
 
   const viewport = track(figma.createFrame());
   viewport.name = "SVG_Viewport/" + s.figure_id;
@@ -691,34 +698,34 @@ for (const s of SPECS) {{
 
   // Ensure uncertain dashed vectors stay visually dashed in Figma
   const uncGroup = svgNode.findOne(n => n.name === "uncertain");
-  if (uncGroup && "findAllWithCriteria" in uncGroup) {{
-    for (const v of uncGroup.findAllWithCriteria({{ types: ["VECTOR"] }})) {{
-      if (!v.dashPattern || v.dashPattern.length === 0) {{
+  if (uncGroup && "findAllWithCriteria" in uncGroup) {
+    for (const v of uncGroup.findAllWithCriteria({ types: ["VECTOR"] })) {
+      if (!v.dashPattern || v.dashPattern.length === 0) {
         v.dashPattern = [3, 3];
-      }}
-    }}
-  }}
+      }
+    }
+  }
 
   const metaRows = [
-    {{ k: "Askeladden / FMIS ID", v: s.site_panel_id }},
-    {{ k: "EPSG:4326 Coords", v: s.coordinates_str }},
-    {{ k: "Motif (Taxonomy)", v: s.motif_str }},
-    {{ k: "Size / Calibration", v: s.size_str }},
-    {{ k: "Licence / Holder", v: s.licence + " · " + s.rights_holder.slice(0, 28) }},
-    {{ k: "Confidence & Layers", v: "conf=" + s.confidence + " · " + s.layer_summary }},
-    {{ k: "Dual-Trace QA", v: s.iou !== null ? ("IoU=" + s.iou.toFixed(4) + " · Hausdorff=" + s.hausdorff_px + " px") : "Single-trace verified" }}
+    { k: "Askeladden / FMIS ID", v: s.site_panel_id },
+    { k: "EPSG:4326 Coords", v: s.coordinates_str },
+    { k: "Motif (Taxonomy)", v: s.motif_str },
+    { k: "Size / Calibration", v: s.size_str },
+    { k: "Licence / Holder", v: s.licence + " · " + s.rights_holder.slice(0, 28) },
+    { k: "Confidence & Layers", v: "conf=" + s.confidence + " · " + s.layer_summary },
+    { k: "Dual-Trace QA", v: s.iou !== null ? ("IoU=" + s.iou.toFixed(4) + " · Hausdorff=" + s.hausdorff_px + " px") : "Single-trace verified" }
   ];
 
-  for (let i = 0; i < metaRows.length; i++) {{
+  for (let i = 0; i < metaRows.length; i++) {
     const mr = metaRows[i];
-    const rFrame = track(figma.createAutoLayout("HORIZONTAL", {{
+    const rFrame = track(figma.createAutoLayout("HORIZONTAL", {
       name: "Meta/" + mr.k,
       paddingTop: 5,
       paddingBottom: 5,
       paddingLeft: 8,
       paddingRight: 8,
       itemSpacing: 10
-    }}));
+    }));
     rFrame.primaryAxisAlignItems = "SPACE_BETWEEN";
     rFrame.counterAxisAlignItems = "CENTER";
     rFrame.fills = [{ type: "SOLID", color: i % 2 === 0 ? C.viewportBg : C.cardBg }];
@@ -727,44 +734,45 @@ for (const s of SPECS) {{
     rFrame.layoutSizingHorizontal = "FILL";
     rFrame.layoutSizingVertical = "HUG";
 
-    addText(rFrame, mr.k, {{
+    addText(rFrame, mr.k, {
       family: "IBM Plex Sans",
       style: "Medium",
       size: 11,
       color: C.inkMuted,
-      lh: {{ value: 15, unit: "PIXELS" }},
-      width: 170
-    }});
-    addText(rFrame, mr.v, {{
+      lh: { value: 15, unit: "PIXELS" },
+      width: 165
+    });
+    const mv = addText(rFrame, mr.v, {
       family: "IBM Plex Mono",
       style: "Regular",
       size: 11,
       color: C.ink,
-      lh: {{ value: 15, unit: "PIXELS" }},
-      width: 400
-    }});
-  }}
+      lh: { value: 15, unit: "PIXELS" },
+      width: 395
+    });
+    mv.textAlignHorizontal = "RIGHT";
+  }
 
   const layerNames = "children" in svgNode ? svgNode.children.map(c => c.name) : [];
-  importedSummary.push({{ figure_id: s.figure_id, svgNodeId: svgNode.id, layers: layerNames }});
-}}
+  importedSummary.push({ figure_id: s.figure_id, svgNodeId: svgNode.id, layers: layerNames });
+}
 
 section.resize(1400, Math.ceil(root.height));
-return {{
+return {
   success: true,
   imported: importedSummary,
-  sectionBounds: {{ x: section.x, y: section.y, width: section.width, height: section.height }},
+  sectionBounds: { x: section.x, y: section.y, width: section.width, height: section.height },
   createdCount: createdNodeIds.length
-}};
-"""
+};
+""".replace("__PAYLOAD__", payload)
     return JS_PREAMBLE + body
 
 
 def build_puzzle750_js(data: dict) -> str:
     payload = json.dumps(data, ensure_ascii=True)
-    body = f"""
-const DATA = {payload};
-const {{ section, root }} = createEditorialSection("Helleristning 750 — Production & Consolidation", 5770, -546, 1400);
+    body = r"""
+const DATA = __PAYLOAD__;
+const { section, root } = createEditorialSection("Helleristning 750 — Production & Consolidation", 5770, -546, 1400);
 
 addSectionHeader(
   root,
@@ -779,7 +787,7 @@ addSectionHeader(
 
 addKpiStrip(root, DATA.kpis);
 
-const midRow = track(figma.createAutoLayout("HORIZONTAL", {{ name: "ProdGrid", itemSpacing: 20 }}));
+const midRow = track(figma.createAutoLayout("HORIZONTAL", { name: "ProdGrid", itemSpacing: 20 }));
 midRow.fills = [];
 root.appendChild(midRow);
 midRow.layoutSizingHorizontal = "FILL";
@@ -788,8 +796,8 @@ midRow.layoutSizingVertical = "HUG";
 addKeyValCard(midRow, "Hard-Gate Verification & Seam Samples", DATA.gate_rows, 642, ["KERF 0.10-0.25 MM", "pine", "pineTint"]);
 addKeyValCard(midRow, "Commercial Rights Split & Release v2026.W48", DATA.rights_rows, 642, ["750 / 750 COMMERCIAL_OK", "amber", "amberTint"]);
 
-const archCard = makeCard(root, "Card/ConsolidatedStructure", {{ pad: 24, gap: 14, width: 1304 }});
-const archTop = track(figma.createAutoLayout("HORIZONTAL", {{ name: "ArchHeader", itemSpacing: 12 }}));
+const archCard = makeCard(root, "Card/ConsolidatedStructure", { pad: 24, gap: 14, width: 1304 });
+const archTop = track(figma.createAutoLayout("HORIZONTAL", { name: "ArchHeader", itemSpacing: 12 }));
 archTop.primaryAxisAlignItems = "SPACE_BETWEEN";
 archTop.counterAxisAlignItems = "CENTER";
 archTop.fills = [];
@@ -797,16 +805,16 @@ archCard.appendChild(archTop);
 archTop.layoutSizingHorizontal = "FILL";
 archTop.layoutSizingVertical = "HUG";
 
-addText(archTop, "Consolidated helleristninger/ Repository Architecture", {{
+addText(archTop, "Consolidated helleristninger/ Repository Architecture", {
   family: "Newsreader",
   style: "SemiBold",
   size: 22,
   color: C.ink,
-  lh: {{ value: 28, unit: "PIXELS" }}
-}});
+  lh: { value: 28, unit: "PIXELS" }
+});
 makeBadge(archTop, DATA.release_badge, "fjord", "fjordTint");
 
-const dirGrid = track(figma.createAutoLayout("HORIZONTAL", {{ name: "DirGrid", itemSpacing: 14, counterAxisSpacing: 14 }}));
+const dirGrid = track(figma.createAutoLayout("HORIZONTAL", { name: "DirGrid", itemSpacing: 14, counterAxisSpacing: 14 }));
 dirGrid.layoutWrap = "WRAP";
 dirGrid.fills = [];
 archCard.appendChild(dirGrid);
@@ -814,35 +822,35 @@ dirGrid.resize(1256, 100);
 dirGrid.layoutSizingHorizontal = "FIXED";
 dirGrid.layoutSizingVertical = "HUG";
 
-for (const d of DATA.dirs) {{
-  const dc = makeCard(dirGrid, "Dir/" + d.name, {{ pad: 14, gap: 4, bg: C.viewportBg, radius: 8, width: 303 }});
-  addText(dc, d.name, {{
+for (const d of DATA.dirs) {
+  const dc = makeCard(dirGrid, "Dir/" + d.name, { pad: 14, gap: 4, bg: C.viewportBg, radius: 8, width: 303 });
+  addText(dc, d.name, {
     family: "IBM Plex Mono",
     style: "SemiBold",
     size: 12,
     color: C.ochre,
-    lh: {{ value: 16, unit: "PIXELS" }},
+    lh: { value: 16, unit: "PIXELS" },
     width: 275
-  }});
-  addText(dc, d.desc, {{
+  });
+  addText(dc, d.desc, {
     family: "IBM Plex Sans",
     style: "Regular",
     size: 12,
     color: C.inkSec,
-    lh: {{ value: 17, unit: "PIXELS" }},
+    lh: { value: 17, unit: "PIXELS" },
     width: 275
-  }});
-}}
+  });
+}
 
 section.resize(1400, Math.ceil(root.height));
-return {{
+return {
   success: true,
   sectionId: section.id,
   sectionName: section.name,
-  bounds: {{ x: section.x, y: section.y, width: section.width, height: section.height }},
+  bounds: { x: section.x, y: section.y, width: section.width, height: section.height },
   createdCount: createdNodeIds.length
-}};
-"""
+};
+""".replace("__PAYLOAD__", payload)
     return JS_PREAMBLE + body
 
 

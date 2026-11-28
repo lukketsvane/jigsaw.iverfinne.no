@@ -98,8 +98,12 @@ def test_catalog_curation_commercial_clean_zero_filler():
     assert rights["helleristning_count"] == 30
     assert rights["anonymous_filler_count"] == 0
     assert rights["alta_nc_sa_count"] == 0
+    assert rights["synthetic_vae_count"] == 0
+    assert rights["missing_metadata_count"] == 0
     assert rights["commercial_ok_count"] == 40
     assert rights["share_alike_count"] == 0
+    assert rights["legal_review_status"] == "evidence_recorded_pending_legal_review"
+    assert rights["cleared_for_sale"] is False
     assert all(m.kind in ("trilobite", "helleristning") for m in motifs)
     assert all(m.polygon_local.is_valid and m.polygon_local.area > 400.0 for m in motifs)
 
@@ -187,23 +191,60 @@ def test_final_750_piece_production_bundle_passes_all_hard_gates():
     rights = json.loads((PROD_DIR / "rights_summary.json").read_text(encoding="utf-8"))
     part = json.loads((PROD_DIR / "partition.json").read_text(encoding="utf-8"))
 
-    # 1. Exact 750 pieces, zero anonymous filler, zero Alta NC-SA
+    # 1. Exact 750 pieces, zero anonymous filler, zero Alta NC-SA, zero synthetic VAE, honest legal status
     assert part["num_pieces"] == 750
     assert audit["n"] == 750
     assert audit["trilobite_count"] >= 100
     assert audit["helleristning_count"] == 750 - audit["trilobite_count"]
     assert audit["anonymous_filler_count"] == 0
     assert audit["alta_nc_sa_count"] == 0
+    assert audit["synthetic_vae_count"] == 0
+    assert audit["cleared_for_sale"] is False
+    assert audit["legal_review_status"] == "evidence_recorded_pending_legal_review"
     assert rights["total_pieces"] == 750
     assert rights["commercial_ok_count"] == 750
     assert rights["alta_nc_sa_count"] == 0
+    assert rights["synthetic_vae_count"] == 0
+    assert rights["missing_metadata_count"] == 0
+    assert rights["cleared_for_sale"] is False
+    assert rights["legal_review_status"] == "evidence_recorded_pending_legal_review"
     assert len(rights["pieces"]) == 750
+    for face in part["faces"]:
+        meta = face["metadata"]
+        assert meta["kind"] in ("trilobite", "helleristning")
+        assert meta["commercial_ok"] is True
+        assert meta["is_synthetic_vae"] is False
+        assert meta["cleared_for_sale"] is False
+        assert meta["legal_review_status"] == "evidence_recorded_pending_legal_review"
+        assert str(meta.get("asset_id") or "").strip()
+        assert str(meta.get("creator") or "").strip()
+        assert str(meta.get("license") or "").strip()
+        assert str(meta.get("source_url") or "").strip()
 
-    # 2. All production hard gates green
+    # 2. All production hard gates green (exact zero gap & zero overlap)
     assert audit["all_production_gates_passed"] is True, f"Failed gates: {audit['gates']}"
-    assert audit["coverage_sym_diff_mm2"] <= 1e-2
-    assert audit["max_pairwise_overlap_mm2"] <= 1e-3
+    assert audit["coverage_sym_diff_mm2"] == 0.0
+    assert audit["max_pairwise_overlap_mm2"] == 0.0
     assert audit["min_segment_mm"] >= 0.05
+
+    # 2b. Required deliverables present on disk
+    for fname in (
+        "cut.svg",
+        "engrave.svg",
+        "production.svg",
+        "partition.json",
+        "quality.json",
+        "production-audit.json",
+        "rights_summary.json",
+        "assembly.png",
+        "crop_trilobite_dendrite_center.png",
+        "crop_trilobite_dendrite_border.png",
+        "contact_sheet_trilobites.png",
+        "contact_sheet_helleristninger.png",
+        "contact_sheet_weakest.png",
+    ):
+        fpath = PROD_DIR / fname
+        assert fpath.exists() and fpath.stat().st_size > 0, f"Missing or empty deliverable: {fname}"
 
     # 3. Kerf (0.10-0.25 mm), neck (>= 3.0 mm), thin tips (0 > 6 mm), 360-deg lock (>= 3.0 mm)
     for k in ("kerf_0.10", "kerf_0.15", "kerf_0.20", "kerf_0.25"):
@@ -211,6 +252,8 @@ def test_final_750_piece_production_bundle_passes_all_hard_gates():
         assert audit["kerf_sweep"][k]["neck_pass"] == 750
     assert audit["thin_feature"]["pieces_tip_loss_over_6mm"] == 0
     assert audit["lock_360"]["lock_margin_mm"] >= 3.0
+    assert audit["lock_360"]["unlocked_directions_at_1mm"] == 0
+    assert audit["lock_360"]["unlocked_directions_at_2mm"] == 0
     assert audit["lock_360"]["unlocked_directions_at_3mm"] == 0
     assert audit["finite_motion_translation"]["all_proper_groups_blocked_within_3mm"] is True
 

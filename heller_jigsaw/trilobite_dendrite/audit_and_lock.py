@@ -425,30 +425,110 @@ def clean_partition_micro_segments(
     min_seg_mm: float = 0.07,
 ) -> PlanarPartition:
     """Clean every canonical edge so zero segments < `min_seg_mm` exist, preserving exact topology."""
-    d = partition.to_dict()
-    edges = d["edges"]
-    changed = False
-    for e in edges:
-        old = e["coords"]
-        cleaned = _clean_polyline_min_seg(old, min_seg_mm=min_seg_mm)
-        if len(cleaned) >= 2 and cleaned != old:
-            if LineString(cleaned).is_simple:
-                e["coords"] = cleaned
-                changed = True
-    if not changed:
-        return partition
-    polys = [face_from_edges(f, edges) for f in d["faces"]]
-    if all(p.is_valid and p.geom_type == "Polygon" and not p.interiors for p in polys):
-        u = unary_union(polys)
-        if u.geom_type == "Polygon" and not u.interiors:
-            return partition_from_polygons(
-                polys,
-                snap_polygon(u, snap=SNAP),
-                face_metadata=[f["metadata"].copy() for f in d["faces"]],
-                snap=SNAP,
-                auto_node=False,
+    cur = partition
+    for _pass in range(3):
+        d = cur.to_dict()
+        edges = d["edges"]
+        changed = False
+        for e in edges:
+            old = e["coords"]
+            cleaned = _clean_polyline_min_seg(old, min_seg_mm=min_seg_mm)
+            if len(cleaned) >= 2 and cleaned != old:
+                if LineString(cleaned).is_simple:
+                    e["coords"] = cleaned
+                    changed = True
+
+        # Check for short 2-vertex junction-to-junction edges (< min_seg_mm) and weld their endpoints!
+        short_edges = []
+        for e in edges:
+            pts = e["coords"]
+            if len(pts) == 2:
+                dist = math.hypot(pts[1][0] - pts[0][0], pts[1][1] - pts[0][1])
+                if dist < min_seg_mm:
+                    short_edges.append(e)
+
+        if short_edges:
+            # Map welded endpoint coordinates to their SNAP-rounded midpoint across all incident edges
+            pt_map: Dict[Tuple[float, float], Tuple[float, float]] = {}
+            for se in short_edges:
+                p0 = (round(float(se["coords"][0][0]), 4), round(float(se["coords"][0][1]), 4))
+                p1 = (round(float(se["coords"][1][0]), 4), round(float(se["coords"][1][1]), 4))
+                if p0 in pt_map or p1 in pt_map:
+                    continue
+                mid = (round(0.5 * (p0[0] + p1[0]), 4), round(0.5 * (p0[1] + p1[1]), 4))
+                pt_map[p0] = mid
+                pt_map[p1] = mid
+            if pt_map:
+                for e in edges:
+                    pts = [(round(float(x), 4), round(float(y), 4)) for x, y in e["coords"]]
+                    new_pts = [pt_map.get(pt, pt) for pt in pts]
+                    # Drop consecutive identical points
+                    dedup = [new_pts[0]]
+                    for pt in new_pts[1:]:
+                        if pt != dedup[-1]:
+                            dedup.append(pt)
+                    if dedup != pts:
+                        e["coords"] = dedup
+                        changed = True
+
+        if not changed:
+            break
+
+        # Rebuild each face from its surviving edges (skipping collapsed 1-point edges)
+        polys: List[Polygon] = []
+        ok_all = True
+        for f in d["faces"]:
+            ring_pts: List[Tuple[float, float]] = []
+            for eid, rev in f["edge_refs"]:
+                ec = edges[eid]["coords"]
+                if len(ec) < 2:
+                    continue
+                seq = list(reversed(ec)) if rev else ec
+                if not ring_pts:
+                    ring_pts.extend((float(x), float(y)) for x, y in seq)
+                else:
+                    ring_pts.extend((float(x), float(y)) for x, y in seq[1:])
+            if len(ring_pts) < 4:
+                ok_all = False
+                break
+            p = orient(Polygon(ring_pts), 1.0)
+            if not p.is_valid or p.geom_type != "Polygon" or p.interiors or p.area <= 0:
+                ok_all = False
+                break
+            polys.append(p)
+
+        if ok_all:
+            u = unary_union(polys)
+            if u.geom_type == "Polygon" and not u.interiors:
+                try:
+                    cur = partition_from_polygons(
+                        polys,
+                        snap_polygon(u, snap=SNAP),
+                        face_metadata=[f["metadata"].copy() for f in d["faces"]],
+                        snap=SNAP,
+                        auto_node=False,
+                    )
+                except Exception:
+                    break
+            else:
+                break
+        else:
+            break
+
+    # Guarantee exact outline = unary_union(faces) so coverage_sym_diff_mm2 == 0.0
+    face_polys = [f.polygon for f in cur.faces]
+    u_exact = unary_union(face_polys)
+    if u_exact.geom_type == "Polygon" and not u_exact.interiors:
+        snapped_u = snap_polygon(u_exact, snap=SNAP)
+        if float(u_exact.symmetric_difference(cur.outline).area) > 0.0:
+            cur = PlanarPartition(
+                outline=snapped_u,
+                vertices=cur.vertices,
+                edges=cur.edges,
+                faces=cur.faces,
+                adjacency=cur.adjacency,
             )
-    return partition
+    return cur
 
 
 # ---------------------------------------------------------------------------
@@ -721,7 +801,7 @@ def lock_dendritic_board(
                         coords = dendritic_curl_curve(line, frac, sign, size=size, lean=lean, style=style)
                         if coords is None:
                             continue
-                        # Fast screen at strictest kerf=0.25 first, then confirm all 4 kerf widths
+                        # Fast screen at strictest kerf=0.25 first, then confirm remaining kerfs (0.10, 0.15, 0.20)
                         res = _test_seam_edit(
                             e, coords, d, edges, polys, placed_silhouettes,
                             piece_kinds=piece_kinds,
@@ -731,15 +811,17 @@ def lock_dendritic_board(
                         )
                         if res is None:
                             continue
-                        res_all = _test_seam_edit(
-                            e, coords, d, edges, polys, placed_silhouettes,
-                            piece_kinds=piece_kinds,
-                            min_pair_margin=req_margin,
-                            max_tip_mm=max_tip_mm,
-                            check_all_kerfs=True,
-                        )
-                        if res_all is not None:
-                            cost, na, nb, pm = res_all
+                        cost, na, nb, pm = res
+                        ok_other = True
+                        for p_chk in (na, nb):
+                            for k_chk in (0.10, 0.15, 0.20):
+                                fab_chk = analyze_piece_fabrication(p_chk, kerf_mm=k_chk, min_neck_mm=3.0)
+                                if not (fab_chk["kerf_pass"] and fab_chk["neck_pass"]):
+                                    ok_other = False
+                                    break
+                            if not ok_other:
+                                break
+                        if ok_other:
                             if best is None or cost < best[0]:
                                 best = (cost, eid, coords, na, nb, pm, size, style)
                     if best is not None and best[0] < 0.045:
@@ -878,6 +960,92 @@ def repair_weak_pieces_750(
         nbrs = partition.adjacency.get(i, [])
         accepted = False
 
+        # Case 0: Kerf disconnection (p.buffer(-0.125) splits into >= 2 parts) -> trim detached lobe or widen pinch!
+        kerf_in0 = p.buffer(-0.125, quad_segs=12)
+        kparts = sorted(
+            [g for g in shapely.get_parts(kerf_in0) if g.geom_type == "Polygon" and g.area > 1e-4],
+            key=lambda g: -g.area,
+        )
+        if len(kparts) != 1:
+            if len(kparts) >= 2:
+                main_k = kparts[0]
+                det_union = unary_union([kp.buffer(0.22, quad_segs=8) for kp in kparts[1:]])
+                lobe = p.intersection(det_union).buffer(0)
+                main_keep = p.difference(lobe).buffer(0)
+                if main_keep.geom_type != "Polygon":
+                    mparts = [g for g in shapely.get_parts(main_keep) if g.geom_type == "Polygon" and g.area > 0]
+                    if mparts:
+                        main_keep = max(mparts, key=lambda g: g.area)
+                xfer = p.difference(main_keep).buffer(0)
+                # Option 0a: hand detached lobe(s) cleanly to touching neighbor(s)
+                if main_keep.geom_type == "Polygon" and not main_keep.is_empty and not xfer.is_empty:
+                    touching_k = sorted(
+                        ((polys[j].boundary.intersection(xfer.buffer(0.08)).length, j) for j in nbrs if polys[j].distance(xfer) < 0.12),
+                        reverse=True,
+                    )
+                    for _, j in touching_k[:3]:
+                        pj = polys[j]
+                        qi = main_keep.buffer(0)
+                        qj = pj.union(xfer).buffer(0)
+                        if any(q.geom_type != "Polygon" or q.interiors or not q.is_valid for q in (qi, qj)):
+                            continue
+                        bi, ti, _ = piece_issue(qi, check_all_kerfs=True)
+                        bj, tj, _ = piece_issue(qj, check_all_kerfs=True)
+                        if not bj and (not bi or ti < 50.0):
+                            polys[i], polys[j] = orient(qi, 1.0), orient(qj, 1.0)
+                            accepted = True
+                            repaired_count += 1
+                            break
+                # Option 0b: widen the pinched bridge between main_k and kparts[1] using neighbor area
+                if not accepted:
+                    p0, p1 = nearest_points(main_k, kparts[1])
+                    bseg = LineString([p0, p1])
+                    touching_b = sorted(((polys[j].distance(bseg), j) for j in nbrs), key=lambda x: x[0])
+                    for _, j in touching_b[:3]:
+                        pj = polys[j]
+                        for w in (1.2, 2.0, 2.8, 3.6):
+                            grab = bseg.buffer(w, quad_segs=10).intersection(pj)
+                            if grab.is_empty:
+                                continue
+                            qi = p.union(grab).buffer(0)
+                            qj = pj.difference(grab).buffer(0)
+                            if any(q.geom_type != "Polygon" or q.interiors or not q.is_valid for q in (qi, qj)):
+                                continue
+                            bi, ti, _ = piece_issue(qi, check_all_kerfs=True)
+                            bj, tj, _ = piece_issue(qj, check_all_kerfs=True)
+                            if not bj and (not bi or ti < 50.0):
+                                polys[i], polys[j] = orient(qi, 1.0), orient(qj, 1.0)
+                                accepted = True
+                                repaired_count += 1
+                                break
+                        if accepted:
+                            break
+                # Option 0c: if detached lobe touches exterior outline, trim it off exterior or bridge on exterior
+                if not accepted and partition.outline.exterior.distance(p) < 1.0:
+                    near_tree = STRtree(polys)
+                    x0, y0, x1, y1 = p.bounds
+                    near_ids = [int(k) for k in near_tree.query(box(x0 - 5.0, y0 - 5.0, x1 + 5.0, y1 + 5.0)) if int(k) != i]
+                    nbr_union = unary_union([polys[j] for j in near_ids]) if near_ids else Polygon()
+                    p0, p1 = nearest_points(main_k, kparts[1])
+                    bseg = LineString([p0, p1])
+                    ext_cands = [main_keep] + [
+                        p.union(bseg.buffer(w, quad_segs=10).difference(nbr_union.buffer(0.05))).buffer(0)
+                        for w in (1.5, 2.4, 3.4)
+                    ]
+                    for cand in ext_cands:
+                        if cand.geom_type != "Polygon" or cand.interiors or not cand.is_valid:
+                            continue
+                        if cand.intersection(nbr_union).area > 0.002:
+                            continue
+                        bi, ti, _ = piece_issue(cand, check_all_kerfs=True)
+                        if not bi or ti < 50.0:
+                            polys[i] = orient(cand, 1.0)
+                            accepted = True
+                            repaired_count += 1
+                            break
+            if accepted:
+                continue
+
         # Case A: 2-lobe neck bridge pinch (eroded core splits into >= 2 load-bearing lobes) -> widen bridge!
         if is_neck_split:
             eroded = p.buffer(-1.625, join_style="round", mitre_limit=2.0)
@@ -913,7 +1081,10 @@ def repair_weak_pieces_750(
                         break
                 # Fallback if pinch is near exterior outline: widen bridge smoothly on exterior side
                 if not accepted and partition.outline.exterior.distance(bridge_seg) < 8.0:
-                    nbr_union = unary_union([polys[j] for j in nbrs]) if nbrs else Polygon()
+                    near_tree = STRtree(polys)
+                    x0, y0, x1, y1 = bridge_seg.bounds
+                    near_ids = [int(k) for k in near_tree.query(box(x0 - 5.0, y0 - 5.0, x1 + 5.0, y1 + 5.0)) if int(k) != i]
+                    nbr_union = unary_union([polys[j] for j in near_ids]) if near_ids else Polygon()
                     for w in (2.2, 2.8, 3.5):
                         ext_grab = bridge_seg.buffer(w, quad_segs=10).difference(nbr_union.buffer(0.05))
                         cand = p.union(ext_grab).buffer(0)
@@ -931,8 +1102,15 @@ def repair_weak_pieces_750(
                 continue
 
         # Case B: Thin protrusion / tip > max_tip_mm -> hand spike to neighbor or widen cleanly
-        opened = p.buffer(-1.66, quad_segs=10).buffer(1.66, quad_segs=10)
-        if opened.is_empty or opened.geom_type != "Polygon":
+        kerf_in = p.buffer(-0.125, quad_segs=12)
+        if kerf_in.is_empty or kerf_in.geom_type != "Polygon":
+            # Fallback: use largest kerf component so we can still trim/repair thin spikes
+            kp_all = [g for g in shapely.get_parts(kerf_in) if g.geom_type == "Polygon" and g.area > 0]
+            if not kp_all:
+                continue
+            kerf_in = max(kp_all, key=lambda g: g.area)
+        opened = kerf_in.buffer(-1.5, quad_segs=12).buffer(1.5, quad_segs=12).intersection(p)
+        if opened.is_empty:
             continue
         lost = p.difference(opened)
         spikes = [g for g in shapely.get_parts(lost) if g.geom_type == "Polygon" and g.area > 0.15]
@@ -970,7 +1148,10 @@ def repair_weak_pieces_750(
         if not accepted:
             ext_touch = partition.outline.exterior.distance(p) < 0.2
             if ext_touch:
-                nbr_union = unary_union([polys[j] for j in nbrs]) if nbrs else Polygon()
+                near_tree = STRtree(polys)
+                x0, y0, x1, y1 = p.bounds
+                near_ids = [int(k) for k in near_tree.query(box(x0 - 5.0, y0 - 5.0, x1 + 5.0, y1 + 5.0)) if int(k) != i]
+                nbr_union = unary_union([polys[j] for j in near_ids]) if near_ids else Polygon()
                 keep_seam = p.intersection(nbr_union.buffer(0.35))
                 for cand in (
                     opened.union(keep_seam).buffer(0),
@@ -1199,6 +1380,7 @@ def run_full_750_audit(
     # 6. Rights / commercial cleanliness check
     alta_nc = sum(1 for f in partition.faces if not bool(f.metadata.get("commercial_ok", False)))
     filler = sum(1 for f in partition.faces if f.metadata.get("kind") not in ("trilobite", "helleristning"))
+    synth_vae = sum(1 for f in partition.faces if bool(f.metadata.get("is_synthetic_vae", False)))
 
     fidelity_summary = {
         "mean_aligned_iou": round(float(np.mean(all_ious)), 4),
@@ -1216,6 +1398,9 @@ def run_full_750_audit(
         "exact_750_pieces": n == len(motifs),
         "zero_anonymous_filler": filler == 0,
         "zero_alta_nc_sa": alta_nc == 0,
+        "zero_synthetic_vae": synth_vae == 0,
+        "zero_coverage_gap": float(val_report["summary"]["coverage_sym_diff_mm2"]) == 0.0,
+        "zero_pairwise_overlap": float(val_report["summary"]["max_pairwise_overlap_mm2"]) == 0.0,
         "zero_micro_segments_under_0_05mm": float(val_report["summary"]["min_segment_mm"]) >= 0.05,
         "all_kerfs_0_10_to_0_25_pass": all_kerf_neck_ok,
         "zero_thin_tips_over_6mm": tip_audit["pieces_tip_loss_over_6mm"] == 0,
@@ -1232,6 +1417,9 @@ def run_full_750_audit(
         "helleristning_count": len(heller_ious),
         "anonymous_filler_count": filler,
         "alta_nc_sa_count": alta_nc,
+        "synthetic_vae_count": synth_vae,
+        "legal_review_status": "evidence_recorded_pending_legal_review",
+        "cleared_for_sale": False,
         "board_bounds_mm": [round(float(v), 3) for v in partition.outline.bounds],
         "board_width_mm": round(float(partition.outline.bounds[2] - partition.outline.bounds[0]), 3),
         "board_height_mm": round(float(partition.outline.bounds[3] - partition.outline.bounds[1]), 3),

@@ -790,6 +790,9 @@ def generate_trilobite(
             "source_url": "internal://heller_jigsaw/trilobite_dendrite/trilobites.py",
             "commercial_ok": True,
             "share_alike_required": False,
+            "is_synthetic_vae": False,
+            "legal_review_status": "evidence_recorded_pending_legal_review",
+            "cleared_for_sale": False,
             **extra,
         },
     )

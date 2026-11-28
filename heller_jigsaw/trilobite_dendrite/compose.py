@@ -497,13 +497,18 @@ def _windowed_gpu_partition(
                 r0, c0 = int(origins[i, 0]), int(origins[i, 1])
                 sl = (slice(r0, r0 + sh), slice(c0, c0 + sw))
                 f = Fm[j]
+                # Normalize negative inside-motif SDF depth to [-1, 0] so thick motifs cannot bury slender ones
+                p_in = p_b[j]
+                min_in = float(p_in.min())
+                if min_in < -1e-3:
+                    f = torch.where(p_in <= 0.0, p_in / abs(min_in), f)
                 V1, V2, L1 = v1[sl], v2[sl], l1[sl]
                 better = f < V1
                 second = (~better) & (f < V2)
                 v2[sl] = torch.where(better, V1, torch.where(second, f, V2))
                 v1[sl] = torch.where(better, f, V1)
                 l1[sl] = torch.where(better, torch.full_like(L1, i), L1)
-                phi_own_t[sl] = torch.where(better, p_b[j], phi_own_t[sl])
+                phi_own_t[sl] = torch.where(better, p_in, phi_own_t[sl])
             del p_b, Fm
 
     labels = l1.cpu().numpy()
@@ -595,9 +600,9 @@ def compose_750_board(
         init_centers=init_centers,
         init_angles=init_angles,
         target_outline=target_poly,
-        steps=pack_steps,
+        steps=max(pack_steps, 360),
         pack_px=2.0,
-        corridor_margin_mm=1.35,
+        corridor_margin_mm=2.0,
         log=log,
     )
 
@@ -605,6 +610,40 @@ def compose_750_board(
         _transform_polygon_local(motifs[i].polygon_local, c_opt[i, 0], c_opt[i, 1], th_opt[i], sc_opt[i])
         for i in range(n)
     ]
+
+    # 3b. Exact pairwise overlap separation pass so zero slender motifs are ever buried by neighbors
+    from shapely.strtree import STRtree as _STRtree
+    for _sep in range(18):
+        stree = _STRtree(placed_raw)
+        disp = np.zeros((n, 2), dtype=np.float64)
+        ovl_pairs = 0
+        for i in range(n):
+            pi = placed_raw[i]
+            for j in stree.query(pi):
+                ji = int(j)
+                if ji <= i:
+                    continue
+                inter = pi.intersection(placed_raw[ji])
+                if not inter.is_empty and inter.area > 1.0:
+                    ovl_pairs += 1
+                    dv = c_opt[i] - c_opt[ji]
+                    dist = float(np.hypot(dv[0], dv[1]))
+                    if dist < 1e-3:
+                        ang_r = float(rng.uniform(0, 2.0 * math.pi))
+                        uv = np.array([math.cos(ang_r), math.sin(ang_r)])
+                    else:
+                        uv = dv / dist
+                    push = min(4.0, 0.55 * math.sqrt(inter.area) + 0.6)
+                    disp[i] += uv * push
+                    disp[ji] -= uv * push
+        if ovl_pairs == 0:
+            break
+        c_opt += disp * 0.65
+        placed_raw = [
+            _transform_polygon_local(motifs[i].polygon_local, c_opt[i, 0], c_opt[i, 1], th_opt[i], sc_opt[i])
+            for i in range(n)
+        ]
+    log(f"  [sep] post-pack pairwise overlap separation finished (remaining overlapping pairs={ovl_pairs})")
 
     # 4. Build final smooth organic outline
     if use_motif_hugging_outline:

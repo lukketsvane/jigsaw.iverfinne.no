@@ -1,0 +1,32 @@
+{
+  "wave": "wave1",
+  "file_key": "w0sThYnGJQo1cPrYx7GQR8",
+  "page_id": "27:338",
+  "protected_node_ids": [
+    "42:18",
+    "42:17",
+    "72:953"
+  ],
+  "scripts": [
+    {
+      "file": "01_overview.js",
+      "chars": 14661,
+      "bytes_utf8": 14665
+    },
+    {
+      "file": "02a_specimens_shell.js",
+      "chars": 11808,
+      "bytes_utf8": 11814
+    },
+    {
+      "file": "02b_specimens_batch1.js",
+      "chars": 43600,
+      "bytes_utf8": 43603
+    },
+    {
+      "file": "03_puzzle750.js",
+      "chars": 15462,
+      "bytes_utf8": 15466
+    }
+  ]
+}

@@ -35,13 +35,13 @@ def build_puzzle(
     out_dir: Path,
     n_pieces: int = 750,
     n_trilobites: int = 150,
-    board_width_mm: float = 890.0,
+    board_width_mm: float = 910.0,
     board_height_mm: float = 650.0,
-    base_area_mm2: float = 720.0,
+    base_area_mm2: float = 650.0,
     px: float = 0.30,
     seed: int = 2026,
-    pack_steps: int = 280,
-    dendrite_steps: int = 180,
+    pack_steps: int = 300,
+    dendrite_steps: int = 220,
     allow_share_alike: bool = False,
 ) -> dict:
     """Run the full 7-stage GPU build, dendritic evolution, locking, audit, and export pipeline."""
@@ -92,15 +92,25 @@ def build_puzzle(
     # Stage 4: Extract canonical single-pass common-line PlanarPartition
     t_ext = time.perf_counter()
     face_meta = [dict(m.metadata) for m in motifs]
-    partition = extract_partition_from_labels(
-        labels_inside=labels_den,
-        outline=composed.outline,
-        px=px,
-        n_pieces=n_pieces,
-        face_metadata=face_meta,
-        smooth_iters=3,
-        simplify_tol_mm=0.16,
-    )
+    partition = None
+    last_exc = None
+    for sm_it, simp_tol in ((3, 0.16), (2, 0.12), (1, 0.08), (0, 0.04)):
+        try:
+            partition = extract_partition_from_labels(
+                labels_inside=labels_den,
+                outline=composed.outline,
+                px=px,
+                n_pieces=n_pieces,
+                face_metadata=face_meta,
+                smooth_iters=sm_it,
+                simplify_tol_mm=simp_tol,
+            )
+            break
+        except RuntimeError as exc:
+            last_exc = exc
+            log(f"[stage 4] smooth_iters={sm_it}, simplify={simp_tol} failed ({exc}); retrying gentler smoothing...")
+    if partition is None:
+        raise last_exc
     partition = clean_partition_micro_segments(partition, min_seg_mm=0.065)
     log(
         f"[stage 4] Extracted exact PlanarPartition: {partition.num_pieces} faces, "
@@ -110,9 +120,14 @@ def build_puzzle(
 
     # Stage 5: Thin-tip / neck pre-repair -> Organic Dendritic 360-deg Seam Locking -> final tip check
     partition, pre_repair = repair_weak_pieces_750(partition, composed.placed_silhouettes, max_tip_mm=5.75, log=log)
-    if pre_repair["remaining_weak_count"] > 0:
-        partition, pre_repair2 = repair_weak_pieces_750(partition, composed.placed_silhouettes, max_tip_mm=5.85, log=log)
-        pre_repair["pass2"] = pre_repair2
+    for extra_pass in range(2, 5):
+        if pre_repair.get("remaining_weak_count", 0) == 0:
+            break
+        partition, p_extra = repair_weak_pieces_750(partition, composed.placed_silhouettes, max_tip_mm=5.85, log=log)
+        pre_repair[f"pass{extra_pass}"] = p_extra
+        pre_repair["remaining_weak_count"] = p_extra["remaining_weak_count"]
+        if p_extra["repaired_count"] == 0:
+            break
     partition, lock_report = lock_dendritic_board(
         partition=partition,
         placed_silhouettes=composed.placed_silhouettes,
@@ -123,6 +138,15 @@ def build_puzzle(
         log=log,
     )
     partition, post_repair = repair_weak_pieces_750(partition, composed.placed_silhouettes, max_tip_mm=5.85, log=log)
+    for extra_post in range(2, 4):
+        if post_repair.get("remaining_weak_count", 0) == 0:
+            break
+        partition, p_post2 = repair_weak_pieces_750(partition, composed.placed_silhouettes, max_tip_mm=5.90, log=log)
+        post_repair[f"pass{extra_post}"] = p_post2
+        post_repair["remaining_weak_count"] = p_post2["remaining_weak_count"]
+        post_repair["repaired_count"] += p_post2["repaired_count"]
+        if p_post2["repaired_count"] == 0:
+            break
     if post_repair["repaired_count"] > 0:
         partition, lock_report2 = lock_dendritic_board(
             partition=partition,
@@ -199,9 +223,9 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Build 750-Piece Dendrite + Trilobites + Helleristninger Jigsaw")
     parser.add_argument("--pieces", type=int, default=750)
     parser.add_argument("--trilobites", type=int, default=150)
-    parser.add_argument("--width", type=float, default=880.0)
-    parser.add_argument("--height", type=float, default=640.0)
-    parser.add_argument("--area", type=float, default=600.0)
+    parser.add_argument("--width", type=float, default=910.0)
+    parser.add_argument("--height", type=float, default=650.0)
+    parser.add_argument("--area", type=float, default=650.0)
     parser.add_argument("--px", type=float, default=0.30)
     parser.add_argument("--seed", type=int, default=2026)
     parser.add_argument("--pack-steps", type=int, default=300)

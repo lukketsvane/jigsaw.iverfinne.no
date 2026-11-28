@@ -65,6 +65,28 @@ def _is_non_commercial(license_str: str, commercial_ok: bool) -> bool:
     return "NC" in u or "NON-COMMERCIAL" in u or "NONCOMMERCIAL" in u or "ALTA MUSEUM" in u
 
 
+def _is_synthetic_or_vae(rec: Dict[str, Any]) -> bool:
+    fields = (
+        str(rec.get("source_archive", "")),
+        str(rec.get("asset_id", "")),
+        str(rec.get("creator", "")),
+        str(rec.get("title", "")),
+    )
+    joined = " ".join(fields).lower()
+    return any(tok in joined for tok in ("vae", "synthetic", "latent_prior"))
+
+
+def _has_complete_provenance(rec: Dict[str, Any]) -> bool:
+    creator = str(rec.get("creator") or "").strip()
+    source_url = str(rec.get("source_url") or "").strip()
+    lic = str(rec.get("license") or "").strip()
+    if not creator or creator.lower() in ("ukjent", "unknown", "n/a", "none"):
+        return False
+    if not source_url or not lic:
+        return False
+    return True
+
+
 def _extract_clean_helleristning_polygon(
     mask: np.ndarray,
     target_area_mm2: float,
@@ -217,6 +239,10 @@ def curate_750_motifs(
         lic = str(rec.get("license", ""))
         if _is_non_commercial(lic, comm_ok):
             continue
+        if _is_synthetic_or_vae(rec):
+            continue
+        if not _has_complete_provenance(rec):
+            continue
         if int(rec.get("connected_components", 1) or 1) != 1:
             continue
         if int(rec.get("hole_count", 0) or 0) != 0:
@@ -287,6 +313,9 @@ def curate_750_motifs(
             "license_url": str(rec.get("license_url", "")),
             "commercial_ok": True,
             "share_alike_required": sa_req,
+            "is_synthetic_vae": False,
+            "legal_review_status": "evidence_recorded_pending_legal_review",
+            "cleared_for_sale": False,
             "jigsaw_tier": str(rec.get("jigsaw_tier", "")),
             "sha256": str(rec.get("sha256", "")),
         }
@@ -349,6 +378,9 @@ def curate_750_motifs(
                 "license_url": str(rec.get("license_url", "")),
                 "commercial_ok": True,
                 "share_alike_required": _is_share_alike(lic),
+                "is_synthetic_vae": False,
+                "legal_review_status": "evidence_recorded_pending_legal_review",
+                "cleared_for_sale": False,
                 "jigsaw_tier": str(rec.get("jigsaw_tier", "")),
                 "sha256": str(rec.get("sha256", "")),
             }
@@ -407,28 +439,47 @@ def curate_750_motifs(
         if _is_non_commercial(m.metadata["license"], bool(m.metadata.get("commercial_ok", False)))
     )
     sa_count = sum(1 for m in all_motifs if m.metadata.get("share_alike_required", False))
+    synthetic_vae_count = sum(1 for m in all_motifs if m.metadata.get("is_synthetic_vae", False))
+    missing_meta_count = sum(
+        1 for m in all_motifs
+        if not (
+            str(m.metadata.get("creator") or "").strip()
+            and str(m.metadata.get("license") or "").strip()
+            and str(m.metadata.get("source_url") or "").strip()
+        )
+    )
 
     assert alta_nc_count == 0, f"Found {alta_nc_count} non-commercial motifs!"
+    assert synthetic_vae_count == 0, f"Found {synthetic_vae_count} synthetic VAE motifs!"
+    assert missing_meta_count == 0, f"Found {missing_meta_count} motifs with missing provenance metadata!"
 
     rights_summary: Dict[str, Any] = {
         "total_pieces": len(all_motifs),
         "trilobite_count": len(trilo_motifs),
         "helleristning_count": len(selected_heller),
         "anonymous_filler_count": 0,
+        "synthetic_vae_count": synthetic_vae_count,
+        "missing_metadata_count": missing_meta_count,
         "commercial_ok_count": sum(1 for m in all_motifs if m.metadata.get("commercial_ok")),
         "alta_nc_sa_count": alta_nc_count,
         "non_commercial_count": alta_nc_count,
         "share_alike_count": sa_count,
         "non_share_alike_count": len(all_motifs) - sa_count,
         "skipped_unfabricable_candidates": skipped_unfab,
+        "legal_review_status": "evidence_recorded_pending_legal_review",
+        "cleared_for_sale": False,
         "license_breakdown": dict(lic_counts),
         "archive_breakdown": dict(arch_counts),
         "trilobite_genus_breakdown": dict(genus_counts),
         "helleristning_class_breakdown": dict(heller_cls_counts),
         "legal_note": (
-            "All 750 motifs are filtered to commercial_ok=True (0 Alta Museum NC-SA). "
-            "Trilobites are 100% original procedural CC0 artwork; archival rock-art records "
-            "retain primary source URLs, creators, and license metadata for commercial attribution review."
+            "Preliminary commercial-source curation ONLY — NOT CLEARED FOR COMMERCIAL SALE. "
+            "All 750 motifs are filtered to commercial_ok=True with 0 Alta Museum NC-SA motifs, "
+            "0 synthetic VAE shapes, and 0 missing creator/license/source_url fields. "
+            "Trilobites are original procedural CC0 artwork; archival rock-art records retain "
+            "primary source URLs, creators, and license metadata and are honestly flagged "
+            "evidence_recorded_pending_legal_review pending formal legal/attribution counsel review "
+            "(including EU/NO 70-yr p.m.a. checks on 20th-century archival tracings)."
         ),
         "pieces": [
             {
@@ -445,6 +496,9 @@ def curate_750_motifs(
                 "source_url": m.metadata.get("source_url", ""),
                 "commercial_ok": bool(m.metadata.get("commercial_ok", False)),
                 "share_alike_required": bool(m.metadata.get("share_alike_required", False)),
+                "is_synthetic_vae": bool(m.metadata.get("is_synthetic_vae", False)),
+                "legal_review_status": str(m.metadata.get("legal_review_status", "evidence_recorded_pending_legal_review")),
+                "cleared_for_sale": bool(m.metadata.get("cleared_for_sale", False)),
             }
             for idx, m in enumerate(all_motifs)
         ],

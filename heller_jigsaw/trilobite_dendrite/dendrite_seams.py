@@ -209,34 +209,56 @@ def _repair_connectivity_and_holes(
         out[orphan] = out[idx[0][orphan], idx[1][orphan]]
 
     # Eliminate any piece completely surrounded by ONE other piece (which would create an interior hole!)
-    # Check 4-neighbor adjacency counts per piece: if any piece touches only 1 neighbor and not exterior,
-    # bridge it cleanly out or check hole_count via binary_fill_holes per bbox!
     slices = ndimage.find_objects(out + 1)
     for pid in range(n_pieces):
         sl = slices[pid] if pid < len(slices) else None
         if sl is None:
             continue
-        sub = out[sl]
+        r0, r1 = sl[0].start, sl[0].stop
+        c0, c1 = sl[1].start, sl[1].stop
+        sub = out[r0:r1, c0:c1]
         m = sub == pid
-        filled = ndimage.binary_fill_holes(m)
+        # Pad by 1 pixel of False so binary_fill_holes handles holes accurately near bbox boundaries
+        m_pad = np.pad(m, 1, mode="constant", constant_values=False)
+        filled = ndimage.binary_fill_holes(m_pad)[1:-1, 1:-1]
         holes = filled & (~m)
         if np.any(holes):
-            # Find what's inside the hole: if it's another entire piece, do NOT swallow it;
-            # instead open a corridor from the trapped piece to its nearest third neighbor!
             hole_labels = np.unique(sub[holes])
             hole_labels = hole_labels[hole_labels >= 0]
             if len(hole_labels) == 0:
-                sub[holes] = pid
-                out[sl] = sub
+                sub[holes & inside[r0:r1, c0:c1]] = pid
+                out[r0:r1, c0:c1] = sub
             else:
-                # Carve a clean bridge from each enclosed neighbor to the nearest non-`pid` label
-                # outside the bounding box so `pid` is simply connected without losing any piece!
                 for h_lbl in hole_labels:
-                    # Check if h_lbl exists outside the hole too
-                    if np.sum(out == h_lbl) > np.sum(sub[holes] == h_lbl):
-                        # Just an orphan lobe of h_lbl trapped inside pid -> absorb into pid
-                        sub[holes & (sub == h_lbl)] = pid
-                        out[sl] = sub
+                    h_lbl_i = int(h_lbl)
+                    in_hole_mask = holes & (sub == h_lbl_i)
+                    if np.sum(out == h_lbl_i) > np.sum(in_hole_mask):
+                        # Orphan lobe of h_lbl trapped inside pid -> absorb into pid
+                        sub[in_hole_mask] = pid
+                        out[r0:r1, c0:c1] = sub
+                    else:
+                        # Entire piece h_lbl is enclosed inside pid -> carve a clean 3-px corridor
+                        # from h_lbl to the nearest non-pid, non-h_lbl interior pixel so pid has 0 holes!
+                        other_mask = inside & (out >= 0) & (out != pid) & (out != h_lbl_i)
+                        h_global = out == h_lbl_i
+                        if np.any(other_mask) and np.any(h_global):
+                            dist_other, idx_other = ndimage.distance_transform_edt(~other_mask, return_indices=True)
+                            hy, hx = np.where(h_global)
+                            best_k = int(np.argmin(dist_other[hy, hx]))
+                            sy, sx = int(hy[best_k]), int(hx[best_k])
+                            ty, tx = int(idx_other[0, sy, sx]), int(idx_other[1, sy, sx])
+                            steps = max(abs(ty - sy), abs(tx - sx), 1)
+                            ys = np.round(np.linspace(sy, ty, steps + 1)).astype(np.int32)
+                            xs = np.round(np.linspace(sx, tx, steps + 1)).astype(np.int32)
+                            gh, gw = out.shape
+                            for py, px_ in zip(ys, xs):
+                                for dy in range(-6, 7):
+                                    for dx in range(-6, 7):
+                                        if dy * dy + dx * dx > 36:
+                                            continue
+                                        ny, nx_ = py + dy, px_ + dx
+                                        if 0 <= ny < gh and 0 <= nx_ < gw and inside[ny, nx_] and out[ny, nx_] == pid:
+                                            out[ny, nx_] = h_lbl_i
 
     out[~inside] = -1
     return out
@@ -350,21 +372,23 @@ def evolve_dendritic_seams_gpu(
     mobility = (mob_core * (0.35 + 0.65 * mob_seam) * mob_ext).astype(np.float32)
     mobility[~inside] = 0.0
 
-    # Anchor mask: innermost pixels of every piece (guarantee EVERY piece has >= 1 anchor pixel!)
+    # Anchor mask: innermost pixels of every piece (guarantee EVERY piece has a stout protected core!)
     core_anchor = np.where(inside & (phi_own < -1.5), labels_init, -1)
-    present_anchors = set(np.unique(core_anchor[core_anchor >= 0]).tolist())
-    if len(present_anchors) < n_pieces:
-        slices_init = ndimage.find_objects(labels_init + 1)
-        for pid in range(n_pieces):
-            if pid in present_anchors:
-                continue
-            sl = slices_init[pid] if pid < len(slices_init) else None
-            if sl is not None:
-                sub_m = (labels_init[sl] == pid) & inside[sl]
-                if np.any(sub_m):
-                    sub_phi = np.where(sub_m, phi_own[sl], 1e9)
-                    iy, ix = np.unravel_index(int(np.argmin(sub_phi)), sub_phi.shape)
-                    core_anchor[sl[0].start + iy, sl[1].start + ix] = pid
+    slices_init = ndimage.find_objects(labels_init + 1)
+    for pid in range(n_pieces):
+        sl = slices_init[pid] if pid < len(slices_init) else None
+        if sl is None:
+            continue
+        sub_m = (labels_init[sl] == pid) & inside[sl]
+        if not np.any(sub_m):
+            continue
+        if int(np.sum(core_anchor[sl] == pid)) < 80:
+            sub_phi = np.where(sub_m, phi_own[sl], 1e9)
+            flat = np.argsort(sub_phi.ravel())
+            k_keep = min(160, int(np.sum(sub_m)))
+            ys_f, xs_f = np.unravel_index(flat[:k_keep], sub_phi.shape)
+            core_anchor[sl[0].start + ys_f, sl[1].start + xs_f] = pid
+    mobility[core_anchor >= 0] = 0.0
 
     # 2. Seed smooth 2-scale sinusoidal dendritic ripples (Paper Fig. 5) along corridor seams
     labels_seeded = _build_sinusoidal_corridor_perturbation(
@@ -415,49 +439,45 @@ def evolve_dendritic_seams_gpu(
         inv_tau = 1.0 / cfg.tau
         alpha_over_pi = cfg.alpha / math.pi
 
-        # Exact symmetric multiphase Allen-Cahn evolution (Eqs. 5-10):
-        # Notice sum_{k != c} p_c * p_k * (p_c - p_k + m_{ck})
-        # With only 2-3 phases nonzero at any interface pixel, we vectorize cleanly across C channels!
+        # Exact symmetric multiphase Allen-Cahn evolution (Eqs. 5-10) in low-VRAM sequential staging
+        # (keeps peak VRAM <= 2.0 GB on RTX A4500 so sibling workers can share the GPU cleanly!).
         for step in range(cfg.steps):
-            # Isotropic Laplacians with zero-flux (reflective) boundary conditions
-            lap_p = F.conv2d(F.pad(p, (1, 1, 1, 1), mode="replicate"), lap_weight, groups=num_colors)
-            lap_T = F.conv2d(F.pad(T, (1, 1, 1, 1), mode="replicate"), lap_weight, groups=num_colors)
+            # 1. Phase field RHS accumulated into a single buffer `dp`
+            dp = F.conv2d(F.pad(p, (1, 1, 1, 1), mode="replicate"), lap_weight, groups=num_colors)
+            dp.mul_(eps2)
 
-            # Fast pairwise Allen-Cahn + latent-heat interaction across all active interface channels:
-            # First term: sum_{k} p_c * p_k * (p_c - p_k) = p_c * (p_c * sum(p) - sum(p^2)) = p_c * (p_c - sum(p^2))
             sum_p2 = (p * p).sum(dim=1, keepdim=True)
-            double_well = p * (p - sum_p2)
+            dp.addcmul_(p, p - sum_p2)
+            del sum_p2
 
-            # Second term (latent heat undercooling driving force):
-            # m_{ck} = (alpha/pi) * atan(gamma * (T_k - T_c))
-            # Use exact top-2 active phases at each pixel (since at a shared seam interface only the 2
-            # competing phases have substantial p_c * p_k > 0, and at triple junctions top-3; top-2 gives
-            # exact antisymmetry m_{ab} = -m_{ba} in O(C) memory — only ~1.1 GB VRAM total!).
+            # Latent heat undercooling driving force across top-2 active phases at each pixel
             top_p, top_idx = torch.topk(p, k=2, dim=1)  # (1, 2, H, W)
             p0, p1 = top_p[:, 0:1], top_p[:, 1:2]
             i0, i1 = top_idx[:, 0:1], top_idx[:, 1:2]
             T0 = torch.gather(T, 1, i0)
             T1 = torch.gather(T, 1, i1)
-            # Driving force for winner (i0) against runner-up (i1)
-            m01 = alpha_over_pi * torch.atan(cfg.gamma * (T1 - T0))
-            drive_mag = p0 * p1 * m01  # (1, 1, H, W)
+            drive_mag = p0 * p1 * (alpha_over_pi * torch.atan(cfg.gamma * (T1 - T0)))
+            dp.scatter_add_(1, i0, drive_mag)
+            dp.scatter_add_(1, i1, -drive_mag)
+            del top_p, top_idx, p0, p1, i0, i1, T0, T1, drive_mag
 
-            drive = torch.zeros_like(p)
-            drive.scatter_add_(1, i0, drive_mag)
-            drive.scatter_add_(1, i1, -drive_mag)
+            dp.mul_(mob_t * (cfg.dt * inv_tau))
 
-            dp_dt = mob_t * inv_tau * (eps2 * lap_p + double_well + drive)
-            dp = cfg.dt * dp_dt
-
-            # Update phase and temperature simultaneously (Eqs. 5 & 6)
-            p = (p + dp).clamp(0.0, 1.0)
-            p = torch.where(in_t, p, torch.zeros_like(p))
+            # Update phase field in-place & normalize simplex inside domain
+            p.add_(dp).clamp_(0.0, 1.0)
+            p.mul_(in_t)
             p_tot = p.sum(dim=1, keepdim=True)
-            p = torch.where(p_tot > 1e-6, p / p_tot.clamp_min(1e-6), p)
+            p.div_(p_tot.clamp_min(1e-6))
+            p.mul_(p_tot > 1e-6)
+            del p_tot
 
-            # Latent heat release K * dp/dt slows flanks & shapes bulbous dendritic tips
-            T = T + cfg.dt * (cfg.d_temp * lap_T) + cfg.k_latent * dp
-            T = T.clamp(-1.2, 1.6)
+            # Release latent heat K * dp into T, free `dp` BEFORE computing lap_T!
+            T.add_(dp, alpha=cfg.k_latent)
+            del dp
+
+            lap_T = F.conv2d(F.pad(T, (1, 1, 1, 1), mode="replicate"), lap_weight, groups=num_colors)
+            T.add_(lap_T, alpha=cfg.dt * cfg.d_temp).clamp_(-1.2, 1.6)
+            del lap_T
 
         win_color = torch.argmax(p[0], dim=0).cpu().numpy().astype(np.int32)
         del p, T, cg_t, mob_t, in_t, lap_weight, blur_w
@@ -487,8 +507,10 @@ def evolve_dendritic_seams_gpu(
         _, idx = ndimage.distance_transform_edt(~ok, return_indices=True)
         labels_den[miss] = labels_den[idx[0][miss], idx[1][miss]]
 
-    # 6. Minimum-width neck guard (preserving motif cores!) + connectivity/hole repair
-    core_prot = inside & (phi_own < -0.25)
+    # 6. Minimum-width neck guard (preserving motif cores & anchors!) + connectivity/hole repair
+    core_prot = inside & ((phi_own < -0.25) | (core_anchor >= 0))
+    # Restore any piece whose evolved core shrank below anchor pixels
+    labels_den = np.where(core_anchor >= 0, core_anchor, labels_den)
     labels_den = _apply_neck_thickness_guard(
         labels_den, inside, n_pieces, px=px, radius_mm=cfg.min_feature_radius_mm, protect_mask=core_prot
     )

@@ -31,6 +31,7 @@ from heller_jigsaw.scale750.audit_sparse import (
 from heller_jigsaw.scale750.lock_repair import (
     clean_micro_segments,
     lock_partition_sparse,
+    rebalance_area_ratio,
     repair_necks_and_tips,
 )
 from heller_jigsaw.scale750.packer_gpu import (
@@ -149,8 +150,19 @@ def build_puzzle(
         log=log,
     )
 
+    # 5b. Rebalance extreme piece-area outliers (keep max_area / min_area <= 3.85 < 4.0)
+    part, area_repairs = rebalance_area_ratio(
+        part,
+        placed_targets,
+        max_ratio=3.85,
+        min_neck_mm=min_neck_mm,
+        max_tip_mm=max_tip_mm,
+        preserve_lock_mm=3.10,
+        log=log,
+    )
+
     # 6. Eliminate micro-segments < min_seg_mm while preserving topology
-    part = clean_micro_segments(part, min_seg_mm=min_seg_mm, log=log)
+    part = clean_micro_segments(part, min_seg_mm=min_seg_mm, preserve_lock_mm=3.10, log=log)
 
     # 7. Export authoritative puzzle bundle (cut.svg, pieces.svg, partition.json, quality.json, etc.)
     catalog_sha = _sha256_file(catalog_path)
@@ -176,6 +188,7 @@ def build_puzzle(
         "locking_tabs_added": len(lock_tabs),
         "pre_lock_repairs": len(pre_repairs),
         "post_lock_repairs": len(post_repairs),
+        "area_rebalances": len(area_repairs),
         "zero_filler": True,
     }
     provenance_payload = {

@@ -1,0 +1,26 @@
+{
+  "candidates_inspected": 1331,
+  "manifest_total": 120,
+  "manifest_traceable": 59,
+  "manifest_quarantined": 61,
+  "by_media_type": {
+    "bw_tracing": 59,
+    "painted_photo": 61
+  },
+  "by_rights_holder": {
+    "Vänersborgs museum": 51,
+    "Västmanlands läns museum": 1,
+    "Västergötlands museum": 1,
+    "Bohusläns museum": 24,
+    "Kalmar County Museum": 38,
+    "Upplands Museum": 5
+  },
+  "download_stats": {
+    "skipped_photo_other": 858,
+    "sha256_duplicate_skipped": 351,
+    "downloaded_ok": 59,
+    "quarantined_painted": 61,
+    "skipped_reject": 2
+  },
+  "elapsed_sec": 285.9
+}
