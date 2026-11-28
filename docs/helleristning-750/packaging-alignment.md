@@ -4,6 +4,8 @@
 **Board Geometry Sync Status:** LOCKED FROM `runs/helleristning-750/partition.json`  
 **Commercial Readiness Notice:** Pre-production specification aligned with [`eu-norway-safety-provisional-review.md`](./eu-norway-safety-provisional-review.md) and [`rights-inventory.md`](./rights-inventory.md). Final print mechanicals require locked supplier thickness, final legal clearance, and physical prototype fit check.
 
+[Product studies 01](product-studies/01/README.md) explore the birch pieces, companion guide and retail packaging. [Product studies 02](product-studies/02/README.md) explore motif families, seams, calibration and pigment. [Product studies 03](product-studies/03/README.md) trace archival drawings into printed faces, inlay and reversible finishes. [Product studies 04](product-studies/04/README.md) pair individual motifs with print and finishing trials and a collector’s set.
+
 ---
 
 ## 1. Finalized Board & Product Specifications
