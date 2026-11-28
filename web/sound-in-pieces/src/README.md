@@ -19,4 +19,4 @@ python icons.py    # piece 093 -> public/icons, public/splash, splash-links.html
 npm run model      # puzzle.glb -> public/models/puzzle.js, its print -> public/img/print-1600.webp
 ```
 
-Optional: `public/media/melody.mid`. When present, each tap on the 3D board plays the next chord of its highest track, and once the refrain (the opening, as far as it matches its first return) has been played, the last piece tapped comes to the middle.
+`build.py` reads the upper melody track from `public/media/melody.mid` and embeds its pitches and velocities in the page. Taps on the 3D board, featured piece, cut field, and atlas advance the same melody one chord at a time. It loops after the last chord.
