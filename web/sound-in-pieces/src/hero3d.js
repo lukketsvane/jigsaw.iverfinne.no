@@ -1,6 +1,6 @@
 // Hero: the assembled board as a live object, which stays where it is.
 // It leans a little towards the cursor (or the finger). Right-drag, or two fingers, orbit the camera; pinch zooms, within limits.
-// A tap lifts a piece and plays it; a long press or double tap brings a piece to the middle and the rest make room.
+// Each tap on a piece toggles its lift and plays the next chord of the melody.
 // Left alone, a piece twitches now and then.
 import {
   WebGLRenderer, Scene, PerspectiveCamera, Group, Raycaster, Vector2, Vector3, Box3, Sphere, Quaternion,
@@ -13,38 +13,6 @@ import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.j
 const fig = document.querySelector('.hero figure');
 const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-
-// a standard MIDI file -> the chords of its highest track, and how many of them make the refrain:
-// the opening, as far as it matches its first return (at least 16 chords long)
-function tune(d) {
-  let p = 0;
-  const u32 = () => d[p++] * 16777216 + (d[p++] << 16 | d[p++] << 8 | d[p++]), u16 = () => d[p++] << 8 | d[p++];
-  const vlq = () => { let v = 0, b; do { b = d[p++]; v = v * 128 + (b & 127); } while (b & 128); return v; };
-  if (u32() !== 0x4d546864) return null;
-  const hl = u32(); p += 2; const nt = u16(); p = 8 + hl;
-  const tracks = [];
-  for (let t = 0; t < nt && p + 8 <= d.length; t++) {
-    const id = u32(), len = u32(), end = p + len, notes = [];
-    let tick = 0, run = 0;
-    while (id === 0x4d54726b && p < end) {
-      tick += vlq();
-      let s = d[p]; if (s & 128) p++; else s = run;
-      if (s === 0xff) { p++; const n = vlq(); p += n; continue; }          // meta: type, length, data
-      if (s === 0xf0 || s === 0xf7) { const n = vlq(); p += n; continue; } // sysex
-      run = s; const hi = s & 0xf0, a = d[p++], b = hi === 0xc0 || hi === 0xd0 ? 0 : d[p++];
-      if (hi === 0x90 && b) notes.push([tick, a]);
-    }
-    p = end; if (notes.length) tracks.push(notes);
-  }
-  if (!tracks.length) return null;
-  const mean = n => n.reduce((s, x) => s + x[1], 0) / n.length, top = tracks.reduce((a, b) => (mean(b) > mean(a) ? b : a)), at = new Map();
-  for (const [k, n] of top) (at.get(k) || at.set(k, []).get(k)).push(n);
-  const chords = [...at.keys()].sort((a, b) => a - b).map(k => at.get(k)), seq = chords.map(c => Math.max(...c));
-  const same = k => { let n = 0; while (k + n < seq.length && seq[n] === seq[k + n]) n++; return n; };
-  let refrain = seq.length;
-  for (let k = 16; k < seq.length; k++) if (same(k) >= 16) { refrain = same(k); break; }
-  return { chords, refrain };
-}
 
 async function main() {
   const renderer = new WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
@@ -87,26 +55,18 @@ async function main() {
     if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; }
     if (/^piece-\d+$/.test(o.name)) pieces.push(o); // the piece groups, not their print, edge and back meshes
   });
-  // each piece lifts and tips about its own centre, along its own axis; its note falls as it grows
+  // each piece lifts and tips about its own centre, along its own axis
   rig.updateMatrixWorld(true);
-  const bb = new Box3(), sz = new Vector3();
+  const bb = new Box3();
   pieces.forEach((p, i) => {
     const a = i * 2.39996;
-    bb.setFromObject(p).getSize(sz);
     Object.assign(p.userData, {
-      lift: 0, to: 0, tw: 0, size: sz.x * sz.z, c: board.worldToLocal(bb.getCenter(new Vector3())), axis: new Vector3(Math.cos(a), 0, Math.sin(a)),
-      p0: p.position.clone(), q0: p.quaternion.clone(), s0: p.scale.clone(),
-      off: new Vector3(), offTo: new Vector3(), s: 1, sTo: 1, rot: 0, rotTo: 0, at: 0, k: (Math.sin(i * 12.9898) * 43758.5453) % 1,
+      lift: 0, to: 0, tw: 0, c: board.worldToLocal(bb.setFromObject(p).getCenter(new Vector3())),
+      axis: new Vector3(Math.cos(a), 0, Math.sin(a)), p0: p.position.clone(), q0: p.quaternion.clone(),
     });
   });
-  const SCALE = [1, 9 / 8, 5 / 4, 3 / 2, 5 / 3];
-  [...pieces].sort((a, b) => b.userData.size - a.userData.size).forEach((p, r, all) => {
-    const deg = Math.round(14 * r / (all.length - 1));
-    p.userData.f = 196 * 2 ** Math.floor(deg / 5) * SCALE[deg % 5];
-  });
-  const q = new Quaternion(), qs = new Quaternion(), v3 = new Vector3(), UP = new Vector3(0, 1, 0);
+  const q = new Quaternion(), UP = new Vector3(0, 1, 0);
   const sphere = new Box3().setFromObject(board).getBoundingSphere(new Sphere());
-  const mid = board.worldToLocal(new Vector3()); // the middle of the board, where a chosen piece goes
 
   // the camera orbits the board's centre; zoom stays between a little further out than the start and not too close
   const cam = new PerspectiveCamera(26, 1, 0.01, 20);
@@ -132,7 +92,7 @@ async function main() {
 
   const cv = renderer.domElement;
   cv.className = 'gl';
-  cv.setAttribute('aria-label', 'The assembled board in 3D. It leans towards the cursor; right-drag or two fingers orbit, pinch zooms, tap a piece to lift it, press and hold or double-click one to bring it to the middle.');
+  cv.setAttribute('aria-label', 'The assembled board in 3D. Tap a piece to lift or lower it and play the next chord. Right-drag or use two fingers to orbit. Pinch to zoom.');
   fig.append(cv);
   frame();
   new ResizeObserver(frame).observe(fig);
@@ -149,50 +109,31 @@ async function main() {
     while (o && !/^piece-\d+$/.test(o.name)) o = o.parent;
     return o;
   };
-  // media/melody.mid, when the site has one: each tap plays its next chord; once the refrain is played, that piece comes forward
-  let song = null, step = 0;
-  fetch(new URL('../media/melody.mid', import.meta.url)).then(r => (r.ok ? r.arrayBuffer() : null)).then(b => { song = b && tune(new Uint8Array(b)); }).catch(() => {});
-  const lift = (x, y) => {
-    const o = pick(x, y); if (!o) return;
+  const lift = o => {
     const u = o.userData; u.to = u.to >= 1 ? 0 : 1; u.tw = 0;
-    if (!song) { window.blip?.(u.f, u.to); return; }
-    for (const n of song.chords[step]) window.blip?.(440 * 2 ** ((n - 69) / 12), 1);
-    if (++step >= song.refrain) { step = 0; gather(o); }
+    window.playNextChord();
   };
-  // a chosen piece glides to the middle, grows, floats and turns; the rest make room, nearest first
-  let chosen = null;
-  const gather = f => {
-    const t = performance.now();
-    chosen = f;
+  const reset = () => {
+    home = true;
     for (const p of pieces) {
-      const u = p.userData, dx = u.c.x - mid.x, dz = u.c.z - mid.z, r = Math.hypot(dx, dz) || 1e-3;
-      u.tw = 0; u.at = f ? t + r * 1400 : t; u.rot = Math.atan2(Math.sin(u.rot), Math.cos(u.rot));
-      if (!f) { u.to = 0; u.offTo.set(0, 0, 0); u.sTo = 1; u.rotTo = 0; }
-      else if (p === f) { u.to = 0; u.at = t; u.offTo.set(mid.x - u.c.x, 0.08, mid.z - u.c.z); u.sTo = 2.2; }
-      else { const push = 0.02 + 0.085 * Math.exp(-r / 0.1); u.offTo.set((dx / r) * push, -0.004, (dz / r) * push); u.sTo = 1; u.rotTo = u.k * 0.5 * push / 0.125; }
+      p.userData.to = 0;
+      p.userData.tw = 0;
     }
-  };
-  const summon = (x, y) => { // long press or double tap: choose a piece, let it go, or put everything back
-    const o = pick(x, y);
-    if (o && o !== chosen) { gather(o); window.blip?.(o.userData.f, 1); }
-    else if (chosen) { window.blip?.(chosen.userData.f, 0); gather(null); }
-    else { home = true; gather(null); }
   };
 
   // left button or one finger: the board only leans towards it; right button or two fingers: orbit and pinch
   const pts = new Map();
-  let one = null, two = null, rmb = null, multi = false, tap = 0, press = 0;
+  let one = null, two = null, rmb = null, lastEmptyTap = -Infinity;
   const pair = () => { const [a, b] = [...pts.values()]; return { x: (a[0] + b[0]) / 2, y: (a[1] + b[1]) / 2, d: Math.hypot(a[0] - b[0], a[1] - b[1]) || 1 }; };
   cv.addEventListener('pointerdown', e => {
-    clearTimeout(press); home = false; touched = true; last = performance.now();
+    home = false; touched = true; last = performance.now();
     if (e.pointerType === 'mouse' && e.button === 2) { rmb = { x: e.clientX, y: e.clientY }; cv.setPointerCapture(e.pointerId); cv.classList.add('orbit'); return; }
     if (e.pointerType === 'mouse' && e.button !== 0) return;
     pts.set(e.pointerId, [e.clientX, e.clientY]);
     if (e.pointerType === 'mouse') cv.setPointerCapture(e.pointerId);
     if (pts.size === 1) {
-      one = { x: e.clientX, y: e.clientY, moved: 0 }; multi = false; gaze(e.clientX, e.clientY);
-      press = setTimeout(() => { if (one && !multi && one.moved < 8) { one.long = true; summon(one.x, one.y); } }, 450);
-    } else { one = null; multi = true; two = pts.size === 2 ? pair() : null; cv.classList.add('orbit'); }
+      one = { x: e.clientX, y: e.clientY, moved: 0, start: e.timeStamp }; gaze(e.clientX, e.clientY);
+    } else { one = null; two = pts.size === 2 ? pair() : null; cv.classList.add('orbit'); }
   });
   cv.addEventListener('pointermove', e => {
     if (rmb) { orbit(e.clientX - rmb.x, e.clientY - rmb.y); rmb.x = e.clientX; rmb.y = e.clientY; last = performance.now(); return; }
@@ -200,7 +141,6 @@ async function main() {
     pts.set(e.pointerId, [e.clientX, e.clientY]);
     if (one) {
       one.moved += Math.abs(e.clientX - one.x) + Math.abs(e.clientY - one.y); one.x = e.clientX; one.y = e.clientY;
-      if (one.moved >= 8) clearTimeout(press);
       gaze(e.clientX, e.clientY);
     } else if (two && pts.size === 2) {
       const n = pair();
@@ -212,9 +152,11 @@ async function main() {
   const end = e => {
     if (rmb && e.pointerType === 'mouse' && (e.button === 2 || e.type === 'pointercancel')) { rmb = null; cv.classList.remove('orbit'); return; }
     if (!pts.delete(e.pointerId)) return;
-    clearTimeout(press);
-    if (one && !multi && !one.long && one.moved < 6 && e.type === 'pointerup') {
-      if (e.timeStamp - tap < 320) { summon(e.clientX, e.clientY); tap = 0; } else { tap = e.timeStamp; lift(e.clientX, e.clientY); }
+    if (one && one.moved < 6 && e.type === 'pointerup') {
+      const piece = pick(e.clientX, e.clientY);
+      if (piece) { lift(piece); lastEmptyTap = -Infinity; }
+      else if (e.timeStamp - one.start >= 450 || e.timeStamp - lastEmptyTap < 320) { reset(); lastEmptyTap = -Infinity; }
+      else lastEmptyTap = e.timeStamp;
     }
     one = null; two = pts.size === 2 ? pair() : null;
     if (!pts.size) { cv.classList.remove('orbit'); if (e.pointerType !== 'mouse') lookTo.set(0, 0); }
@@ -256,22 +198,12 @@ async function main() {
     for (const p of pieces) {
       const u = p.userData;
       if (u.tw && now > u.tw) { u.to = 0; u.tw = 0; }
-      if (p === chosen && !still) { u.rotTo += 0.004; u.offTo.y = 0.08 + 0.005 * Math.sin(now * 0.0021); }
-      const go = now >= u.at, g = still ? 1 : 0.07;
-      if (u.lift === u.to && (!go || (u.s === u.sTo && u.rot === u.rotTo && u.off.equals(u.offTo)))) continue;
+      if (u.lift === u.to) continue;
       u.lift += (u.to - u.lift) * (still ? 1 : 0.14);
       if (Math.abs(u.to - u.lift) < 0.002) u.lift = u.to;
-      if (go) {
-        u.off.lerp(u.offTo, g); if (u.off.distanceToSquared(u.offTo) < 1e-10) u.off.copy(u.offTo);
-        u.s += (u.sTo - u.s) * g; if (Math.abs(u.sTo - u.s) < 1e-4) u.s = u.sTo;
-        u.rot += (u.rotTo - u.rot) * g; if (Math.abs(u.rotTo - u.rot) < 1e-4) u.rot = u.rotTo;
-      }
-      // turn about its own centre, grow about it, then move: tip (lift) inside spin (rot)
       q.setFromAxisAngle(u.axis, u.lift * 0.5);
-      qs.setFromAxisAngle(UP, u.rot).multiply(q);
-      p.quaternion.copy(qs).multiply(u.q0);
-      p.scale.copy(u.s0).multiplyScalar(u.s);
-      p.position.copy(v3.copy(u.p0).sub(u.c).applyQuaternion(qs).multiplyScalar(u.s)).add(u.c).add(u.off);
+      p.quaternion.copy(q).multiply(u.q0);
+      p.position.copy(u.p0).sub(u.c).applyQuaternion(q).add(u.c);
       p.position.y += u.lift * 0.09;
     }
     renderer.render(scene, cam);

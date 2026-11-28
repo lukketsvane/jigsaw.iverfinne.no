@@ -74,6 +74,9 @@ section:last-child{padding-bottom:calc(clamp(64px,8vw,120px) + env(safe-area-ins
 .gl{position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity 1.4s cubic-bezier(.2,.7,0,1);touch-action:pan-y;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .gl.orbit{cursor:grabbing}.live .gl{opacity:1}
 
+#specimen button{display:block;width:100%;padding:0;border:0;background:transparent;cursor:pointer;touch-action:manipulation}
+#specimen button:focus-visible{outline:2px solid var(--lime);outline-offset:4px}
+
 /* seed 22: the three stages change as you scroll */
 .seq{height:300svh;padding:0}
 .pin{position:sticky;top:0;height:100svh;display:grid;place-items:center;padding:calc(clamp(26px,3vw,44px) + env(safe-area-inset-top)) var(--gr) calc(clamp(26px,3vw,44px) + env(safe-area-inset-bottom)) var(--gl)}
@@ -128,7 +131,11 @@ body::after{content:"";position:fixed;z-index:10;inset:-120px;pointer-events:non
 </section>
 
 <section id="specimen">
-  <figure class="pl w710"><img src="img/specimen-1100.webp" srcset="img/specimen-700.webp 700w, img/specimen-1100.webp 1100w, img/specimen-1420.webp 1420w" sizes="(max-width: 700px) 84vw, min(49vw, 710px)" width="1420" height="1420" alt="Piece 093 alone on black." class="f" loading="lazy" decoding="async"></figure>
+  <figure class="pl w710">
+    <button type="button" aria-label="Play the next chord with piece 093">
+      <img src="img/specimen-1100.webp" srcset="img/specimen-700.webp 700w, img/specimen-1100.webp 1100w, img/specimen-1420.webp 1420w" sizes="(max-width: 700px) 84vw, min(49vw, 710px)" width="1420" height="1420" alt="Piece 093 alone on black." class="f" loading="lazy" decoding="async">
+    </button>
+  </figure>
 </section>
 
 <section id="absence">
@@ -209,20 +216,33 @@ const stage=()=>{const r=seq.getBoundingClientRect(),p=Math.min(1,Math.max(0,-r.
   if(i===cur)return;cur=i;st.forEach((im,j)=>im.classList.toggle('on',i===j))};
 let tick=false;addEventListener('scroll',()=>{if(!tick){tick=true;requestAnimationFrame(()=>{tick=false;stage()})}},{passive:true});
 
-/* every piece has a note: a small FM bell, lower for larger pieces; sound starts only from a touch */
-let ac;window.blip=(f,up=1)=>{try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();if(ac.state!=='running')ac.resume();
-  const t=ac.currentTime+.005,d=up?1.1:.45,o=ac.createOscillator(),m=ac.createOscillator(),mg=ac.createGain(),g=ac.createGain();f*=up?1:.5;
-  o.frequency.value=f*(1+(Math.random()-.5)*.004);m.frequency.value=f*3.5;mg.gain.setValueAtTime(f*(up?2.2:1),t);mg.gain.exponentialRampToValueAtTime(f*.01,t+d);
-  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(up?.12:.07,t+.006);g.gain.exponentialRampToValueAtTime(1e-4,t+d);
-  m.connect(mg).connect(o.frequency);o.connect(g).connect(ac.destination);o.start(t);m.start(t);o.stop(t+d);m.stop(t+d)}catch(e){}};
-const NOTE=r=>{const k=Math.round(14*r);return 196*2**Math.floor(k/5)*[1,9/8,5/4,3/2,5/3][k%5]};
+/* All puzzle views play through the same MIDI melody, one chord per tap. */
+const melody=[[[72,65]],[[65,53]],[[68,74]],[[68,74],[60,53]],[[65,78],[61,61]],[[65,83]],[[75,78]],[[73,85]],[[72,86]],[[68,93]],[[72,74]],[[65,72]],[[68,71]],[[68,71],[60,74]],[[61,66],[65,74]],[[65,80]],[[75,74]],[[73,64]],[[72,86]],[[68,71]],[[72,65],[84,83]],[[65,53],[77,78]],[[80,93],[68,74]],[[68,74],[72,62],[80,71],[60,53]],[[73,63],[77,72],[65,78],[61,61]],[[84,86],[72,74]],[[77,89],[65,72]],[[80,93],[68,71]],[[72,76],[80,78],[68,71],[60,74]],[[73,67],[77,74],[65,74],[61,66]],[[60,92]],[[60,92]],[[63,66]],[[60,80]],[[60,92]],[[60,76]],[[63,64]],[[65,86]],[[63,70]],[[60,92]],[[60,92]],[[63,66]],[[60,80]],[[60,92]],[[60,76]],[[63,64]],[[65,86]],[[63,70]],[[60,92]],[[60,92]],[[63,66]],[[60,80]],[[60,92]],[[60,76]],[[63,64]],[[65,86]],[[63,70]],[[60,92]],[[60,92]],[[63,66]],[[60,80]],[[60,92]],[[60,76]],[[63,64]],[[65,86]],[[63,70]],[[61,66]],[[77,74],[65,76]],[[67,72],[79,76]],[[68,66],[80,66]],[[72,66],[84,74]],[[79,83],[67,80]],[[61,58]],[[77,76],[65,76]],[[79,78],[67,66]],[[68,67],[80,71]],[[72,72],[84,74]],[[79,80],[67,83]],[[61,66]],[[65,76],[77,74]],[[79,76],[67,72]],[[80,66],[68,66]],[[84,74],[72,66]],[[79,83],[67,80]],[[61,58]],[[77,76],[65,76]],[[67,66],[79,78]],[[68,67],[80,71]],[[72,72],[84,74]],[[79,80],[67,83]],[[72,65]],[[65,53]],[[68,74]],[[68,74],[60,53]],[[65,78],[61,61]],[[65,83]],[[75,78]],[[73,85]],[[72,86]],[[68,93]],[[72,74]],[[65,72]],[[68,71]],[[68,71],[60,74]],[[65,74],[61,66]],[[65,80]],[[75,74]],[[73,64]],[[72,86]],[[68,71]],[[72,65],[84,89]],[[65,53],[77,83]],[[68,74],[80,93]],[[60,53],[80,69],[68,74]],[[65,78],[61,61],[77,78]],[[65,78],[77,89]],[[75,74],[87,78]],[[73,69],[85,67]],[[72,78],[84,74]],[[68,71],[80,67]],[[72,74],[84,76]],[[65,72],[77,76]],[[68,71],[80,78]],[[80,74],[68,71],[60,74]],[[77,78],[65,74],[61,66]],[[65,89],[77,86]],[[75,74],[87,71]],[[73,85],[85,101]],[[72,89],[84,96]],[[68,74],[80,69]],[[72,92]],[[70,109]],[[72,83]],[[72,83]],[[75,85]],[[77,74]],[[75,85]],[[72,76]],[[75,80]],[[72,76]],[[70,85]],[[68,60]],[[72,80]],[[75,74]],[[77,80]],[[65,76]],[[72,89]],[[72,78]],[[84,89]],[[70,74]],[[72,89]],[[84,86]],[[84,70],[72,57]],[[75,71],[87,67]],[[89,62],[77,74]],[[75,71],[87,67]],[[99,74]],[[84,68],[72,56]],[[96,80]],[[75,78],[87,78]],[[72,86]],[[92,85]],[[89,89]],[[70,71]],[[68,78],[80,85]],[[77,89]],[[72,70],[84,76]],[[87,64],[75,101]],[[89,78],[77,83]],[[65,92],[77,70]],[[84,80],[72,65]],[[72,80]],[[72,78]],[[72,89]]];
+let audio,step=0;
+window.playNextChord=()=>{
+  const Audio=window.AudioContext||window.webkitAudioContext;
+  if(!Audio)return;
+  audio=audio||new Audio();
+  if(audio.state!=='running')audio.resume().catch(()=>{});
+  const t=audio.currentTime+.005,end=t+1.1;
+  for(const [pitch,velocity] of melody[step]){
+    const f=440*2**((pitch-69)/12);
+    const note=audio.createOscillator(),mod=audio.createOscillator(),depth=audio.createGain(),gain=audio.createGain();
+    note.frequency.value=f;mod.frequency.value=f*3.5;
+    depth.gain.setValueAtTime(f*2.2,t);depth.gain.exponentialRampToValueAtTime(f*.01,end);
+    gain.gain.setValueAtTime(0,t);gain.gain.linearRampToValueAtTime(.16*velocity/127,t+.006);gain.gain.exponentialRampToValueAtTime(.0001,end);
+    mod.connect(depth).connect(note.frequency);note.connect(gain).connect(audio.destination);
+    note.start(t);mod.start(t);note.stop(end);mod.stop(end);
+  }
+  step=(step+1)%melody.length;
+};
+$('#specimen button').addEventListener('click',window.playNextChord);
 
 /* the 183 pieces, drawn from the cut file; touching one lights it in both views */
-const field=$('#field'),specs=$('#specs');let on=-1,F=[];
-const pick=i=>{window.blip(F[i]||392,i!==on);field.querySelector('.on')?.classList.remove('on');specs.querySelector('.on')?.classList.remove('on');
+const field=$('#field'),specs=$('#specs');let on=-1;
+const pick=i=>{window.playNextChord();field.querySelector('.on')?.classList.remove('on');specs.querySelector('.on')?.classList.remove('on');
   if(i===on){on=-1;return}on=i;field.children[i].classList.add('on');specs.children[i].classList.add('on')};
 fetch('data/pieces.json').then(r=>r.json()).then(P=>{const defs=$('#pd defs'),frag=document.createDocumentFragment();
-  P.map((p,i)=>i).sort((a,b)=>P[b].a-P[a].a).forEach((i,r)=>F[i]=NOTE(r/(P.length-1)));
   P.forEach((p,i)=>{defs.append(el('path',{id:'p'+p.n,d:p.d}));field.append(el('path',{d:p.d,'data-i':i}));
     const cx=(p.b[0]+p.b[2])/2,cy=(p.b[1]+p.b[3])/2,c=document.createElement('div'),s=el('svg',{viewBox:'-38 -38 76 76','aria-hidden':'true'}),t=document.createElement('span');
     c.className='sp';c.dataset.i=i;s.append(el('use',{href:'#p'+p.n,transform:`translate(${-cx} ${-cy})`}));t.textContent=p.n;c.append(s,t);frag.append(c)});

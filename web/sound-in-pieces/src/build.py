@@ -4,6 +4,7 @@ B = os.path.dirname(os.path.abspath(__file__))
 SITE = os.path.join(B, '..', 'public')
 D = os.environ.get('SIP_SRC', os.path.join(B, '..', '..', '..', 'runs', 'sound-in-pieces'))  # private sources: renders, cut field, GLB
 import hashlib, json, os, re
+from melody import melody_chords
 
 IMG = json.load(open(f'{B}/images.json'))
 
@@ -39,6 +40,7 @@ def preload(args):
 
 
 t = open(f'{B}/template.html').read()
+t = t.replace('{{melody}}', json.dumps(melody_chords(f'{SITE}/media/melody.mid'), separators=(',', ':')))
 t = t.replace('{{splash}}', open(f'{B}/splash-links.html').read())
 t = re.sub(r'\{\{preload ([^}]+)\}\}', lambda m: preload(m.group(1)), t)
 t = re.sub(r'\{\{img ([^}]+)\}\}', lambda m: img(m.group(1)), t)
