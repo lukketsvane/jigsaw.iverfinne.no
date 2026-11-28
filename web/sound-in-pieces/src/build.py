@@ -50,17 +50,26 @@ chunks = re.split(r'(<style>.*?</style>|<script>.*?</script>)', t, flags=re.S)
 t = ''.join(c if c.startswith(('<style>', '<script>')) else c.replace('~', '&nbsp;') for c in chunks)
 open(f'{SITE}/index.html', 'w').write(t)
 
-# designer: design.html as is; designer.js = head + web/fossilnet geometry, layout, partition and seams + tail
+# Both boards use the same logo model, layout, partition and seam renderer.
 import re, shutil
 shutil.copy(f'{B}/design.html', f'{SITE}/design.html')
 _src = open(os.path.join(B, '..', '..', 'fossilnet', 'index.html')).read()
 _cut = lambda a, b: _src[_src.index(a):_src.index(b)]
 _geo = re.sub(r'function chaikin\(.*?\n}\n', '', _cut('// ---------------------------------------------------------------- small geometry', '// ---------------------------------------------------------------- creatures'), flags=re.S)
-open(f'{SITE}/js/designer.js', 'w').write(open(f'{B}/designer_head.js').read()
+def script(name):
+    with open(os.path.join(B, name)) as source:
+        return source.read()
+
+
+cut_model = (script('designer_head.js')
     + '// the geometry, layout, partition and seams below are web/fossilnet/index.html, unchanged\n' + _geo
-    + _cut('// ---------------------------------------------------------------- creatures', 'const NA = ANCH.length')
-    + _cut('// ---------------------------------------------------------------- layout (field.pack', '// ---------------------------------------------------------------- engraving')
-    + open(f'{B}/designer_tail.js').read())
+    + _cut('// ---------------------------------------------------------------- creatures', 'function thin(p)'))
+fabrication_check = _cut('function thin(p)', 'const NA = ANCH.length')
+packing = (_cut('// ---------------------------------------------------------------- layout (field.pack', '// ---------------------------------------------------------------- engraving')
+    + script('cut_logos.js'))
+cut_board = script('cut_board.js')
+open(f'{SITE}/js/designer.js', 'w').write('\n'.join([cut_model + fabrication_check + packing, script('designer_sound.js'), cut_board, script('designer_tail.js')]))
+open(f'{SITE}/js/home-cut.js', 'w').write('\n'.join([cut_model + script('home_make.js') + packing, cut_board, script('home_cut.js')]))
 
 manifest = {
     'name': 'Sound in Pieces', 'short_name': 'In Pieces',
@@ -81,7 +90,7 @@ core = ['./', 'index.html', 'manifest.webmanifest', 'data/pieces.json',
         'fonts/plex-mono-400.woff2', 'icons/favicon.svg',
         'icons/apple-touch-icon.png', 'icons/icon-192.png', 'img/hero-800.webp', 'img/hero-1400.webp',
         'js/hero.js', 'models/puzzle.js', 'img/grain.png',
-        'design.html', 'js/designer.js', 'js/pathnet-logo.js', 'img/print-1600.webp']
+        'design.html', 'js/designer.js', 'js/home-cut.js', 'js/pathnet-logo.js', 'img/print-1600.webp']
 h = hashlib.sha1()
 for f in core[1:]:
     h.update(open(f'{SITE}/{f}', 'rb').read())

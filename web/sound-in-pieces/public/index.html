@@ -74,6 +74,28 @@ section:last-child{padding-bottom:calc(clamp(64px,8vw,120px) + env(safe-area-ins
 .gl{position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity 1.4s cubic-bezier(.2,.7,0,1);touch-action:pan-y;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .gl.orbit{cursor:grabbing}.live .gl{opacity:1}
 
+.live-cut{width:min(100%,84svh,1056px)}
+#board{width:100%;aspect-ratio:1;touch-action:pan-y pinch-zoom;user-select:none;-webkit-user-select:none}
+#board[data-interactive]{cursor:crosshair}
+#board:focus-visible{outline:2px solid var(--lime);outline-offset:4px}
+.live-cut figcaption{visibility:hidden;margin-top:12px;color:var(--dim)}
+#board[data-interactive]+figcaption{visibility:visible}
+#board image{transition:opacity 1.2s ease}
+#board.dev image{opacity:.22}
+#board g{fill:none;stroke-linecap:round;stroke-linejoin:round;transition:opacity .7s ease}
+#board .ghost{stroke:var(--lime);stroke-opacity:.75}
+#board .ghost path{animation:silhouette-in .45s ease backwards}
+#board .cut{stroke:var(--lime);transition:stroke 1.4s ease,stroke-opacity 1.4s ease,opacity .7s ease}
+#board .cut.set{stroke:#000;stroke-opacity:.8}
+#board .cut path{stroke-dasharray:1 1;stroke-dashoffset:1;animation:trace-cut .5s cubic-bezier(.5,0,.3,1) var(--t,0s) forwards}
+#board .gone{opacity:0}
+@keyframes trace-cut{to{stroke-dashoffset:0}}
+@keyframes silhouette-in{from{opacity:0}}
+@media (prefers-reduced-motion:reduce){
+  #board image,#board g,#board .cut{transition:none}
+  #board .ghost path,#board .cut path{animation:none;stroke-dasharray:none;stroke-dashoffset:0}
+}
+
 #specimen button{display:block;width:100%;padding:0;border:0;background:transparent;cursor:pointer;touch-action:manipulation}
 #specimen button:focus-visible{outline:2px solid var(--lime);outline-offset:4px}
 
@@ -127,6 +149,12 @@ body::after{content:"";position:fixed;z-index:10;inset:-120px;pointer-events:non
 </section>
 
 <section id="surface">
+  <figure class="pl live-cut">
+    <svg id="board" data-inline viewBox="0 0 368 368" role="img" aria-label="A puzzle cut generated from the Aphex logo model.">
+      <image id="print" href="img/print-1600.webp" width="368" height="368"/>
+    </svg>
+    <figcaption id="cut-help">Tap for a new cut · Drag sideways to reshape</figcaption>
+  </figure>
   <figure class="pl bleed"><img src="img/surface-1400.webp" srcset="img/surface-800.webp 800w, img/surface-1400.webp 1400w, img/surface-2000.webp 2000w, img/surface-2560.webp 2560w" sizes="100vw" width="2880" height="2304" alt="The printed face crossed by hairline cuts." class="f" loading="lazy" decoding="async"></figure>
 </section>
 
@@ -198,7 +226,7 @@ body::after{content:"";position:fixed;z-index:10;inset:-120px;pointer-events:non
 </section>
 
 <section class="door">
-  <a id="door" href="design.html" aria-label="Design your own: every piece a logo, your image on top."><svg viewBox="-.62 -.62 1.24 1.24" aria-hidden="true"><path d=""/></svg></a>
+  <a id="door" href="#board" aria-label="Return to the live puzzle cut"><svg viewBox="-.62 -.62 1.24 1.24" aria-hidden="true"><path d=""/></svg></a>
 </section>
 
 </main>
@@ -255,9 +283,32 @@ const v=$('video[data-src]'),still=matchMedia('(prefers-reduced-motion: reduce)'
 if(still)v.controls=true;
 new IntersectionObserver(([e])=>{if(e.isIntersecting){if(!v.src)v.src=v.dataset.src;if(!still)v.play().catch(()=>{})}else v.pause()},{rootMargin:'400px 0px'}).observe(v);
 
+/* Load the model once for the inline cut and the footer logo. */
+function loadScript(src){
+  return new Promise((resolve,reject)=>{
+    const script=document.createElement('script');
+    script.src=src;script.onload=resolve;script.onerror=()=>{script.remove();reject(new Error(src))};
+    document.head.append(script);
+  });
+}
+let model;
+function loadModel(){
+  if(!model)model=loadScript('js/pathnet-logo.js').catch(error=>{model=null;throw error});
+  return model;
+}
+function whenNear(element,start){
+  const observer=new IntersectionObserver(([entry])=>{
+    if(!entry.isIntersecting)return;
+    observer.unobserve(element);
+    start().catch(()=>{element.addEventListener('pointerdown',()=>start().catch(()=>{}),{once:true})});
+  },{rootMargin:'350px 0px'});
+  observer.observe(element);
+}
+whenNear($('#board'),()=>loadModel().then(()=>loadScript('js/home-cut.js')));
+
 /* the door: PathNet's logo decoder run live, wandering through its latent space, now and then a jolt */
 const door=$('#door path');
-new IntersectionObserver(([e],o)=>{if(!e.isIntersecting)return;o.disconnect();const s=document.createElement('script');s.src='js/pathnet-logo.js';s.onload=breathe;document.head.append(s)},{rootMargin:'600px 0px'}).observe(door);
+whenNear($('#door'),()=>loadModel().then(breathe));
 function breathe(){const M=window.PATHNET_LOGO;if(!M)return;
   const f16=s=>{const b=atob(s),n=b.length>>1,o=new Float32Array(n);for(let i=0;i<n;i++){const h=b.charCodeAt(2*i)|b.charCodeAt(2*i+1)<<8,e=h>>10&31,m=h&1023;o[i]=(h>>15?-1:1)*(e?(1+m/1024)*2**(e-15):m*5.960464477539063e-8)}return o};
   const L=M.layers.map(l=>({i:l.i,o:l.o,w:f16(l.w),b:f16(l.b)}));

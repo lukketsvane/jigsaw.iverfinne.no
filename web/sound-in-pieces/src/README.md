@@ -19,4 +19,6 @@ python icons.py    # piece 093 -> public/icons, public/splash, splash-links.html
 npm run model      # puzzle.glb -> public/models/puzzle.js, its print -> public/img/print-1600.webp
 ```
 
-`build.py` reads the upper melody track from `public/media/melody.mid` and embeds its pitches and velocities in the page. Taps on the 3D board, featured piece, cut field, and atlas advance the same melody one chord at a time. It loops after the last chord.
+The live cut below the homepage hero uses the designer's PathNet model to generate silhouettes, pack them and trace shared seams. Tap for a new layout or drag sideways to reshape the cut.
+
+`build.py` reads the upper melody track from `public/media/melody.mid` and embeds its pitches and velocities in the page. Taps on the live cut, 3D board, featured piece, cut field, and atlas advance the same melody one chord at a time. It loops after the last chord.
