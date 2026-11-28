@@ -15,7 +15,7 @@ and latent vector in, (n, 96, 2) controls out) and the 59 classes, and changes t
   part of the outline smoothly (Gaussian falloff, 0.2 of the extent), so an arm can lean into a gap on its own.
 * the whole latent cube is usable: amplitudes are calibrated (`calibrate`) so that random latents in [-1, 1]^18 stay
   within IoU 0.85 of the traced logo, the threshold field.py checks; checkpoints carry zlim = 1 for every class.
-* cutting rules learned on the decoder's own output: no neck under 3 mm and no two parts of the outline closer than
+* cutting rules learned on the decoder's own output: no neck under 2.8 mm and no two parts of the outline closer than
   0.7 mm, at the smallest piece size (34 mm). Where a target breaks a rule, the decoder learns the nearest shape that
   keeps it, so the board optimiser can roam the whole cube and still get cuttable logos.
 * the network predicts a displacement from the class's base outline (zero at the start) through residual blocks with
@@ -294,7 +294,7 @@ def calibrate(a):
                 A = Polygon(flatten(q, 6)); ious.append(A.intersection(ref).area / A.union(ref).area if A.is_valid else 0.)
             ious = np.array(ious)
             print(f'ag {ag:.3f} ah {ah:.3f}: IoU vs logo mean {ious.mean():.3f} p1 {np.percentile(ious, 1):.3f} min {ious.min():.3f} >=0.85 {np.mean(ious >= .85):.3%} | '
-                  f'necks < 3 mm {(dn < NECK).float().mean():.1%} (narrowest {dn.min() * SIZE_MM:.2f} mm) contacts < 0.7 mm {(dc < GAP).float().mean():.1%}', flush=True)
+                  f'necks < 2.8 mm {(dn < NECK).float().mean():.1%} (narrowest {dn.min() * SIZE_MM:.2f} mm) contacts < 0.7 mm {(dc < GAP).float().mean():.1%}', flush=True)
     fam = Family(a.ag[-1], a.ah[-1], handles=a.handles, sigma=a.sigma); pk, pz = probes(len(fam.names), zdim=fam.z); t = fam(pk, pz); b = fam(pk, torch.zeros_like(pz))
     base = fam.P[:1]; pn, pc, dn, dc = cut_rules(base)
     sheet(out / f'calibration-h{a.handles}.png', t, b, [f'v2 shape space: {a.handles} handles, sigma {a.sigma}, ag {a.ag[-1]}, ah {a.ah[-1]}; dark = target at the probe latent, red = base outline',
@@ -325,7 +325,7 @@ def evaluate(a):
              zero_latent_iou_vs_traced_logo=A0.intersection(ref).area / A0.union(ref).area, zero_latent_hausdorff_mm=ref.exterior.hausdorff_distance(A0.exterior) * SIZE_MM,
              **polygon_metrics(q, t, ref, np.zeros(len(q), int)), rms_error_mm=float(np.sqrt(((q - t) ** 2).sum(-1).mean()) * SIZE_MM),
              worst_error_mm=float(np.sqrt(((q - t) ** 2).sum(-1)).max() * SIZE_MM),
-             necks_under_3mm=float((dn < NECK - .05 / SIZE_MM).float().mean()), target_necks_under_3mm=float((tdn < NECK - .05 / SIZE_MM).float().mean()),
+             necks_under_2_8mm=float((dn < NECK - .05 / SIZE_MM).float().mean()), target_necks_under_2_8mm=float((tdn < NECK - .05 / SIZE_MM).float().mean()),
              narrowest_neck_mm=float(dn.min() * SIZE_MM), contacts_under_0_7mm=float((dc < GAP - .05 / SIZE_MM).float().mean()))
     print(json.dumps(r, indent=1))
     if a.out: Path(a.out).write_text(json.dumps(r, indent=1))

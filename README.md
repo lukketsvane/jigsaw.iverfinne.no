@@ -9,11 +9,11 @@ Lag eit kantlaust puslespel med 216 øgler. Kvar brikke har fire føter, krumma 
 Køyr frå prosjektrota med pakkane i `requirements.txt`.
 
 ```powershell
-.\.venv\Scripts\python.exe -m pathnet.lizards --seed 387 --output runs/lizards-387
+.\.venv\Scripts\python.exe -m pathnet.lizards --seed 387 --color-mode solid --output runs/lizards-387
 Start-Process runs/lizards-387/index.html
 ```
 
-`index.html` er eit sjølvstendig spel som verkar utan nett. Du kan starte med åtte lause brikker eller blande alle. `artwork.svg` og `cut.svg` har same mål og koordinatsystem. Kvar fysisk saum står éin gong i kuttefila. Standardbreidda på 298,45 mm gjeld éin repetisjon. Heile føter og halar stikk utanfor dette rektangelet. `assembly.png` viser heile puslespelet, og `detail.png` viser korleis to lause brikker møter naboane sine.
+`index.html` er eit sjølvstendig spel som verkar utan nett. Du kan starte med åtte lause brikker eller blande alle. `artwork.svg` og `cut.svg` har same mål og koordinatsystem. Kvar fysisk saum står éin gong i kuttefila. Éin repetisjon er 500 mm brei. Med heile føter og halar er kuttefila for frø 387 om lag 528 × 421 mm. `assembly.png` viser heile puslespelet, og `detail.png` viser korleis dei lause øglene passar inn.
 
 Tre kurver og 120-gradars rotasjonar definerer grunnøgla. Eit trena konvolusjonsnett lærer korleis eit elastisk ark bøyer seg rundt lokale trekkpunkt. Øgler, auge og ryggstrekar blir flytta gjennom det same periodiske feltet. Avgrensa lokale hellingar hindrar at feltet brettar seg. Kvar eksport kontrollerer dei avrunda saumane, dekninga over begge kantane og at kuttefila dannar nøyaktig dei same lukka brikkene som spelet. Fysisk passform avheng òg av materiale og snittbreidd.
 

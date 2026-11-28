@@ -868,6 +868,7 @@ def preview(pieces, file, detail=False, *, periods=None, seed=387, color_mode="g
 def generate(output, seed=387, cols=9, rows=4, width=DEFAULT_WIDTH, *,
              color_mode="gradient", run_motion=True, workers=None):
     data, cuts, report = build(seed, cols, rows, width)
+    data["color_mode"] = color_mode
     output = Path(output)
     output.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(dir=output) as scratch:

@@ -163,7 +163,7 @@ function buildBoard() {
     bounds[id] = [Math.min(...x), Math.min(...y), Math.max(...x), Math.max(...y)];
     $('shapes').append(node('path', {id: 'lizard-' + id, d: pathData(p.outline) + 'Z'}));
     let fill = p.color;
-    if (p.gradient?.stops?.length >= 2) {
+    if (puzzle.color_mode !== 'solid' && p.gradient?.stops?.length >= 2) {
       const grad = node('linearGradient', {id: 'grad-' + id, gradientUnits: 'userSpaceOnUse', x1: p.gradient.x1, y1: p.gradient.y1, x2: p.gradient.x2, y2: p.gradient.y2});
       p.gradient.stops.forEach((c, idx) => grad.append(node('stop', {offset: (idx / (p.gradient.stops.length - 1) * 100) + '%', 'stop-color': c})));
       $('shapes').append(grad);
